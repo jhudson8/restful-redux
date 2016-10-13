@@ -1,7 +1,7 @@
 redux-model-util
 ----------------
 
-Most web applications have models (or REST documents if you prefer) to fetch and perform actions on.  This project provides a suite of action creators, reducer functions, model data wrappers (your redux state data is still just a plain old object) and a React component wrapper to auto-fetch your model data.
+Most web applications have models (or REST documents if you prefer) to fetch and perform actions on.  This project provides a suite of action creators, reducer functions, model data wrappers (your redux state data is still just a plain old object) and a React component wrapper to auto-fetch your model data and provide consistency in your application code.
 
 Middleware requirements
 - [redux-effects-fetch](https://github.com/redux-effects/redux-effects-fetch): XHR fetch actions are handled using this
