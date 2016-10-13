@@ -11,6 +11,14 @@ Middleware requirements
 ```
 npm install --save redux-model-util redux-effects redux-effects-fetch redux-multi
 ```
+And apply the middleware dependencies
+```
+import effects from 'redux-effects';
+import fetch from 'redux-effects-fetch';
+import multi from 'redux-multi';
+
+applyMiddleware(multi, effects, fetch);
+```
 
 ## Usage
 
