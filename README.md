@@ -25,10 +25,14 @@ applyMiddleware(multi, effects, fetch);
 ### Reducer
 ```javascript
 import { modelReducer } from 'redux-model-util';
-const customerModelReducer = modelReducer('CUSTOMER');  // "CUSTOMER" is the example action prefix that would match what is provided to the action creator
 
+// "CUSTOMER" is the example action prefix that would match what is provided to the action creator
+const customerModelReducer = modelReducer('CUSTOMER');
+
+// in this example, this reducer would be included using redux combineReducers with the `customers` attribute
 export default function (state = {}, action) {
-  // note the provided reducer utility function *is not actually a reducer* as it will return false if no operation was performed
+  // note the provided reducer utility function *is not actually a reducer*
+  // because it will return false if no operation was performed - your reducer must always return state
   const newState = customerModelReducer(state, action);
   if (newState) {
     return newState;
@@ -65,7 +69,8 @@ import myCustomerActionCreator from '...';
 // redux mapStateToProps smart component function
 function mapStateToProps (state) {
   return {
-    customers: state.customers // this should match the state (or sub-state using combineReducer) for the model reducer (refer to "Reducer" example)
+    // `custoemrs` should match the state for the model reducer (refer to "Reducer" example)
+    customers: state.customers
   }
 }
 
