@@ -7,6 +7,13 @@ Middleware requirements
 - [redux-effects-fetch](https://github.com/redux-effects/redux-effects-fetch): XHR fetch actions are handled using this
 - [redux-multi](https://github.com/ashaffer/redux-multi): actions to be dispatched can be arrays
 
+The idea is to put some structure around common redux needs
+- there is a common pattern seen in web apps in the fact that data needs to be fetched asynchronously
+- redux state needs to represent the fetching/fetched state if the UI should represent that state
+- action types need to match up with reducer expectations
+- model data needs to match a location that the components are looking for them in `mapStateToProps`
+- smart component would (usually) want to fetch the model data if it isn’t present
+
 ## Installation
 ```
 npm install --save redux-model-util redux-effects redux-effects-fetch redux-multi
