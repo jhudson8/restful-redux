@@ -92,8 +92,10 @@ function mapDispatchToProps (dispatch) {
 // think of this example as a smart component that ensures the model data is fetched and the model is provided as a prop value
 export default connect(mapStateToProps, mapDispatchToProps)(
   componentUtil.modelFetcher(MyCustomerDumbComponent, {
-    id: 'params.id', // the property path to find the model id (this example would get the id from props.params.id)
-    models: 'customers', // should match the property passed with `mapStateToProps` representing the models domain object
+    // the property path to find the model id (this example would get the id from props.params.id)
+    id: 'params.id',
+    // should match the property name passed with `mapStateToProps` representing the models domain object
+    models: 'customers',
   });
 );
 
