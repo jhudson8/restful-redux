@@ -16,6 +16,8 @@ function mapStateToProps (state) {
 // redux mapDispatchToProps smart component function
 function mapDispatchToProps (dispatch) {
   return {
+    // a `fetch` property is required and will be used to initiate the fetch
+    // the property name can be overridden using the `fetchProp` modelFetcher option
     fetch: id => dispatch(fetch(id))
   };
 }

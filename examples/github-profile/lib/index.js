@@ -4,7 +4,7 @@ import { createStore, combineReducers, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 import { Router, Route, browserHistory } from 'react-router';
 
-// our customer application stuff
+// our custom application stuff
 import middleware from './middleware';
 import reducers from './reducers';
 import ProfilePage from './profile-page';
