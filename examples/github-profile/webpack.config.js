@@ -17,7 +17,7 @@ module.exports = {
   module: {
     loaders: [
       {
-        test: /\.jsx?$/,
+        test: /\.js$/,
         include: __dirname,
         loader: 'babel',
         query: {
@@ -25,21 +25,12 @@ module.exports = {
           cacheDirectory: true,
           presets: ['react', 'es2015', 'stage-2']
         }
-      },
-      { test: /\.css/, loaders: ['style-loader', 'css-loader'] },
-      { test: /\.less$/,
-        loader: 'style!css!less' },
-      { test: /\.woff(2)?$/,
-        loader: 'url-loader?limit=10000&minetype=application/font-woff' },
-      { test: /\.(ttf|eot|svg|png|jpg)$/,
-        loader: 'file-loader' },
-      { test: /\.json$/,
-        loader: 'json-loader' }
+      }
     ]
   },
   resolve: {
     modulesDirectories: ['node_modules'],
-    extensions: ['', '.js', '.jsx']
+    extensions: ['', '.js']
   },
   plugins: [
     // Clean
@@ -47,9 +38,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       inject: 'body',
       template: path.join(__dirname, 'lib', 'index.html')
-    }),
-    // if we're using moment, only include en bundle
-    new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en\.js$/)
+    })
   ],
 
   devServer: {
