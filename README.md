@@ -98,8 +98,8 @@ export default connect(mapStateToProps, mapDispatchToProps)(
     id: 'params.id',
     // should match the property name passed with `mapStateToProps` representing the models domain object
     // `customers` should match the reducer sub-state (the Reducer example would be merged using combineReducers)
-    models: 'customers',
-  });
+    models: 'customers'
+  })
 );
 
 // an additional `id` and `model` property will be provided to your dumb component
