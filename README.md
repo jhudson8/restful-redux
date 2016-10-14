@@ -36,7 +36,10 @@ import { modelReducer } from 'redux-model-util';
 // "CUSTOMER" is the example action prefix that would match what is provided to the action creator
 const customerModelReducer = modelReducer('CUSTOMER');
 
-// in this example, this reducer would be included using redux combineReducers with the `customers` attribute
+// if you don't have any additional domain specific action types, just use the line below
+// export default customerModelReducer;
+
+// or if you do have additional action types to handle
 export default function (state = {}, action) {
 
   const newState = customerModelReducer(state, action);
@@ -45,7 +48,6 @@ export default function (state = {}, action) {
   }
 
   // add your own reducer logic here or, if you have no additional action types to work with
-  // export default customerModelReducer;
 }
 ```
 
