@@ -14,6 +14,8 @@ The idea is to put some structure around common redux needs
 - model data needs to match a location that the components are looking for them in `mapStateToProps`
 - smart component would (usually) want to fetch the model data if it isn’t present
 
+[See example application using the Github profile API](./examples/github-profile)
+
 ## Installation
 ```
 npm install --save redux-model-util redux-effects redux-effects-fetch redux-multi

@@ -2,6 +2,7 @@
 import { actionCreator } from 'redux-model-util';
 const profileActionCreator = actionCreator('PROFILE');
 
+// fetch a github profile designed by the provided id
 export function fetch (id) {
   return profileActionCreator.createFetchAction({
     id: id,
