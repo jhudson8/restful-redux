@@ -23,9 +23,22 @@ var savedInitialState1 = JSON.parse(JSON.stringify(initialState1));
 describe('reducer-util', function () {
   var fooActionHandler = reducer('FOO');
 
+  it ('should return provided state for N/A action type', function () {
+    var state = fooActionHandler(emptyState, {
+      type: 'BAR_FETCH_SUCCESS',
+      payload: {
+        __meta: {
+          id: '1'
+        },
+        foo: 'bar'
+      }
+    });
+    expect(state).to.equal(emptyState);
+  });
+
   describe('FETCH_SUCCESS', function () {
     it ('should handle empty state', function () {
-      var state = fooActionHandler({
+      var state = fooActionHandler(emptyState, {
         type: 'FOO_FETCH_SUCCESS',
         payload: {
           __meta: {
@@ -33,7 +46,7 @@ describe('reducer-util', function () {
           },
           foo: 'bar'
         }
-      }, emptyState);
+      });
       expect(emptyState).to.deep.equal(savedEmptyState);
       expect(state).to.deep.equal({
         index: {
@@ -50,7 +63,7 @@ describe('reducer-util', function () {
     });
 
     it('should update an existing model but keep existing custom meta properties', function () {
-      var state = fooActionHandler({
+      var state = fooActionHandler(initialState1, {
         type: 'FOO_FETCH_SUCCESS',
         payload: {
           __meta: {
@@ -58,7 +71,7 @@ describe('reducer-util', function () {
           },
           foo: 'bar'
         }
-      }, initialState1);
+      });
       expect(initialState1).to.deep.equal(savedInitialState1);
       expect(state).to.deep.equal({
         index: {
@@ -79,14 +92,14 @@ describe('reducer-util', function () {
 
   describe('FETCH_PENDING', function () {
     it('should handle empty state', function () {
-      var state = fooActionHandler({
+      var state = fooActionHandler(emptyState, {
         type: 'FOO_FETCH_PENDING',
         payload: {
           __meta: {
             id: '1'
           }
         }
-      }, emptyState);
+      });
       expect(emptyState).to.deep.equal(savedEmptyState);
       expect(state).to.deep.equal({
         index: {
@@ -102,12 +115,12 @@ describe('reducer-util', function () {
       });
     });
     it('should accept id outside of __meta', function () {
-      var state = fooActionHandler({
+      var state = fooActionHandler(emptyState, {
         type: 'FOO_FETCH_PENDING',
         payload: {
           id: '1'
         }
-      }, emptyState);
+      });
       expect(emptyState).to.not.equal(state);
       expect(state).to.deep.equal({
         index: {
@@ -123,14 +136,14 @@ describe('reducer-util', function () {
       });
     });
     it('should clear out current model details and set new state', function () {
-      var state = fooActionHandler({
+      var state = fooActionHandler(initialState1, {
         type: 'FOO_FETCH_PENDING',
         payload: {
           __meta: {
             id: '1'
           }
         }
-      }, initialState1);
+      });
       expect(initialState1).to.deep.equal(savedInitialState1);
       expect(state).to.deep.equal({
         index: {
@@ -151,7 +164,7 @@ describe('reducer-util', function () {
 
   describe('FETCH_ERROR', function () {
     it('should handle empty state', function () {
-      var state = fooActionHandler({
+      var state = fooActionHandler(emptyState, {
         type: 'FOO_FETCH_ERROR',
         payload: {
           __meta: {
@@ -159,7 +172,7 @@ describe('reducer-util', function () {
           },
           code: 'bad'
         }
-      }, emptyState);
+      });
       expect(emptyState).to.deep.equal(savedEmptyState);
       expect(state).to.deep.equal({
         index: {
@@ -178,13 +191,13 @@ describe('reducer-util', function () {
       });
     });
     it('should accept id outside of __meta', function () {
-      var state = fooActionHandler({
+      var state = fooActionHandler(emptyState, {
         type: 'FOO_FETCH_ERROR',
         payload: {
           id: '1',
           code: 'bad'
         }
-      }, emptyState);
+      });
       expect(emptyState).to.deep.equal(savedEmptyState);
       expect(state).to.deep.equal({
         index: {
@@ -204,7 +217,7 @@ describe('reducer-util', function () {
       });
     });
     it('should clear out current model details and set new state', function () {
-      var state = fooActionHandler({
+      var state = fooActionHandler(initialState1, {
         type: 'FOO_FETCH_ERROR',
         payload: {
           __meta: {
@@ -212,7 +225,7 @@ describe('reducer-util', function () {
           },
           code: 'bad'
         }
-      }, initialState1);
+      });
       expect(initialState1).to.deep.equal(savedInitialState1);
       expect(state).to.deep.equal({
         index: {
@@ -236,7 +249,7 @@ describe('reducer-util', function () {
 
   describe('ACTION_SUCCESS', function () {
     it('should handle empty state', function () {
-      var state = fooActionHandler({
+      var state = fooActionHandler(emptyState, {
         type: 'FOO_ACTION_SUCCESS',
         payload: {
           __meta: {
@@ -245,7 +258,7 @@ describe('reducer-util', function () {
           },
           foo: 'bar'
         }
-      }, emptyState);
+      });
       expect(emptyState).to.deep.equal(savedEmptyState);
       expect(state).to.deep.equal({
         index: {
@@ -264,7 +277,7 @@ describe('reducer-util', function () {
       });
     });
     it('should clear out current model details and set new state', function () {
-      var state = fooActionHandler({
+      var state = fooActionHandler(initialState1, {
         type: 'FOO_ACTION_SUCCESS',
         payload: {
           __meta: {
@@ -273,7 +286,7 @@ describe('reducer-util', function () {
           },
           foo: 'bar'
         }
-      }, initialState1);
+      });
       expect(initialState1).to.deep.equal(savedInitialState1);
       expect(state).to.deep.equal({
         index: {
@@ -300,7 +313,7 @@ describe('reducer-util', function () {
 
   describe('ACTION_PENDING', function () {
     it('should handle empty state', function () {
-      var state = fooActionHandler({
+      var state = fooActionHandler(emptyState, {
         type: 'FOO_ACTION_PENDING',
         payload: {
           __meta: {
@@ -308,7 +321,7 @@ describe('reducer-util', function () {
             actionId: 'bar'
           }
         }
-      }, emptyState);
+      });
       expect(emptyState).to.deep.equal(savedEmptyState);
       expect(state).to.deep.equal({
         index: {
@@ -324,7 +337,7 @@ describe('reducer-util', function () {
       });
     });
     it('should work with existing model', function () {
-      var state = fooActionHandler({
+      var state = fooActionHandler(initialState1, {
         type: 'FOO_ACTION_PENDING',
         payload: {
           __meta: {
@@ -332,7 +345,7 @@ describe('reducer-util', function () {
             actionId: 'bar'
           }
         }
-      }, initialState1);
+      });
       expect(initialState1).to.deep.equal(savedInitialState1);
       expect(state).to.deep.equal({
         index: {
@@ -355,7 +368,7 @@ describe('reducer-util', function () {
 
   describe('ACTION_ERROR', function () {
     it('should handle empty state', function () {
-      var state = fooActionHandler({
+      var state = fooActionHandler(emptyState, {
         type: 'FOO_ACTION_ERROR',
         payload: {
           __meta: {
@@ -364,7 +377,7 @@ describe('reducer-util', function () {
           },
           abc: 'def'
         }
-      }, emptyState);
+      });
       expect(emptyState).to.deep.equal(savedEmptyState);
       expect(state).to.deep.equal({
         index: {
@@ -383,7 +396,7 @@ describe('reducer-util', function () {
       });
     });
     it('should work with existing model', function () {
-      var state = fooActionHandler({
+      var state = fooActionHandler(initialState1, {
         type: 'FOO_ACTION_ERROR',
         payload: {
           __meta: {
@@ -392,7 +405,7 @@ describe('reducer-util', function () {
           },
           abc: 'def'
         }
-      }, initialState1);
+      });
       expect(initialState1).to.deep.equal(savedInitialState1);
       expect(state).to.deep.equal({
         index: {
@@ -419,7 +432,7 @@ describe('reducer-util', function () {
 
   describe('ACTION_CLEAR', function () {
     it('should handle empty state', function () {
-      var state = fooActionHandler({
+      var state = fooActionHandler(emptyState, {
         type: 'FOO_ACTION_CLEAR',
         payload: {
           __meta: {
@@ -427,7 +440,7 @@ describe('reducer-util', function () {
             actionId: 'bar'
           }
         }
-      }, emptyState);
+      });
       expect(emptyState).to.deep.equal(savedEmptyState);
       expect(state).to.deep.equal({
         index: {
@@ -441,7 +454,7 @@ describe('reducer-util', function () {
       });
     });
     it('should work with existing model', function () {
-      var state = fooActionHandler({
+      var state = fooActionHandler(initialState1, {
         type: 'FOO_ACTION_CLEAR',
         payload: {
           __meta: {
@@ -450,7 +463,7 @@ describe('reducer-util', function () {
           },
           abc: 'def'
         }
-      }, initialState1);
+      });
       expect(initialState1).to.deep.equal(savedInitialState1);
       expect(state).to.deep.equal({
         index: {

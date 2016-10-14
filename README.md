@@ -38,14 +38,14 @@ const customerModelReducer = modelReducer('CUSTOMER');
 
 // in this example, this reducer would be included using redux combineReducers with the `customers` attribute
 export default function (state = {}, action) {
-  // note the provided reducer utility function *is not actually a reducer*
-  // because it will return false if no operation was performed - your reducer must always return state
+
   const newState = customerModelReducer(state, action);
-  if (newState) {
+  if (newState !== state) {
     return newState;
   }
 
-  // add your own reducer logic here
+  // add your own reducer logic here or, if you have no additional action types to work with
+  // export default customerModelReducer;
 }
 ```
 
@@ -76,7 +76,7 @@ import myCustomerActionCreator from '...';
 // redux mapStateToProps smart component function
 function mapStateToProps (state) {
   return {
-    // `custoemrs` should match the state for the model reducer (refer to "Reducer" example)
+    // `customers` should match the state for the model reducer (refer to "Reducer" example)
     customers: state.customers
   }
 }
