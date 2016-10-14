@@ -97,6 +97,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(
     // the property path to find the model id (this example would get the id from props.params.id)
     id: 'params.id',
     // should match the property name passed with `mapStateToProps` representing the models domain object
+    // `customers` should match the reducer sub-state (the Reducer example would be merged using combineReducers)
     models: 'customers',
   });
 );
