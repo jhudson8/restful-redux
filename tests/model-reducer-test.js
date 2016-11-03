@@ -25,7 +25,7 @@ var initialState1 = {
 var savedInitialState1 = JSON.parse(JSON.stringify(initialState1));
 
 
-describe('reducer-util', function () {
+describe('model-reducer', function () {
   var fooReducer = reducer('foo');
 
   it ('should return provided state for N/A action type', function () {
@@ -232,7 +232,7 @@ describe('reducer-util', function () {
             foo: {
               '1': {
                 actionId: 'test',
-                actionPending: false,
+                actionSuccess: true,
                 actionResponse: {
                   foo: 'bar'
                 }
@@ -266,7 +266,7 @@ describe('reducer-util', function () {
                 fetched: 'partial',
                 customMetaProp: 'foo',
                 actionId: 'test',
-                actionPending: false
+                actionSuccess: true
               }
             }
           },

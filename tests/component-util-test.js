@@ -9,18 +9,20 @@ function Stub () {}
 describe('component-util', function () {
   const Component = modelFetcher(Stub, {
     id: 'id',
-    models: 'foo'
+    domain: 'foo'
   });
   const ComponentNestedId = modelFetcher(Stub, {
     id: 'params.id',
-    models: 'foo'
+    domain: 'foo'
   });
 
   it ('should trigger fetch when mounted', function () {
     const fetch = sinon.spy();
     const impl = shallow(React.createElement(Component, {
       id: '1',
-      foo: {},
+      entities: {
+        foo: {}
+      },
       fetch: fetch
     }));
 
@@ -33,7 +35,9 @@ describe('component-util', function () {
     const fetch = sinon.spy();
     const impl = shallow(React.createElement(ComponentNestedId, {
       params: { id: '1' },
-      foo: {},
+      entities: {
+        foo: {}
+      },
       fetch: fetch
     }));
 
@@ -46,7 +50,9 @@ describe('component-util', function () {
     const fetch = sinon.spy();
     const impl = shallow(React.createElement(Component, {
       id: '1',
-      foo: {},
+      entities: {
+        foo: {}
+      },
       fetch: fetch
     }));
 
@@ -57,7 +63,9 @@ describe('component-util', function () {
       }
     }, {
       id: '2',
-      foo: {},
+      entities: {
+        foo: {}
+      },
       fetch: fetch
     });
     expect(fetch.callCount).to.eql(2);
@@ -69,18 +77,9 @@ describe('component-util', function () {
     const fetch = sinon.spy();
     const impl = shallow(React.createElement(Component, {
       id: '1',
-      foo: { '1': {} },
-      fetch: fetch
-    }));
-
-    expect(fetch.callCount).to.eql(0);
-  });
-
-  it ('should not trigger fetch if model is provided directly', function () {
-    const fetch = sinon.spy();
-    const impl = shallow(React.createElement(Component, {
-      id: '1',
-      model: {},
+      entities: {
+        foo: { '1': {} }
+      },
       fetch: fetch
     }));
 
@@ -90,7 +89,7 @@ describe('component-util', function () {
   describe ('should obey "modelProp"', function () {
     const Component = modelFetcher(Stub, {
       id: 'id',
-      models: 'foo',
+      domain: 'foo',
       modelProp: 'bar'
     });
 
@@ -98,7 +97,9 @@ describe('component-util', function () {
       const fetch = sinon.spy();
       const impl = shallow(React.createElement(Component, {
         id: '1',
-        foo: {},
+        entities: {
+          foo: {}
+        },
         fetch: fetch,
         bar: 'test'
       }));
@@ -124,7 +125,7 @@ describe('component-util', function () {
   describe ('should obey "idProp"', function () {
     const Component = modelFetcher(Stub, {
       id: 'id',
-      models: 'foo',
+      domain: 'foo',
       idProp: 'bar'
     });
 
@@ -146,7 +147,7 @@ describe('component-util', function () {
   describe ('should obey "fetchProp"', function () {
     const Component = modelFetcher(Stub, {
       id: 'id',
-      models: 'foo',
+      domain: 'foo',
       fetchProp: 'bar'
     });
 
@@ -193,7 +194,7 @@ describe('component-util', function () {
   describe('should obey "fetchOptions"', function () {
     const Component = modelFetcher(Stub, {
       id: 'id',
-      models: 'foo',
+      domain: 'foo',
       fetchOptions: {
         abc: 'params.def',
         ghi: 'params.jkl'
