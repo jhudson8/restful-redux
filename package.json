@@ -25,7 +25,7 @@
     "react": "*"
   },
   "scripts": {
-    "test": "rm -rf .test mkdir .test && babel ./lib --out-dir .test/lib && babel ./tests --out-dir .test/tests && mocha ./.test/tests"
+    "test": "rm -rf .test mkdir .test && babel ./lib --out-dir .test/lib && babel ./action-creator --out-dir .test/action-creator && babel ./tests --out-dir .test/tests && mocha --recursive ./.test/tests"
   },
   "author": "Joe Hudson <joehud@gmail.com>",
   "license": "MIT"
