@@ -86,6 +86,21 @@ describe('component-util', function () {
     expect(fetch.callCount).to.eql(0);
   });
 
+  it ('should gracefully handle the parent state', function () {
+    const fetch = sinon.spy();
+    const impl = shallow(React.createElement(Component, {
+      id: '1',
+      entities: {
+        entities: {
+          foo: { '1': {} }
+        }
+      },
+      fetch: fetch
+    }));
+
+    expect(fetch.callCount).to.eql(0);
+  });
+
   describe ('should obey "modelProp"', function () {
     const Component = modelFetcher(Stub, {
       id: 'id',
