@@ -5,7 +5,7 @@ export default function ({ id, model }) {
   // model was provided automatically by the modelFetcher in the smart component (./index.js)
   // you will *always* get a model even if you actually have no model state data
 
-  const data = model.fetched();
+  const data = model.data();
 
   if (data) {
     // we have the data fetched

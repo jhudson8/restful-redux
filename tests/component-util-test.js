@@ -1,7 +1,7 @@
 import React from 'react';
 import sinon from 'sinon';
 import { shallow } from 'enzyme';
-import { modelFetcher } from '../src/component-util';
+var modelFetcher = require('../src/component-util').modelFetcher;
 var expect = require('chai').expect;
 
 function Stub () {}

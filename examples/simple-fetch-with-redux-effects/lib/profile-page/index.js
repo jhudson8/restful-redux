@@ -9,7 +9,7 @@ import { fetch } from './actions';
 function mapStateToProps (state) {
   return {
     // the `profiles` attribute of state would match the combineReducers attribute in ../reducer
-    profiles: state.profiles
+    entities: state.profiles
   }
 }
 
@@ -26,7 +26,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(
   componentUtil.modelFetcher(ProfilePage, {
     // react-router will give us the id as props.params.id because our route is `/profile/:id`
     id: 'params.id',
-    // should match the property name passed with `mapStateToProps` representing the models domain object
-    models: 'profiles'
+    // should match the action creator `domain` parameter (1st parameter)
+    domain: 'profile'
   })
 );

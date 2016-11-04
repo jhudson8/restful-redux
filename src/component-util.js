@@ -7,8 +7,8 @@ import Model from './model';
  * exist in the store.  A `fetch` prop value is expected to be provided with `mapDispatchToProps`
  * - Component: the "dumb" component
  */
-export function modelFetcher (_Component, options) {
-  // sanity check required fields
+function modelFetcher (_Component, options) {
+   // sanity check required fields
   ['id', 'domain'].forEach(function (key) {
     if (!options[key]) {
       throw new Error('missing "' + key + '" options value');
@@ -104,3 +104,7 @@ export function modelFetcher (_Component, options) {
     }
   });
 }
+
+module.exports = {
+  modelFetcher
+};

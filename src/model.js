@@ -7,7 +7,9 @@ export default class Model {
   constructor (options) {
     const id = this.id = options.id;
     const domain = this.domain = options.domain;
-    const entities = this.entities = options.entities || {};
+    let entities = options.entities || {};
+    // allow for the root state to be provided as entities object
+    this.entities = entities.entities || entities;
     this.options = options;
     this._meta = deepValue(entities, ['_meta', domain, id]) || {};
   }
