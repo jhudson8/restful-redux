@@ -2,7 +2,7 @@
   "name": "redux-model-util",
   "version": "0.0.2",
   "description": "",
-  "main": "index.js",
+  "main": "lib/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/jhudson8/redux-model-util.git"
@@ -25,7 +25,10 @@
     "react": "*"
   },
   "scripts": {
-    "test": "rm -rf .test mkdir .test && babel ./lib --out-dir .test/lib && babel ./action-creator --out-dir .test/action-creator && babel ./tests --out-dir .test/tests && mocha --recursive ./.test/tests"
+    "test": "rm -rf .test mkdir .test && babel src --out-dir .test/src && babel tests --out-dir .test/tests && mocha --recursive .test/tests",
+    "build": "babel src --out-dir lib",
+    "postpublish": "rm -rf lib",
+    "prepublish": "rm -rf lib && rm -rf .test && npm run build"
   },
   "author": "Joe Hudson <joehud@gmail.com>",
   "license": "MIT"

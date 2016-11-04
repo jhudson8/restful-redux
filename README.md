@@ -3,11 +3,7 @@ redux-model-util
 
 Most web applications have models (or REST documents if you prefer) to fetch and perform actions on.  And you end up writing the same DRY `FETCHING`, `SUCCESS` and `ERROR` actions and reducers for every fetch.  This project provides a suite of action creators, reducer functions, model data wrappers (your redux state data is still just a plain old object) and a React component wrapper to auto-fetch your model data and provide consistency and reduce DRY application code.
 
-Middleware requirements
-- [redux-effects-fetch](https://github.com/redux-effects/redux-effects-fetch): XHR fetch actions are handled using this
-- [redux-multi](https://github.com/ashaffer/redux-multi): actions to be dispatched can be arrays
-
-The idea is to put some structure around common redux needs
+Have you noticed these common redux needs?
 - there is a common pattern seen in web apps in the fact that data needs to be fetched asynchronously
 - redux state needs to represent data fetching/fetched state if the UI should show that state
 - action types need to match up with reducer expectations
@@ -20,6 +16,8 @@ The idea is to put some structure around common redux needs
 ```
 npm install --save redux-model-util redux-effects redux-effects-fetch redux-multi
 ```
+***note*** `redux-effects`, `redux-effects-fetch` and `redux-multi` are only required if the `reduxEffectsActionCreator` is used.
+
 And apply the middleware dependencies
 ```
 import effects from 'redux-effects';
@@ -33,18 +31,18 @@ applyMiddleware(multi, effects, fetch);
 
 ### Reducer
 ```javascript
-import { modelReducer } from 'redux-model-util';
+import { reducer } from 'redux-model-util';
 
-// "CUSTOMER" is the example action prefix that would match what is provided to the action creator
-const customerModelReducer = modelReducer('CUSTOMER');
+// "customer" is the example action prefix that would match what is provided to the action creator
+const customerReducer = modelReducer('customer');
 
 // if you don't have any additional domain specific action types, just use the line below
-// export default customerModelReducer;
+export default customerReducer;
 
 // or if you do have additional action types to handle
 export default function (state = {}, action) {
 
-  const newState = customerModelReducer(state, action);
+  const newState = customerReducer(state, action);
   if (newState !== state) {
     return newState;
   }
@@ -55,14 +53,15 @@ export default function (state = {}, action) {
 
 ### Action Creator
 ```javascript
-import { actionCreator } from 'redux-model-util';
-const customerActionCreator = actionCreator('CUSTOMER');
+import { reduxEffectsActionCreator } from 'redux-model-util';
+const customerActionCreator = actionCreator('customer');
 
 // return a redux action that will fetch and store the customer data for the provided id
 // the use of `redux-effects`, `redux-effects-fetch` and `redux-multi` is required
-// dispatched event types are `CUSTOMER_FETCH_PENDING`, `CUSTOMER_FETCH_SUCCESS`, `CUSTOMER_FETCH_ERROR`
+// dispatched event types are `customer_FETCH_PENDING`, `customer_FETCH_SUCCESS`, `customer_FETCH_ERROR`
 export function fetch (id) {
   return customerActionCreator.createFetchAction({
+    id: id,
     url: `/path/to/customer/endpoint/${id}`
   });
 }
@@ -81,7 +80,7 @@ import myCustomerActionCreator from '...';
 function mapStateToProps (state) {
   return {
     // `customers` should match the state for the model reducer (refer to "Reducer" example)
-    customers: state.customers
+    entities: state.customers
   }
 }
 
@@ -100,7 +99,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(
     id: 'params.id',
     // should match the property name passed with `mapStateToProps` representing the models domain object
     // `customers` should match the reducer sub-state (the Reducer example would be merged using combineReducers)
-    models: 'customers'
+    domain: 'customers'
   })
 );
 

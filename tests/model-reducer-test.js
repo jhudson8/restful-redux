@@ -1,5 +1,5 @@
 import sinon from 'sinon';
-import reducer from '../lib/model-reducer';
+import reducer from '../src/model-reducer';
 var expect = require('chai').expect;
 
 var emptyState = {};

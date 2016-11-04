@@ -1,5 +1,5 @@
 import sinon from 'sinon';
-import Model from '../lib/model';
+import Model from '../src/model';
 var expect = require('chai').expect;
 
 var nullEntities = undefined;

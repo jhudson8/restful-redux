@@ -1,24 +1,33 @@
-'use strict';
+/**
+ * Utility method for a consistent fetch pattern.  Return the state if applicable and false otherwise.
+ * Options
+ * - state: the reducer state
+ * - domain: the domain used to isolate the event type names
+ * - action: action
+ */
+export default function (domain) {
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-exports.default = function (domain) {
-
-  function update(state, id, entities, meta, clearModel) {
+  function update (
+    state,
+    id,
+    entities,
+    meta,
+    clearModel
+  ) {
     // make sure our necessary data structure is initialized
-    var stateEntities = state.entities || {};
+    let stateEntities = state.entities || {};
     stateEntities._meta = stateEntities._meta || {};
 
     // make sure we are immutable
     state = Object.assign({}, state);
-    state.entities = Object.assign({}, entities ? updateEntityModels(entities, stateEntities) : stateEntities);
+    state.entities = Object.assign({}, entities
+      ? updateEntityModels(entities, stateEntities)
+      : stateEntities);
     state.entities._meta = Object.assign({}, state.entities._meta);
 
     // update the metadata
     stateEntities = state.entities;
-    var metaDomain = Object.assign({}, stateEntities._meta[domain]);
+    const metaDomain = Object.assign({}, stateEntities._meta[domain]);
     stateEntities._meta[domain] = metaDomain;
     meta = Object.assign({}, metaDomain[id], meta);
 
@@ -33,7 +42,7 @@ exports.default = function (domain) {
     if (clearModel) {
       // just delete the model if this action requires it
       stateEntities[domain] = Object.assign({}, stateEntities[domain]);
-      delete stateEntities[domain][id];
+      delete(stateEntities[domain][id]);
     }
 
     return state;
@@ -98,25 +107,22 @@ exports.default = function (domain) {
       actionSuccess: undefined
     }
   }].map(function (data) {
-    return [domain + '_' + data.state, data];
+    return [`${domain}_${data.state}`, data];
   });
 
-  return function () {
-    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    var action = arguments[1];
-
-    var type = action.type;
+  return function (state = {}, action) {
+    const type = action.type;
     for (var i = 0; i < handlers.length; i++) {
       if (handlers[i][0] === type) {
         // we've got a match
-        var options = handlers[i][1];
-        var payload = action.payload;
-        var entities = payload.entities;
-        var response = payload.response;
-        var id = payload.result || payload.id;
-        var actionId = payload.actionId;
-        var meta = Object.assign({}, options.meta);
-        var responseProp = meta._responseProp;
+        const options = handlers[i][1];
+        const payload = action.payload;
+        const entities = payload.entities;
+        const response = payload.response;
+        const id = payload.result || payload.id;
+        const actionId = payload.actionId;
+        const meta = Object.assign({}, options.meta);
+        const responseProp = meta._responseProp;
 
         if (actionId) {
           meta.actionId = actionId;
@@ -126,26 +132,26 @@ exports.default = function (domain) {
           meta[responseProp] = response;
         }
 
-        return update(state, id, entities, meta, options.clearModel);
+        return update(
+          state,
+          id,
+          entities,
+          meta,
+          options.clearModel
+        );
       }
     }
     return state;
-  };
-};
+  }
+}
 
-function updateEntityModels(values, entities) {
+function updateEntityModels (values, entities) {
   var rtn = Object.assign({}, entities);
   var domainIndex = {};
-  for (var domain in values) {
+  for (let domain in values) {
     if (values.hasOwnProperty(domain)) {
       rtn[domain] = Object.assign({}, rtn[domain], values[domain]);
     }
   }
   return rtn;
-} /**
-   * Utility method for a consistent fetch pattern.  Return the state if applicable and false otherwise.
-   * Options
-   * - state: the reducer state
-   * - domain: the domain used to isolate the event type names
-   * - action: action
-   */
+}

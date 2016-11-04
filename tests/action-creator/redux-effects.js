@@ -1,5 +1,5 @@
 import sinon from 'sinon';
-import actionCreator from '../../action-creator/redux-effects';
+import actionCreator from '../../src/action-creator/redux-effects';
 var expect = require('chai').expect;
 
 var fooActionCreator = actionCreator('foo');
