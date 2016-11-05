@@ -30,7 +30,7 @@ describe('model-reducer', function () {
 
   it ('should return provided state for N/A action type', function () {
     var state = fooReducer(emptyState, {
-      type: 'BAR_FETCH_SUCCESS',
+      type: 'BAR_MODEL_FETCH_SUCCESS',
       payload: {
         __meta: {
           id: '1'
@@ -44,7 +44,7 @@ describe('model-reducer', function () {
   describe('FETCH_SUCCESS', function () {
     it('should handle empty state', function () {
       var state = fooReducer(emptyState, {
-        type: 'foo_FETCH_SUCCESS',
+        type: 'foo_MODEL_FETCH_SUCCESS',
         payload: {
           result: '1',
           entities: {
@@ -57,6 +57,8 @@ describe('model-reducer', function () {
         }
       });
       expect(emptyState).to.deep.equal(savedEmptyState);
+      // don't deal with dymanic value
+      delete state.entities._meta.foo['1'].fetchTimestamp;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
@@ -77,7 +79,7 @@ describe('model-reducer', function () {
 
     it('should update an existing model but keep existing custom meta properties', function () {
       var state = fooReducer(initialState1, {
-        type: 'foo_FETCH_SUCCESS',
+        type: 'foo_MODEL_FETCH_SUCCESS',
         payload: {
           result: '1',
           entities: {
@@ -90,6 +92,7 @@ describe('model-reducer', function () {
         }
       });;
       expect(initialState1).to.deep.equal(savedInitialState1);
+      delete state.entities._meta.foo['1'].fetchTimestamp;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
@@ -114,7 +117,7 @@ describe('model-reducer', function () {
   describe('FETCH_PENDING', function () {
     it('should handle empty state', function () {
       var state = fooReducer(emptyState, {
-        type: 'foo_FETCH_PENDING',
+        type: 'foo_MODEL_FETCH_PENDING',
         payload: { id: '1' }
       });
       expect(emptyState).to.deep.equal(savedEmptyState);
@@ -133,7 +136,7 @@ describe('model-reducer', function () {
     });
     it('should clear out current model details and set new state', function () {
       var state = fooReducer(initialState1, {
-        type: 'foo_FETCH_PENDING',
+        type: 'foo_MODEL_FETCH_PENDING',
         payload: { id: '1' }
       });
       expect(initialState1).to.deep.equal(savedInitialState1);
@@ -157,7 +160,7 @@ describe('model-reducer', function () {
   describe('FETCH_ERROR', function () {
     it('should handle empty state', function () {
       var state = fooReducer(emptyState, {
-        type: 'foo_FETCH_ERROR',
+        type: 'foo_MODEL_FETCH_ERROR',
         payload: {
           id: '1',
           response: {
@@ -184,7 +187,7 @@ describe('model-reducer', function () {
     });
     it('should clear out current model details and set new state', function () {
       var state = fooReducer(initialState1, {
-        type: 'foo_FETCH_ERROR',
+        type: 'foo_MODEL_FETCH_ERROR',
         payload: {
           id: '1',
           response: {
@@ -216,7 +219,7 @@ describe('model-reducer', function () {
   describe('ACTION_SUCCESS', function () {
     it('should handle empty state', function () {
       var state = fooReducer(emptyState, {
-        type: 'foo_ACTION_SUCCESS',
+        type: 'foo_MODEL_ACTION_SUCCESS',
         payload: {
           id: '1',
           actionId: 'test',
@@ -226,6 +229,7 @@ describe('model-reducer', function () {
         }
       });
       expect(emptyState).to.deep.equal(savedEmptyState);
+      delete state.entities._meta.foo['1'].actionTimestamp;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
@@ -244,7 +248,7 @@ describe('model-reducer', function () {
     });
     it('should clear out current model details and set new state', function () {
       var state = fooReducer(initialState1, {
-        type: 'foo_ACTION_SUCCESS',
+        type: 'foo_MODEL_ACTION_SUCCESS',
         payload: {
           id: '1',
           actionId: 'test',
@@ -258,6 +262,7 @@ describe('model-reducer', function () {
         }
       });
       expect(initialState1).to.deep.equal(savedInitialState1);
+      delete state.entities._meta.foo['1'].actionTimestamp;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
@@ -284,7 +289,7 @@ describe('model-reducer', function () {
   describe('ACTION_PENDING', function () {
     it('should handle empty state', function () {
       var state = fooReducer(emptyState, {
-        type: 'foo_ACTION_PENDING',
+        type: 'foo_MODEL_ACTION_PENDING',
         payload: {
           id: '1',
           actionId: 'bar'
@@ -306,7 +311,7 @@ describe('model-reducer', function () {
     });
     it('should work with existing model', function () {
       var state = fooReducer(initialState1, {
-        type: 'foo_ACTION_PENDING',
+        type: 'foo_MODEL_ACTION_PENDING',
         payload: {
           id: '1',
           actionId: 'bar'
@@ -339,7 +344,7 @@ describe('model-reducer', function () {
   describe('ACTION_ERROR', function () {
     it('should handle empty state', function () {
       var state = fooReducer(emptyState, {
-        type: 'foo_ACTION_ERROR',
+        type: 'foo_MODEL_ACTION_ERROR',
         payload: {
           id: '1',
           actionId: 'bar',
@@ -366,7 +371,7 @@ describe('model-reducer', function () {
     });
     it('should work with existing model', function () {
       var state = fooReducer(initialState1, {
-        type: 'foo_ACTION_ERROR',
+        type: 'foo_MODEL_ACTION_ERROR',
         payload: {
           id: '1',
           actionId: 'bar',
@@ -405,7 +410,7 @@ describe('model-reducer', function () {
   describe('ACTION_CLEAR', function () {
     it('should handle empty state', function () {
       var state = fooReducer(emptyState, {
-        type: 'foo_ACTION_CLEAR',
+        type: 'foo_MODEL_ACTION_CLEAR',
         payload: { id: '1' }
       });
       expect(emptyState).to.deep.equal(savedEmptyState);
@@ -421,7 +426,7 @@ describe('model-reducer', function () {
     });
     it('should work with existing model', function () {
       var state = fooReducer(initialState1, {
-        type: 'foo_ACTION_CLEAR',
+        type: 'foo_MODEL_ACTION_CLEAR',
         payload: { id: '1' }
       });
       expect(initialState1).to.deep.equal(savedInitialState1);
@@ -453,7 +458,7 @@ describe('model-reducer', function () {
       meta.actionError = 'bar';
       meta.actionSuccess = true;
       state = fooReducer(state, {
-        type: 'foo_ACTION_CLEAR',
+        type: 'foo_MODEL_ACTION_CLEAR',
         payload: { id: '1' }
       });
       expect(initialState1).to.deep.equal(savedInitialState1);

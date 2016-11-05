@@ -1,5 +1,5 @@
 import React from 'react';
-import { deepPropValue } from './common-util';
+import { deepPropValue, checkRequiredOptions } from './common-util';
 import Model from './model';
 
 /**
@@ -8,12 +8,8 @@ import Model from './model';
  * - Component: the "dumb" component
  */
 function modelFetcher (_Component, options) {
-   // sanity check required fields
-  ['id', 'domain'].forEach(function (key) {
-    if (!options[key]) {
-      throw new Error('missing "' + key + '" options value');
-    }
-  });
+  checkRequiredOptions(['id', 'domain'], options);
+
   if (!_Component) {
     throw new Error('Undefined modelFetcher component');
   }

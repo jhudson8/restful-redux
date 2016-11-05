@@ -7,19 +7,29 @@
  */
 export default function (domain) {
 
-  function update (
+  function update ({
     state,
     id,
+    result,
     entities,
     meta,
-    clearModel
-  ) {
+    clear,
+    type
+  }) {
+    var isCollection = type === 'COLLECTION';
+    const _domain = isCollection ? `${domain}Collection` : domain;
+
     // make sure our necessary data structure is initialized
     let stateEntities = state.entities || {};
     stateEntities._meta = stateEntities._meta || {};
 
     // make sure we are immutable
     state = Object.assign({}, state);
+    if (isCollection && result) {
+      // our collection entity value is the results
+      entities = entities || {};
+      entities[_domain][id] = result;
+    }
     state.entities = Object.assign({}, entities
       ? updateEntityModels(entities, stateEntities)
       : stateEntities);
@@ -27,8 +37,8 @@ export default function (domain) {
 
     // update the metadata
     stateEntities = state.entities;
-    const metaDomain = Object.assign({}, stateEntities._meta[domain]);
-    stateEntities._meta[domain] = metaDomain;
+    const metaDomain = Object.assign({}, stateEntities._meta[_domain]);
+    stateEntities._meta[_domain] = metaDomain;
     meta = Object.assign({}, metaDomain[id], meta);
 
     // clear out any undefined fields
@@ -39,7 +49,7 @@ export default function (domain) {
     }
     metaDomain[id] = meta;
 
-    if (clearModel) {
+    if (clear) {
       // just delete the model if this action requires it
       stateEntities[domain] = Object.assign({}, stateEntities[domain]);
       delete(stateEntities[domain][id]);
@@ -49,65 +59,89 @@ export default function (domain) {
   }
 
   // prepare the action types that we'll be looking for
-  var handlers = [{
-    state: 'FETCH_SUCCESS',
-    meta: {
-      fetched: 'full',
-      fetchPending: undefined,
-      fetchError: undefined,
-      actionId: undefined,
-      actionPending: undefined,
-      actionSuccess: undefined,
-      actionError: undefined,
-      actionResponse: undefined
-    }
-  }, {
-    state: 'FETCH_PENDING',
-    clearModel: true,
-    meta: {
-      fetched: undefined,
-      fetchPending: true
-    }
-  }, {
-    state: 'FETCH_ERROR',
-    clearModel: true,
-    meta: {
-      _responseProp: 'fetchError',
-      fetched: false,
-      fetchPending: undefined
-    }
-  }, {
-    state: 'ACTION_ERROR',
-    meta: {
-      _responseProp: 'actionError',
-      actionPending: undefined
-    }
-  }, {
-    state: 'ACTION_PENDING',
-    meta: {
-      actionPending: true,
-      actionError: undefined,
-      actionResponse: undefined
-    }
-  }, {
-    state: 'ACTION_SUCCESS',
-    meta: {
-      _responseProp: 'actionResponse',
-      actionPending: undefined,
-      actionError: undefined,
-      actionSuccess: true
-    }
-  }, {
-    state: 'ACTION_CLEAR',
-    meta: {
-      actionId: undefined,
-      actionPending: undefined,
-      actionError: undefined,
-      actionResponse: undefined,
-      actionSuccess: undefined
-    }
-  }].map(function (data) {
-    return [`${domain}_${data.state}`, data];
+  var handlers = [];
+  ['MODEL', 'COLLECTION'].forEach(function (type) {
+    Array.prototype.push.apply(handlers, [{
+      state: `${type}_FETCH_SUCCESS`,
+      meta: {
+        fetched: 'full',
+        _timestamp: 'fetch',
+        fetchPending: undefined,
+        fetchError: undefined,
+        actionId: undefined,
+        actionPending: undefined,
+        actionSuccess: undefined,
+        actionError: undefined,
+        actionResponse: undefined
+      }
+    }, {
+      // same as FETCH_SUCCESS but if more semantically correct if we're setting manually
+      state: `${type}_SET`,
+      meta: {
+        fetched: 'full',
+        _timestamp: 'fetch',
+        fetchPending: undefined,
+        fetchError: undefined,
+        actionId: undefined,
+        actionPending: undefined,
+        actionSuccess: undefined,
+        actionError: undefined,
+        actionResponse: undefined
+      }
+    }, {
+      state: `${type}_FETCH_PENDING`,
+      clear: true,
+      meta: {
+        fetched: undefined,
+        fetchTimestamp: undefined,
+        fetchPending: true
+      }
+    }, {
+      state: `${type}_FETCH_ERROR`,
+      clear: true,
+      meta: {
+        _responseProp: 'fetchError',
+        fetched: false,
+        fetchPending: undefined
+      }
+    }, {
+      state: `${type}_ACTION_ERROR`,
+      meta: {
+        _responseProp: 'actionError',
+        actionPending: undefined
+      }
+    }, {
+      state: `${type}_ACTION_PENDING`,
+      meta: {
+        actionPending: true,
+        actionTimestamp: undefined,
+        actionError: undefined,
+        actionResponse: undefined
+      }
+    }, {
+      state: `${type}_ACTION_SUCCESS`,
+      meta: {
+        _responseProp: 'actionResponse',
+        _timestamp: 'action',
+        actionPending: undefined,
+        actionError: undefined,
+        actionSuccess: true
+      }
+    }, {
+      state: `${type}_ACTION_CLEAR`,
+      meta: {
+        actionId: undefined,
+        actionPending: undefined,
+        actionTimestamp: undefined,
+        actionError: undefined,
+        actionResponse: undefined,
+        actionSuccess: undefined,
+        actionTimestamp: undefined
+      }
+    }].map(function (data) {
+      data.type = type;
+      return [`${domain}_${data.state}`, data];
+    }))
   });
 
   return function (state = {}, action) {
@@ -119,10 +153,12 @@ export default function (domain) {
         const payload = action.payload;
         const entities = payload.entities;
         const response = payload.response;
-        const id = payload.result || payload.id;
+        const result = payload.result;
+        const id = payload.id || result;
         const actionId = payload.actionId;
         const meta = Object.assign({}, options.meta);
         const responseProp = meta._responseProp;
+        const timestampProp = meta._timestamp;
 
         if (actionId) {
           meta.actionId = actionId;
@@ -131,14 +167,20 @@ export default function (domain) {
           delete meta._responseProp;
           meta[responseProp] = response;
         }
+        if (timestampProp) {
+          delete meta._timestamp;
+          meta[`${timestampProp}Timestamp`] = new Date().getTime();
+        }
 
-        return update(
+        return update({
           state,
           id,
+          result,
           entities,
           meta,
-          options.clearModel
-        );
+          clear: options.clear,
+          type: options.type,
+        });
       }
     }
     return state;

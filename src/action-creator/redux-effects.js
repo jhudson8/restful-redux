@@ -1,11 +1,13 @@
+import { checkRequiredOptions } from '../common-util';
+
 /**
  * IMPORTANT: Usage of [multi](https://github.com/ashaffer/redux-multi) middleware or a lib of similar nature is required
  */
-const FETCH = 'FETCH';
-const ACTION = 'ACTION';
+const MODEL_FETCH = 'MODEL_FETCH';
+const MODEL_ACTION = 'MODEL_ACTION';
 const SUCCESS = 'SUCCESS';
 const ERROR = 'ERROR';
-const PENDING = 'PENDING';
+const MODEL_PENDING = 'MODEL_PENDING';
 
 export default function (
   domain, // the domain key used for all of the event type values
@@ -24,21 +26,24 @@ export default function (
      * parameters include
      * - domain:
      */
-    createFetchAction: function ({
-      id, // the model id (to be added to the payloads for the reducer)
-      url, // the endpoint URI
-      payload, // [effects-fetch payload](https://github.com/redux-effects/redux-effects-fetch#creating-a-user)
-      format, // function used to format the response - must respond with { result: _id_, entries: { _domain_: { _id_: {...} } } }
-      onSuccess,
-      onError
-    }) {
+    modelFetchAction: function (options) {
+      checkRequiredOptions(['id', 'url'], options);
+
+      let {
+        id, // the model id (to be added to the payloads for the reducer)
+        url, // the endpoint URI
+        payload, // [effects-fetch payload](https://github.com/redux-effects/redux-effects-fetch#creating-a-user)
+        format, // function used to format the response - must respond with { result: _id_, entries: { _domain_: { _id_: {...} } } }
+        onSuccess,
+        onError
+      } = options;
       return [
         createPendingAction(domain, id),
         bind(
           fetch(url, payload),
           asyncResponseAction({
             domain: domain,
-            fetchOrAction: FETCH,
+            fetchOrAction: MODEL_FETCH,
             type: SUCCESS,
             id: id,
             format: format,
@@ -46,7 +51,7 @@ export default function (
           }),
           asyncResponseAction({
             domain: domain,
-            fetchOrAction: FETCH,
+            fetchOrAction: MODEL_FETCH,
             type: ERROR,
             id: id,
             format: format,
@@ -85,7 +90,7 @@ export default function (
           fetch(url, payload),
           asyncResponseAction({
             domain: domain,
-            fetchOrAction: ACTION,
+            fetchOrAction: MODEL_ACTION,
             type: SUCCESS,
             id: id,
             actionId: actionId,
@@ -98,7 +103,7 @@ export default function (
           }),
           asyncResponseAction({
             domain: domain,
-            fetchOrAction: ACTION,
+            fetchOrAction: MODEL_ACTION,
             type: ERROR,
             id: id,
             actionId: actionId,
@@ -136,7 +141,7 @@ export default function (
           promise.then(function (value) {
             dispatch(asyncResponseAction({
               domain: domain,
-              fetchOrAction: ACTION,
+              fetchOrAction: MODEL_ACTION,
               type: SUCCESS,
               id: id,
               actionId: actionId,
@@ -145,7 +150,7 @@ export default function (
           }, function (value) {
             dispatch(asyncResponseAction({
               domain: domain,
-              fetchOrAction: ACTION,
+              fetchOrAction: MODEL_ACTION,
               type: ERROR,
               id: id,
               actionId: actionId,
@@ -218,7 +223,7 @@ function asyncResponseAction ({
 
 // create a dispatchable action that represents a pending model/REST document action
 function createPendingAction (domain, id, actionId) {
-  const type = actionId ? ACTION : FETCH;
+  const type = actionId ? MODEL_ACTION : MODEL_FETCH;
   const payload = { id };
   if (actionId) {
     payload.actionId = actionId;

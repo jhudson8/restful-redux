@@ -5,3 +5,11 @@ export function deepPropValue (parts, parent) {
   }
   return parent;
 }
+
+export function checkRequiredOptions (keys, options) {
+  keys.forEach(function (key) {
+    if (!options[key]) {
+      throw new Error('missing "' + key + '" options value');
+    }
+  });
+}
