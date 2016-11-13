@@ -1,8 +1,18 @@
 import sinon from 'sinon';
 import actionCreator from '../../src/action-creator/redux-effects';
+import { normalize, Schema, arrayOf } from 'normalizr';
 var expect = require('chai').expect;
 
-var fooActionCreator = actionCreator('foo');
+var personSchema = new Schema('people');
+var fooSchema = new Schema('foo');
+fooSchema.define({
+  author: personSchema
+});
+
+var fooActionCreator = actionCreator('foo', { normalize: normalize });
+var normalizedFooActionCreator = actionCreator('foo', {
+  normalize: normalize
+});
 
 describe('redux-effects-action-creator', function () {
   // TODO add tests for formatter and normalizr
@@ -47,6 +57,46 @@ describe('redux-effects-action-creator', function () {
             foo: {
               '1': {
                 foo: 'bar'
+              }
+            }
+          }
+        }
+      });
+    });
+
+    it.only('should normalize on success event', function () {
+      var action = normalizedFooActionCreator.modelFetchAction({
+        id: '1',
+        url: 'http://foo.com/thing/1',
+        schema: fooSchema
+      });
+      var steps = action[1].meta.steps[0];
+      var successAction = steps[0]({ value: {
+        id: '1',
+        foo: 'bar',
+        author: {
+          id: '1',
+          firstName: 'Joe',
+          lastName: 'Hudson'
+        }
+      }});
+      expect(successAction).to.deep.equal({
+        type: 'foo_MODEL_FETCH_SUCCESS',
+        payload: {
+          result: '1',
+          entities: {
+            people: {
+              '1': {
+                id: '1',
+                firstName: 'Joe',
+                lastName: 'Hudson'
+              }
+            },
+            foo: {
+              '1': {
+                id: '1',
+                foo: 'bar',
+                author: '1'
               }
             }
           }

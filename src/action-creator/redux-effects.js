@@ -16,6 +16,68 @@ export default function (
   options = options || {};
   const normalize = options.normalize;
 
+  // return a callback handler which includes the provided id in the payload as a top level attribute
+  function asyncResponseAction ({
+    domain,
+    fetchOrAction,
+    type,
+    id,
+    actionId,
+    replaceModel,
+    schema,
+    formatter,
+    callback,
+    clearAfter
+  }) {
+    return function (response) {
+      callback && callback(response.value);
+      // response is assumed to be in [normalize](https://github.com/paularmstrong/normalize) format of
+      // {result: _id_, entities: {_domain_: {_id_: ...}}}
+      let payload = response.value;
+      if (type === SUCCESS) {
+        if (!actionId || replaceModel) {
+          if (formatter) {
+            payload = formatter(payload, id, domain);
+          }
+          if (schema && normalize) {
+            payload = normalize(payload, schema);
+          } else if (!formatter) {
+            payload = defaultFormat(payload, id, domain);
+          }
+        } else {
+          payload = {
+            id: id,
+            response: formatter
+              ? formatter(response.value, id, actionId, domain)
+              : response.value
+          };
+        }
+      } else {
+        payload = { id: id, response: response.value };
+      }
+      if (actionId) {
+        payload.actionId = actionId;
+      }
+      const action = createAction(`${domain}_${fetchOrAction}_${type}`, payload);
+
+      if (clearAfter) {
+        // requires `redux-thunk`
+        return [action, function (dispatch) {
+          setTimeout(function () {
+            dispatch(asyncResponseAction ({
+              domain,
+              fetchOrAction,
+              type: 'CLEAR',
+              id
+            }));
+          }, clearAfter);
+        }];
+      } else {
+        return action;
+      }
+    }
+  }
+
   return {
     /* return the action to be dispatched when a model/REST document should be fetched
      * - FETCH_SUCCESS_{domain}: the data was retrieved successfully
@@ -118,68 +180,6 @@ export default function (
   };
 }
 
-
-// return a callback handler which includes the provided id in the payload as a top level attribute
-function asyncResponseAction ({
-  domain,
-  fetchOrAction,
-  type,
-  id,
-  actionId,
-  replaceModel,
-  schema,
-  formatter,
-  callback,
-  clearAfter
-}) {
-  return function (response) {
-    callback && callback(response.value);
-    // response is assumed to be in [normalize](https://github.com/paularmstrong/normalize) format of
-    // {result: _id_, entities: {_domain_: {_id_: ...}}}
-    let payload = response.value;
-    if (type === SUCCESS) {
-      if (!actionId || replaceModel) {
-        if (formatter) {
-          payload = formatter(payload);
-        }
-        if (schema && normalize) {
-          payload = normalize(schema, payload);
-        } else if (!formatter) {
-          payload = defaultFormat(payload, id, domain);
-        }
-      } else {
-        payload = {
-          id: id,
-          response: formatter
-            ? formatter(response.value, id, actionId, domain)
-            : response.value
-        };
-      }
-    } else {
-      payload = { id: id, response: response.value };
-    }
-    if (actionId) {
-      payload.actionId = actionId;
-    }
-    const action = createAction(`${domain}_${fetchOrAction}_${type}`, payload);
-
-    if (clearAfter) {
-      // requires `redux-thunk`
-      return [action, function (dispatch) {
-        setTimeout(function () {
-          dispatch(asyncResponseAction ({
-            domain,
-            fetchOrAction,
-            type: 'CLEAR',
-            id
-          }));
-        }, clearAfter);
-      }];
-    } else {
-      return action;
-    }
-  }
-}
 
 // create a dispatchable action that represents a pending model/REST document action
 function createPendingAction (domain, id, actionId) {
