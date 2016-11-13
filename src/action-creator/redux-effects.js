@@ -14,11 +14,10 @@ export default function (
   options // { actions: {}}; action response formatters
 ) {
   options = options || {};
-  const normalize = options.normalize;
+  const normalizr = options.normalizr;
   const schema = options.schema;
 
   return {
-
     /* return the action to be dispatched when a model/REST document should be fetched
      * - FETCH_SUCCESS_{domain}: the data was retrieved successfully
      * - FETCH_ERROR_{domain}: there was an error with the request
@@ -33,7 +32,8 @@ export default function (
         id, // the model id (to be added to the payloads for the reducer)
         url, // the endpoint URI
         payload, // [effects-fetch payload](https://github.com/redux-effects/redux-effects-fetch#creating-a-user)
-        format, // function used to format the response - must respond with { result: _id_, entries: { _domain_: { _id_: {...} } } }
+        normalize, // function used to format the response - must respond with { result: _id_, entries: { _domain_: { _id_: {...} } } }
+        formatter,
         onSuccess,
         onError
       } = options;
@@ -42,19 +42,21 @@ export default function (
         bind(
           fetch(url, payload),
           asyncResponseAction({
-            domain: domain,
+            domain,
             fetchOrAction: MODEL_FETCH,
             type: SUCCESS,
-            id: id,
-            format: format,
+            id,
+            normalize,
+            formatter,
             callback: onSuccess
           }),
           asyncResponseAction({
-            domain: domain,
+            domain,
             fetchOrAction: MODEL_FETCH,
             type: ERROR,
-            id: id,
-            format: format,
+            id,
+            normalize,
+            formatter,
             callback: onError
           }),
         )
@@ -78,7 +80,8 @@ export default function (
       actionId,
       url,
       payload,
-      format,
+      normalize,
+      formatter,
       replaceModel,
       onSuccess,
       onError,
@@ -89,75 +92,31 @@ export default function (
         bind(
           fetch(url, payload),
           asyncResponseAction({
-            domain: domain,
+            domain,
             fetchOrAction: MODEL_ACTION,
             type: SUCCESS,
-            id: id,
-            actionId: actionId,
-            format: format,
-            replaceModel: replaceModel,
-            normalize: normalize,
-            schema: schema,
+            id,
+            actionId,
+            replaceModel,
+            formatter,
+            normalize,
+            schema,
             callback: onSuccess,
-            clearAfter: clearAfter
+            clearAfter
           }),
           asyncResponseAction({
-            domain: domain,
+            domain,
             fetchOrAction: MODEL_ACTION,
             type: ERROR,
-            id: id,
-            actionId: actionId,
-            format: format,
-            normalize: normalize,
-            schema: schema,
+            id,
+            actionId,
+            formatter,
+            normalize,
+            schema,
             callback: onError,
-            clearAfter: clearAfter
+            clearAfter
           })
         )
-      ];
-    },
-
-    /**
-     * return the action to be dispatched when an promise-based action should be taken on a model/REST document
-     * - ACTION_SUCCESS_{domain}: the data was retrieved successfully
-     * - ACTION_ERROR_{domain}: there was an error with the request
-     * - ACTION_PENDING_{domain}: an XHR request was submitted
-     * parameters include
-     * - domain: the domain key used for all of the event type values
-     * - id: the model id (to be added to the payloads for the reducer)
-     * - promise: the promise representing the async work to do
-     * - clearAfter: clear the action results after N milliseconds (optional)
-     */
-    createPromiseAction: function ({
-      id,
-      actionId,
-      promise,
-      clearAfter
-    }) {
-      return [
-        createPendingAction(domain, id, actionId),
-        // requires `redux-thunk`
-        function (dispatch) {
-          promise.then(function (value) {
-            dispatch(asyncResponseAction({
-              domain: domain,
-              fetchOrAction: MODEL_ACTION,
-              type: SUCCESS,
-              id: id,
-              actionId: actionId,
-              clearAfter: clearAfter
-            }));
-          }, function (value) {
-            dispatch(asyncResponseAction({
-              domain: domain,
-              fetchOrAction: MODEL_ACTION,
-              type: ERROR,
-              id: id,
-              actionId: actionId,
-              clearAfter: clearAfter
-            }));
-          });
-        }
       ];
     }
   };
@@ -172,7 +131,7 @@ function asyncResponseAction ({
   id,
   actionId,
   replaceModel,
-  format,
+  formatter,
   normalize,
   schema,
   callback,
@@ -182,17 +141,25 @@ function asyncResponseAction ({
     callback && callback(response.value);
     // response is assumed to be in [normalizr](https://github.com/paularmstrong/normalizr) format of
     // {result: _id_, entities: {_domain_: {_id_: ...}}}
-    let payload;
+    let payload = response.value;
     if (type === SUCCESS) {
       if (!actionId || replaceModel) {
-        payload = (format || defaultFormat)(response.value, id, domain);
-        if (normalize && schema) {
-          payload = normalize(payload, schema);
+        if (formatter) {
+          payload = formatter(payload);
+        }
+        if (schema && normalizr) {
+          payload = normalizr(schema, payload);
+        } else if (normalize) {
+          payload = normalize(payload, id, domain);
+        } else if (!formatter) {
+          payload = defaultFormat(payload, id, domain);
         }
       } else {
         payload = {
           id: id,
-          response: format ? format(response.value, id, actionId, domain) : response.value
+          response: formatter
+            ? formatter(response.value, id, actionId, domain)
+            : response.value
         };
       }
     } else {
@@ -208,10 +175,10 @@ function asyncResponseAction ({
       return [action, function (dispatch) {
         setTimeout(function () {
           dispatch(asyncResponseAction ({
-            domain: domain,
-            fetchOrAction: fetchOrAction,
+            domain,
+            fetchOrAction,
             type: 'CLEAR',
-            id: id
+            id
           }));
         }, clearAfter);
       }];
@@ -265,11 +232,11 @@ function fetch (url = '', params = {}) {
 
 // // {result: _id_, entities: {_domain: {_id_: ...
 function defaultFormat (value, id, domain) {
-  var rtn = {
+  const rtn = {
     result: id,
     entities: {}
   };
-  var domainData = rtn.entities[domain] = {};
+  const domainData = rtn.entities[domain] = {};
   domainData[id] = value;
   return rtn;
 }

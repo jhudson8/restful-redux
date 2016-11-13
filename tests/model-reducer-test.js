@@ -129,12 +129,11 @@ describe('model-reducer', function () {
                 fetchPending: true
               }
             }
-          },
-          foo: {}
+          }
         }
       });
     });
-    it('should clear out current model details and set new state', function () {
+    it('should keep current model details and set new state', function () {
       var state = fooReducer(initialState1, {
         type: 'foo_MODEL_FETCH_PENDING',
         payload: { id: '1' }
@@ -150,7 +149,12 @@ describe('model-reducer', function () {
               }
             }
           },
-          foo: {}
+          foo: {
+            '1': {
+              foo: 'abc',
+              beep: 'boop'
+            }
+          }
         }
       });
     });

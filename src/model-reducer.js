@@ -5,7 +5,9 @@
  * - domain: the domain used to isolate the event type names
  * - action: action
  */
-export default function (domain) {
+export default function (domain, options) {
+  options = options || {};
+  const fetchType = options.fetchType = 'full';
 
   function update ({
     state,
@@ -64,7 +66,7 @@ export default function (domain) {
     Array.prototype.push.apply(handlers, [{
       state: `${type}_FETCH_SUCCESS`,
       meta: {
-        fetched: 'full',
+        fetched: fetchType,
         _timestamp: 'fetch',
         fetchPending: undefined,
         fetchError: undefined,
@@ -78,7 +80,7 @@ export default function (domain) {
       // same as FETCH_SUCCESS but if more semantically correct if we're setting manually
       state: `${type}_SET`,
       meta: {
-        fetched: 'full',
+        fetched: fetchType,
         _timestamp: 'fetch',
         fetchPending: undefined,
         fetchError: undefined,
@@ -90,7 +92,6 @@ export default function (domain) {
       }
     }, {
       state: `${type}_FETCH_PENDING`,
-      clear: true,
       meta: {
         fetched: undefined,
         fetchTimestamp: undefined,
@@ -163,6 +164,7 @@ export default function (domain) {
         if (actionId) {
           meta.actionId = actionId;
         }
+        meta.data = payload.data;
         if (responseProp) {
           delete meta._responseProp;
           meta[responseProp] = response;

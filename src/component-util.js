@@ -1,99 +1,116 @@
 import React from 'react';
 import { deepPropValue, checkRequiredOptions } from './common-util';
 import Model from './model';
+import Collection from './collection';
 
 /**
  * smart component utility function to ensure a component-specific model will be fetched if it doesn't
  * exist in the store.  A `fetch` prop value is expected to be provided with `mapDispatchToProps`
  * - Component: the "dumb" component
  */
-function modelFetcher (_Component, options) {
-  checkRequiredOptions(['id', 'domain'], options);
-
+function modelProvider (_Component, options) {
   if (!_Component) {
-    throw new Error('Undefined modelFetcher component');
+    throw new Error('Undefined modelProvider component');
   }
 
-  // property name representing the model identifier with nesting using ".";  e.g. "params.id"
-  const id = options.id.split('.');
-  // the default domain for the entities reference
-  const domain = options.domain;
-  // property name used to pass the model object to the "real" component
-  const modelProp = options.modelProp || 'model';
-  // property name used to pass the actual id value to the "real" component
-  const idProp = options.idProp || 'id';
-  // property name used to fetch the model data
-  const fetchProp = options.fetchProp || 'fetch';
-  // prop name used to provide the `entities` state object
+  // organize up our model and collection requirements
   const entitiesProp = options.entitiesProp || 'entities';
-  // object of additional data provided when fetching (key is key and value is path to value from props)
-  const fetchOptionsData = options.fetchOptions || {};
-
-  // optimize for deep fetching
-  for (var key in fetchOptionsData) {
-    if (fetchOptionsData.hasOwnProperty(key)) {
-      if (typeof fetchOptionsData[key] === 'string') {
-        fetchOptionsData[key] = fetchOptionsData[key].split('.');
-      }
+  const _models = [];
+  if (options.id) {
+    _models.push(organizeProps('modelProp', 'model', 'idProp', 'id', false, options));
+  } else if (options.models) {
+    for (let i = 0; i < options.models.length; i++) {
+      let _model = options.models[i];
+      _models.push(organizeProps('modelProp', 'model', 'idProp', 'id', false, _model));
+    }
+  }
+  if (options.collections) {
+    for (let i = 0; i < options.collections.length; i++) {
+      let _collection = options.collections[i];
+      _models.push(organizeProps('collectionProp', 'collection', true, _collection));
     }
   }
 
-  function getModelData (id, props) {
+  // optimize for deep fetching
+  _models.forEach(function (source) {
+    const data = source.fetchOptions;
+    for (let key in data) {
+      if (data.hasOwnProperty(key)) {
+        if (typeof data[key] === 'string') {
+          data[key] = data[key].split('.');
+        }
+      }
+    }
+  });
+
+  function getModelId (props, options) {
+    const id = options.id;
+    if (typeof id === 'function') {
+      return id(props);
+    } else {
+      return deepPropValue(id, props);
+    }
+  }
+
+  function getModelData (id, props, data) {
     // if a model is provided directly, we short circuit
-    if (props[modelProp]) {
-      return props[modelProp];
+    if (props[data.propName]) {
+      return props[data.propName];
     }
     let entities = props[entitiesProp];
     // gracefully handle the parent state
     entities = entities && (entities.entities || entities);
     if (entities) {
-      const domainModels = entities[domain];
+      const domainModels = entities[options.domain];
       return domainModels && domainModels[id];
     }
   }
 
-  function fetchModel (id, props) {
+  function maybeFetchModels (props) {
+    _models.forEach(function(options) {
+      if (options.fetchProp) {
+        const id = getModelId(props, options);
+        const modelData = getModelData(id, props, options);
+        if (!modelData) {
+          fetchModel(id, props, options);
+        }
+      }
+    });
+  }
+
+  function fetchModel (id, props, options) {
     const fetchOptions = {};
-    for (var key in fetchOptionsData) {
-      if (fetchOptionsData.hasOwnProperty(key)) {
-        fetchOptions[key] = deepPropValue(fetchOptionsData[key], props);
+    const fetchOptionsDef = options.fetchOptions;
+    for (var key in fetchOptionsDef) {
+      if (fetchOptionsDef.hasOwnProperty(key)) {
+        fetchOptions[key] = deepPropValue(fetchOptionsDef[key], props);
       }
     }
-    props[fetchProp](id, fetchOptions);
+    props[options.fetchProp](id, fetchOptions);
   }
 
   return React.createClass({
     componentWillMount () {
-      const props = this.props;
-      const _id = deepPropValue(id, props);
-      const modelData = getModelData(_id, props);
-      if (!modelData) {
-        // we just mounted so if we don't have model data, fetch it
-        fetchModel(_id, props);
-      }
+      maybeFetchModels(this.props);
     },
 
     componentWillReceiveProps (props) {
-      const _id = deepPropValue(id, props);
-      const prevId = deepPropValue(id, this.props);
-
-      if (prevId && prevId !== _id) {
-        var modelData = getModelData(_id, props);
-        if (!modelData) {
-          // the id changed to fetch the new model
-          fetchModel(_id, props);
-        }
-      }
+      maybeFetchModels(props, this.props);
     },
 
     render () {
       const props = Object.assign({}, this.props);
-      const _id = deepPropValue(id, props);
-      props[idProp] = _id;
-      props[modelProp] = new Model({
-        id: _id,
-        domain: options.domain,
-        entities: props[entitiesProp]
+      _models.forEach((options) => {
+        const id = getModelId(props, options);
+        const modelOptions = {
+          id: id,
+          domain: options.domain,
+          entities: props[entitiesProp]
+        }
+        const model = options.isCollection
+          ? new Collection(modelOptions)
+          : new Model(modelOptions);
+        props[options.idPropName] = model;
       });
 
       return React.createElement(_Component, props, props.children);
@@ -101,6 +118,21 @@ function modelFetcher (_Component, options) {
   });
 }
 
+function organizeProps (propNameKey, propNameDefault,
+    idNameKey, idNameDefault, isCollection, options) {
+  checkRequiredOptions(['id', 'domain'], options);
+  const id = options.id;
+  return {
+    id: (typeof id === 'string') ? id.split('.') : id,
+    domain: isCollection ? `${options.domain}Collection` : options.domain,
+    isCollection: isCollection,
+    propName: options[propNameKey] || propNameDefault,
+    idPropName: options[idNameKey] || idNameDefault,
+    fetchProp: options.fetchProp,
+    fetchOptions: Object.assign({}, options.fetchOptions)
+  };
+}
+
 module.exports = {
-  modelFetcher
+  modelProvider
 };

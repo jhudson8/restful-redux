@@ -14,15 +14,21 @@ export default class Model {
     this._meta = deepValue(entities, ['_meta', domain, id]) || {};
   }
 
+  data () {
+    return this._meta.data;
+  }
+
   /**
    * Return the (optionally formatted) model data
    */
-  data () {
+  value () {
     if (!this._formatted) {
       this._formatted = true;
       const options = this.options;
       const formatter = options.formatter;
-      this._formattedData = formatter ? formatter(options) : deepValue(this.entities, [this.domain, this.id]);
+      this._formattedData = formatter
+        ? formatter(options)
+        : deepValue(this.entities, [this.domain, this.id]);
     }
     return this._formattedData;
   }
@@ -31,7 +37,7 @@ export default class Model {
    * Return true if the model has been fetched
    */
   wasFetched () {
-    if (this.data()) {
+    if (this.value()) {
       return this._meta.fetched ? this._meta.fetched : 'exists';
     }
     return false;

@@ -45,15 +45,15 @@ function copyMetaEntities(meta) {
 
 describe('model', function () {
 
-  describe('data', function () {
+  describe('value', function () {
     it('should return with a provided domain and id', function () {
       var model = new Model(options(noMetaEntities, true));
-      expect(model.data()).to.deep.equal({foo: 'bar'});
+      expect(model.value()).to.deep.equal({foo: 'bar'});
     });
 
     it('should not fail if no domain exists', function () {
       var model = new Model(options(nullEntities, true));
-      expect(model.data()).to.deep.equal(undefined);
+      expect(model.value()).to.deep.equal(undefined);
     });
   });
 
