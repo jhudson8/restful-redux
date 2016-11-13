@@ -111,6 +111,47 @@ describe('model-reducer', function () {
         }
       });
     });
+
+    it('should handle "data" state', function () {
+      var state = fooReducer(emptyState, {
+        type: 'foo_MODEL_FETCH_SUCCESS',
+        payload: {
+          result: '1',
+          entities: {
+            foo: {
+              '1': {
+                beep: 'boop'
+              }
+            }
+          },
+          data: {
+            abc: 'def'
+          }
+        }
+      });
+      // don't deal with dymanic value
+      delete state.entities._meta.foo['1'].fetchTimestamp;
+      expect(state).to.deep.equal({
+        entities: {
+          _meta: {
+            foo: {
+              '1': {
+                fetched: 'full',
+                data: {
+                  abc: 'def'
+                }
+              }
+            }
+          },
+          foo: {
+            '1': {
+              beep: 'boop'
+            }
+          }
+        }
+      });
+    });
+
   });
 
 

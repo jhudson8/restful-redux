@@ -1,7 +1,6 @@
 import React from 'react';
 import { deepPropValue, checkRequiredOptions } from './common-util';
 import Model from './model';
-import Collection from './collection';
 
 /**
  * smart component utility function to ensure a component-specific model will be fetched if it doesn't
@@ -52,10 +51,10 @@ function modelProvider (_Component, options) {
     }
   }
 
-  function getModelData (id, props, data) {
+  function getModelData (id, props, options) {
     // if a model is provided directly, we short circuit
-    if (props[data.propName]) {
-      return props[data.propName];
+    if (props[options.propName]) {
+      return props[options.propName];
     }
     let entities = props[entitiesProp];
     // gracefully handle the parent state
@@ -106,10 +105,8 @@ function modelProvider (_Component, options) {
           id: id,
           domain: options.domain,
           entities: props[entitiesProp]
-        }
-        const model = options.isCollection
-          ? new Collection(modelOptions)
-          : new Model(modelOptions);
+        };
+        const model = new Model(modelOptions);
         props[options.idPropName] = model;
       });
 

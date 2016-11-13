@@ -12,10 +12,58 @@ describe('component-util', function () {
     domain: 'foo',
     fetchProp: 'fetch'
   });
+  const ComponentMultipleModels = modelProvider(Stub, {
+    models: [{
+      id: 'id1',
+      domain: 'foo',
+      fetchProp: 'fetch1'
+    }, {
+      id: 'id2',
+      domain: 'foo',
+      fetchProp: 'fetch2'
+    }]
+  });
   const ComponentNestedId = modelProvider(Stub, {
     id: 'params.id',
     domain: 'foo',
     fetchProp: 'fetch'
+  });
+
+  describe('models and collections', function () {
+    it('should trigger fetch when mounted', function () {
+      const fetch1 = sinon.spy();
+      const fetch2 = sinon.spy();
+      const impl = shallow(React.createElement(ComponentMultipleModels, {
+        id1: '1',
+        id2: '2',
+        entities: {
+          foo: {}
+        },
+        fetch1: fetch1,
+        fetch2: fetch2
+      }));
+      expect(fetch1.callCount).to.eql(1);
+      expect(fetch2.callCount).to.eql(1);
+    });
+    it('should not trigger fetch if models already exists', function () {
+      const fetch1 = sinon.spy();
+      const fetch2 = sinon.spy();
+      const impl = shallow(React.createElement(ComponentMultipleModels, {
+        id1: '1',
+        id2: '2',
+        entities: {
+          foo: {
+            '1': {},
+            '2': {}
+          }
+        },
+        fetch1: fetch1,
+        fetch2: fetch2
+      }));
+
+      expect(fetch1.callCount).to.eql(0);
+      expect(fetch2.callCount).to.eql(0);
+    });
   });
 
   it('should trigger fetch when mounted', function () {

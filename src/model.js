@@ -25,10 +25,18 @@ export default class Model {
     if (!this._formatted) {
       this._formatted = true;
       const options = this.options;
-      const formatter = options.formatter;
-      this._formattedData = formatter
-        ? formatter(options)
-        : deepValue(this.entities, [this.domain, this.id]);
+      if (options.schema && options.denormalizr) {
+        this._formattedData = options.denormalizr(
+          deepValue(this.entities, [this.domain, this.id]),
+          this.entities,
+          options.schema
+        );
+      } else {
+        const formatter = options.formatter;
+        this._formattedData = formatter
+          ? formatter(options)
+          : deepValue(this.entities, [this.domain, this.id]);
+      }
     }
     return this._formattedData;
   }
