@@ -15,8 +15,6 @@ var normalizedFooActionCreator = actionCreator('foo', {
 });
 
 describe('redux-effects-action-creator', function () {
-  // TODO add tests for formatter and normalizr
-
   describe('modelFetchAction', function() {
     it('should handle simple fetch action', function () {
       var action = fooActionCreator.modelFetchAction({
@@ -64,7 +62,7 @@ describe('redux-effects-action-creator', function () {
       });
     });
 
-    it.only('should normalize on success event', function () {
+    it('should normalize on success event', function () {
       var action = normalizedFooActionCreator.modelFetchAction({
         id: '1',
         url: 'http://foo.com/thing/1',
