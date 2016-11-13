@@ -6,6 +6,8 @@ var expect = require('chai').expect;
 
 function Stub () {}
 
+import { normalize, Schema, arrayOf } from 'normalizr';
+
 describe('component-util', function () {
   const Component = modelProvider(Stub, {
     id: 'id',

@@ -14,8 +14,7 @@ export default function (
   options // { actions: {}}; action response formatters
 ) {
   options = options || {};
-  const normalizr = options.normalizr;
-  const schema = options.schema;
+  const normalize = options.normalize;
 
   return {
     /* return the action to be dispatched when a model/REST document should be fetched
@@ -32,7 +31,7 @@ export default function (
         id, // the model id (to be added to the payloads for the reducer)
         url, // the endpoint URI
         payload, // [effects-fetch payload](https://github.com/redux-effects/redux-effects-fetch#creating-a-user)
-        normalize, // function used to format the response - must respond with { result: _id_, entries: { _domain_: { _id_: {...} } } }
+        schema,
         formatter,
         onSuccess,
         onError
@@ -46,7 +45,7 @@ export default function (
             fetchOrAction: MODEL_FETCH,
             type: SUCCESS,
             id,
-            normalize,
+            schema,
             formatter,
             callback: onSuccess
           }),
@@ -55,7 +54,7 @@ export default function (
             fetchOrAction: MODEL_FETCH,
             type: ERROR,
             id,
-            normalize,
+            schema,
             formatter,
             callback: onError
           }),
@@ -80,7 +79,7 @@ export default function (
       actionId,
       url,
       payload,
-      normalize,
+      schema,
       formatter,
       replaceModel,
       onSuccess,
@@ -98,9 +97,8 @@ export default function (
             id,
             actionId,
             replaceModel,
-            formatter,
-            normalize,
             schema,
+            formatter,
             callback: onSuccess,
             clearAfter
           }),
@@ -111,8 +109,6 @@ export default function (
             id,
             actionId,
             formatter,
-            normalize,
-            schema,
             callback: onError,
             clearAfter
           })
@@ -131,15 +127,14 @@ function asyncResponseAction ({
   id,
   actionId,
   replaceModel,
-  formatter,
-  normalize,
   schema,
+  formatter,
   callback,
   clearAfter
 }) {
   return function (response) {
     callback && callback(response.value);
-    // response is assumed to be in [normalizr](https://github.com/paularmstrong/normalizr) format of
+    // response is assumed to be in [normalize](https://github.com/paularmstrong/normalize) format of
     // {result: _id_, entities: {_domain_: {_id_: ...}}}
     let payload = response.value;
     if (type === SUCCESS) {
@@ -147,10 +142,8 @@ function asyncResponseAction ({
         if (formatter) {
           payload = formatter(payload);
         }
-        if (schema && normalizr) {
-          payload = normalizr(schema, payload);
-        } else if (normalize) {
-          payload = normalize(payload, id, domain);
+        if (schema && normalize) {
+          payload = normalize(schema, payload);
         } else if (!formatter) {
           payload = defaultFormat(payload, id, domain);
         }
