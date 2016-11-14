@@ -7,7 +7,7 @@ import Model from './model';
  * exist in the store.  A `fetch` prop value is expected to be provided with `mapDispatchToProps`
  * - Component: the "dumb" component
  */
-function modelProvider (_Component, options) {
+export default function modelProvider (_Component, options) {
   if (!_Component) {
     throw new Error('Undefined modelProvider component');
   }
@@ -63,7 +63,8 @@ function modelProvider (_Component, options) {
     _models.forEach((options) => {
       if (options.fetchProp) {
         const id = getModelId(props, options);
-        if (!this.state || !this.state._fetched || !this.state._fetched[id]) {
+        const modelData = getModelData(id, props, options);
+        if (!modelData && (!this.state || !this.state._fetched || !this.state._fetched[id])) {
           const model = new Model(Object.assign({}, options, {
             id: id,
             entities: props[entitiesProp]
@@ -132,7 +133,3 @@ function organizeProps (propNameKey, propNameDefault,
     fetchOptions: Object.assign({}, options.fetchOptions)
   };
 }
-
-module.exports = {
-  modelProvider
-};

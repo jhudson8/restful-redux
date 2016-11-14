@@ -1,5 +1,5 @@
 // "smart / redux store connected" React component
-import { componentUtil } from 'redux-model-util';
+import { modelProvider } from 'redux-model-util';
 import { connect } from 'react-redux';
 
 import ProfilePage from './profile-page';
@@ -23,7 +23,7 @@ function mapDispatchToProps (dispatch) {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(
-  componentUtil.modelProvider(ProfilePage, {
+  modelProvider(ProfilePage, {
     // react-router will give us the id as props.params.id because our route is `/profile/:id`
     id: 'params.id',
     // should match the action creator `entityType` option

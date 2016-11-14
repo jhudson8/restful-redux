@@ -62,7 +62,7 @@ function options(entitiesOrMeta, isEntities, options) {
   var entities = isEntities ? entitiesOrMeta : copyMetaEntities(entitiesOrMeta);
   return Object.assign({
     id: '1',
-    domain: 'foo',
+    entityType: 'foo',
     entities: entities
   }, options);
 }

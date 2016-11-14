@@ -1,11 +1,11 @@
 import Model from './model';
 import reducer from './model-reducer';
-import componentUtil from './component-util';
+import modelProvider from './model-provider';
 import reduxEffectsActionCreator from './action-creator/redux-effects';
 
 export {
   Model,
   reducer,
-  componentUtil,
+  modelProvider,
   reduxEffectsActionCreator
 };

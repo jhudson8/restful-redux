@@ -1,33 +1,33 @@
 import React from 'react';
 import sinon from 'sinon';
 import { shallow } from 'enzyme';
-var modelProvider = require('../src/component-util').modelProvider;
+import modelProvider from '../src/model-provider';
 var expect = require('chai').expect;
 
 function Stub () {}
 
 import { normalize, Schema, arrayOf } from 'normalizr';
 
-describe('component-util', function () {
+describe('model-provider', function () {
   const Component = modelProvider(Stub, {
     id: 'id',
-    domain: 'foo',
+    entityType: 'foo',
     fetchProp: 'fetch'
   });
   const ComponentMultipleModels = modelProvider(Stub, {
     models: [{
       id: 'id1',
-      domain: 'foo',
+      entityType: 'foo',
       fetchProp: 'fetch1'
     }, {
       id: 'id2',
-      domain: 'foo',
+      entityType: 'foo',
       fetchProp: 'fetch2'
     }]
   });
   const ComponentNestedId = modelProvider(Stub, {
     id: 'params.id',
-    domain: 'foo',
+    entityType: 'foo',
     fetchProp: 'fetch'
   });
 
@@ -110,6 +110,7 @@ describe('component-util', function () {
 
     // now change id values
     Component.prototype.componentWillReceiveProps.call({
+      setState: sinon.spy(),
       props: {
         id: '1'
       }
@@ -156,7 +157,7 @@ describe('component-util', function () {
   describe('should obey "modelProp"', function () {
     const Component = modelProvider(Stub, {
       id: 'id',
-      domain: 'foo',
+      entityType: 'foo',
       modelProp: 'bar',
       fetchProp: 'fetch'
     });
@@ -193,7 +194,7 @@ describe('component-util', function () {
   describe ('should obey "idProp"', function () {
     const Component = modelProvider(Stub, {
       id: 'id',
-      domain: 'foo',
+      entityType: 'foo',
       idProp: 'bar',
       fetchProp: 'fetch'
     });
@@ -216,7 +217,7 @@ describe('component-util', function () {
   describe ('should obey "fetchProp"', function () {
     const Component = modelProvider(Stub, {
       id: 'id',
-      domain: 'foo',
+      entityType: 'foo',
       fetchProp: 'bar'
     });
 
@@ -263,7 +264,7 @@ describe('component-util', function () {
   describe('should obey "fetchOptions"', function () {
     const Component = modelProvider(Stub, {
       id: 'id',
-      domain: 'foo',
+      entityType: 'foo',
       fetchProp: 'fetch',
       fetchOptions: {
         abc: 'params.def',
