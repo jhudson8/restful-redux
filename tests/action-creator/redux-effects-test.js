@@ -10,20 +10,20 @@ fooSchema.define({
 });
 
 var fooActionCreator = actionCreator({
-  actionType: 'FOO',
+  actionPrefix: 'FOO',
   entityType: 'foo',
   normalize: normalize
 });
 var normalizedFooActionCreator = actionCreator({
-  actionType: 'FOO',
+  actionPrefix: 'FOO',
   entityType: 'foo',
   normalize: normalize
 });
 
 describe('redux-effects-action-creator', function () {
-  describe('modelFetchAction', function() {
+  describe('createFetchAction', function() {
     it('should handle simple fetch action', function () {
-      var action = fooActionCreator.modelFetchAction({
+      var action = fooActionCreator.createFetchAction({
         id: '1',
         url: 'http://foo.com/thing/1'
       });
@@ -47,7 +47,7 @@ describe('redux-effects-action-creator', function () {
     });
 
     it('should handle success event', function () {
-      var action = fooActionCreator.modelFetchAction({
+      var action = fooActionCreator.createFetchAction({
         id: '1',
         url: 'http://foo.com/thing/1'
       });
@@ -69,7 +69,7 @@ describe('redux-effects-action-creator', function () {
     });
 
     it('should normalize on success event', function () {
-      var action = normalizedFooActionCreator.modelFetchAction({
+      var action = normalizedFooActionCreator.createFetchAction({
         id: '1',
         url: 'http://foo.com/thing/1',
         schema: fooSchema
@@ -109,7 +109,7 @@ describe('redux-effects-action-creator', function () {
     });
 
     it('should handle error event', function () {
-      var action = fooActionCreator.modelFetchAction({
+      var action = fooActionCreator.createFetchAction({
         id: '1',
         url: 'http://foo.com/thing/1'
       });

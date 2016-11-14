@@ -1,17 +1,17 @@
 /**
  * Return the model specific utility object
- * @param {object} modelOrDomain: the model object or domain state object (if model `id` is provided)
- * @param {string} id: the model id if `modelOrDomain` represents the domain state object
+ * @param {object} modelOrDomain: the model object or entityType state object (if model `id` is provided)
+ * @param {string} id: the model id if `modelOrDomain` represents the entityType state object
  */
 export default class Model {
   constructor (options) {
     const id = this.id = options.id;
-    const domain = this.domain = options.domain;
+    const entityType = this.entityType = options.entityType;
     let entities = options.entities || {};
     // allow for the root state to be provided as entities object
     this.entities = entities.entities || entities;
     this.options = options;
-    this._meta = deepValue(entities, ['_meta', domain, id]) || {};
+    this._meta = deepValue(this.entities, ['_meta', entityType, id]) || {};
   }
 
   data () {
@@ -27,7 +27,7 @@ export default class Model {
       const options = this.options;
       if (options.schema && options.denormalize) {
         this._formattedData = options.denormalize(
-          deepValue(this.entities, [this.domain, this.id]),
+          deepValue(this.entities, [this.entityType, this.id]),
           this.entities,
           options.schema
         );
@@ -35,7 +35,7 @@ export default class Model {
         const formatter = options.formatter;
         this._formattedData = formatter
           ? formatter(options)
-          : deepValue(this.entities, [this.domain, this.id]);
+          : deepValue(this.entities, [this.entityType, this.id]);
       }
     }
     return this._formattedData;
@@ -49,6 +49,10 @@ export default class Model {
       return this._meta.fetched ? this._meta.fetched : 'exists';
     }
     return false;
+  }
+
+  canBeFetched () {
+    return !(this._meta.fetchPending || this._meta.fetchError || this._meta.fetched || this.value());
   }
 
   /**

@@ -16,17 +16,11 @@ function modelProvider (_Component, options) {
   const entitiesProp = options.entitiesProp || 'entities';
   const _models = [];
   if (options.id) {
-    _models.push(organizeProps('modelProp', 'model', 'idProp', 'id', false, options));
+    _models.push(organizeProps('modelProp', 'model', 'idProp', 'id', options));
   } else if (options.models) {
     for (let i = 0; i < options.models.length; i++) {
       let _model = options.models[i];
-      _models.push(organizeProps('modelProp', 'model', 'idProp', 'id', false, _model));
-    }
-  }
-  if (options.collections) {
-    for (let i = 0; i < options.collections.length; i++) {
-      let _collection = options.collections[i];
-      _models.push(organizeProps('collectionProp', 'collection', true, _collection));
+      _models.push(organizeProps('modelProp', 'model', 'idProp', 'id', _model));
     }
   }
 
@@ -60,18 +54,28 @@ function modelProvider (_Component, options) {
     // gracefully handle the parent state
     entities = entities && (entities.entities || entities);
     if (entities) {
-      const domainModels = entities[options.domain];
-      return domainModels && domainModels[id];
+      const entityModels = entities[options.entityType];
+      return entityModels && entityModels[id];
     }
   }
 
   function maybeFetchModels (props) {
-    _models.forEach(function(options) {
+    _models.forEach((options) => {
       if (options.fetchProp) {
         const id = getModelId(props, options);
-        const modelData = getModelData(id, props, options);
-        if (!modelData) {
-          fetchModel(id, props, options);
+        if (!this.state || !this.state._fetched || !this.state._fetched[id]) {
+          const model = new Model(Object.assign({}, options, {
+            id: id,
+            entities: props[entitiesProp]
+          }));
+          if (model.canBeFetched()) {
+            fetchModel(id, props, options);
+            this.setState((state) => {
+              state._fetched = state._fetched || {};
+              state._fetched[id] = true;
+              return state;
+            });
+          }
         }
       }
     });
@@ -90,11 +94,11 @@ function modelProvider (_Component, options) {
 
   return React.createClass({
     componentWillMount () {
-      maybeFetchModels(this.props);
+      maybeFetchModels.call(this, this.props);
     },
 
     componentWillReceiveProps (props) {
-      maybeFetchModels(props, this.props);
+      maybeFetchModels.call(this, props, this.props);
     },
 
     render () {
@@ -106,7 +110,8 @@ function modelProvider (_Component, options) {
           entities: props[entitiesProp]
         });
         const model = new Model(modelOptions);
-        props[options.idPropName] = model;
+        props[options.idPropName] = id;
+        props[options.propName] = model;
       });
 
       return React.createElement(_Component, props, props.children);
@@ -115,13 +120,12 @@ function modelProvider (_Component, options) {
 }
 
 function organizeProps (propNameKey, propNameDefault,
-    idNameKey, idNameDefault, isCollection, options) {
-  checkRequiredOptions(['id', 'domain'], options);
+    idNameKey, idNameDefault, options) {
+  checkRequiredOptions(['id', 'entityType'], options);
   const id = options.id;
   return {
     id: (typeof id === 'string') ? id.split('.') : id,
-    domain: isCollection ? `${options.domain}Collection` : options.domain,
-    isCollection: isCollection,
+    entityType: options.entityType,
     propName: options[propNameKey] || propNameDefault,
     idPropName: options[idNameKey] || idNameDefault,
     fetchProp: options.fetchProp,

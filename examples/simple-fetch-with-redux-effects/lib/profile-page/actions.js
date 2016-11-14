@@ -1,6 +1,9 @@
 // redux actions creator used to fetch the github profile data
 import { reduxEffectsActionCreator } from 'redux-model-util';
-const profileActionCreator = reduxEffectsActionCreator('profile');
+const profileActionCreator = reduxEffectsActionCreator({
+  actionPrefix: 'PROFILE',
+  entityType: 'profiles'
+});
 
 // fetch a github profile designed by the provided id
 export function fetch (id) {

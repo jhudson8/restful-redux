@@ -8,8 +8,8 @@ import { fetch } from './actions';
 // redux mapStateToProps smart component function
 function mapStateToProps (state) {
   return {
-    // the `profiles` attribute of state would match the combineReducers attribute in ../reducer
-    entities: state.profiles
+    // the `app` attribute of state would match the combineReducers attribute in ../reducer
+    entities: state.app
   }
 }
 
@@ -23,10 +23,12 @@ function mapDispatchToProps (dispatch) {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(
-  componentUtil.modelFetcher(ProfilePage, {
+  componentUtil.modelProvider(ProfilePage, {
     // react-router will give us the id as props.params.id because our route is `/profile/:id`
     id: 'params.id',
-    // should match the action creator `domain` parameter (1st parameter)
-    domain: 'profile'
+    // should match the action creator `entityType` parameter (1st parameter)
+    entityType: 'profiles',
+    // if this is not included, the model will not be auto-fetched
+    fetchProp: 'fetch'
   })
 );

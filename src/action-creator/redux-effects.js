@@ -10,10 +10,10 @@ const ERROR = 'ERROR';
 const PENDING = 'PENDING';
 
 export default function (options) {
-  checkRequiredOptions(['actionType', 'entityType'], options);
+  checkRequiredOptions(['actionPrefix', 'entityType'], options);
 
   const {
-    actionType,
+    actionPrefix,
     entityType,
     normalize
   } = options;
@@ -59,7 +59,7 @@ export default function (options) {
       if (actionId) {
         payload.actionId = actionId;
       }
-      const action = createAction(`${actionType}_${fetchOrAction}_${type}`, payload);
+      const action = createAction(`${actionPrefix}_${fetchOrAction}_${type}`, payload);
 
       if (clearAfter) {
         // requires `redux-thunk`
@@ -87,7 +87,7 @@ export default function (options) {
      * parameters include
      * - entityType:
      */
-    modelFetchAction: function (options) {
+    createFetchAction: function (options) {
       checkRequiredOptions(['id', 'url'], options);
 
       let {
@@ -100,7 +100,7 @@ export default function (options) {
         onError
       } = options;
       return [
-        createPendingAction(actionType, id),
+        createPendingAction(actionPrefix, id),
         bind(
           fetch(url, payload),
           asyncResponseAction({
@@ -150,7 +150,7 @@ export default function (options) {
       clearAfter
     }) {
       return [
-        createPendingAction(actionType, id, actionId),
+        createPendingAction(actionPrefix, id, actionId),
         bind(
           fetch(url, payload),
           asyncResponseAction({
@@ -183,13 +183,13 @@ export default function (options) {
 
 
 // create a dispatchable action that represents a pending model/REST document action
-function createPendingAction (actionType, id, actionId) {
+function createPendingAction (actionPrefix, id, actionId) {
   const type = actionId ? ACTION : FETCH;
   const payload = { id };
   if (actionId) {
     payload.actionId = actionId;
   }
-  return createAction(`${actionType}_${type}_PENDING`, payload);
+  return createAction(`${actionPrefix}_${type}_PENDING`, payload);
 }
 
 // return an action using the given type and payload
