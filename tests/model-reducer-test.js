@@ -10,7 +10,9 @@ var initialState1 = {
       foo: {
         '1': {
           fetched: 'partial',
-          customMetaProp: 'foo'
+          data: {
+            customMetaProp: 'foo'
+          }
         }
       }
     },
@@ -42,6 +44,105 @@ describe('model-reducer', function () {
       }
     });
     expect(state).to.equal(emptyState);
+  });
+
+  describe('DATA', function () {
+    it('should add new data attribute', function () {
+      var state = fooReducer(initialState1, {
+        type: 'FOO_DATA',
+        payload: {
+          id: '1',
+          data: {
+            boop: 'beep'
+          }
+        }
+      });
+      expect(initialState1).to.deep.equal(savedInitialState1);
+      expect(state).to.deep.equal({
+        entities: {
+          _meta: {
+            foo: {
+              '1': {
+                fetched: 'partial',
+                data: {
+                  customMetaProp: 'foo',
+                  boop: 'beep'
+                }
+              }
+            }
+          },
+          foo: {
+            '1': {
+              foo: 'abc',
+              beep: 'boop'
+            }
+          }
+        }
+      });
+    });
+
+    it('should remove existing data attribute', function () {
+      var state = fooReducer(initialState1, {
+        type: 'FOO_DATA',
+        payload: {
+          id: '1',
+          data: {
+            boop: 'beep',
+            customMetaProp: undefined
+          }
+        }
+      });
+      expect(initialState1).to.deep.equal(savedInitialState1);
+      expect(state).to.deep.equal({
+        entities: {
+          _meta: {
+            foo: {
+              '1': {
+                fetched: 'partial',
+                data: {
+                  boop: 'beep'
+                }
+              }
+            }
+          },
+          foo: {
+            '1': {
+              foo: 'abc',
+              beep: 'boop'
+            }
+          }
+        }
+      });
+    });
+
+    it('should remove all data state', function () {
+      var state = fooReducer(initialState1, {
+        type: 'FOO_DATA',
+        payload: {
+          id: '1',
+          data: false
+        }
+      });
+      expect(initialState1).to.deep.equal(savedInitialState1);
+      expect(state).to.deep.equal({
+        entities: {
+          _meta: {
+            foo: {
+              '1': {
+                fetched: 'partial'
+              }
+            }
+          },
+          foo: {
+            '1': {
+              foo: 'abc',
+              beep: 'boop'
+            }
+          }
+        }
+      });
+    });
+
   });
 
   describe('FETCH_SUCCESS', function () {
@@ -102,7 +203,9 @@ describe('model-reducer', function () {
             foo: {
               '1': {
                 fetched: 'full',
-                customMetaProp: 'foo'
+                data: {
+                  customMetaProp: 'foo'
+                }
               }
             }
           },
@@ -154,7 +257,6 @@ describe('model-reducer', function () {
         }
       });
     });
-
   });
 
 
@@ -188,8 +290,10 @@ describe('model-reducer', function () {
           _meta: {
             foo: {
               '1': {
-                customMetaProp: 'foo',
-                fetchPending: true
+                fetchPending: true,
+                data: {
+                  customMetaProp: 'foo'
+                }
               }
             }
           },
@@ -249,10 +353,12 @@ describe('model-reducer', function () {
           _meta: {
             foo: {
               '1': {
-                customMetaProp: 'foo',
                 fetched: false,
                 fetchError: {
                   code: 'bad'
+                },
+                data: {
+                  customMetaProp: 'foo'
                 }
               }
             }
@@ -317,9 +423,11 @@ describe('model-reducer', function () {
             foo: {
               '1': {
                 fetched: 'partial',
-                customMetaProp: 'foo',
                 actionId: 'test',
-                actionSuccess: true
+                actionSuccess: true,
+                data: {
+                  customMetaProp: 'foo'
+                }
               }
             }
           },
@@ -374,7 +482,9 @@ describe('model-reducer', function () {
                 actionId: 'bar',
                 actionPending: true,
                 fetched: 'partial',
-                customMetaProp: 'foo'
+                data: {
+                  customMetaProp: 'foo'
+                }
               }
             }
           },
@@ -438,8 +548,10 @@ describe('model-reducer', function () {
                 actionError: {
                   abc: 'def'
                 },
-                customMetaProp: 'foo',
-                fetched: 'partial'
+                fetched: 'partial',
+                data: {
+                  customMetaProp: 'foo'
+                }
               }
             }
           },
@@ -483,8 +595,10 @@ describe('model-reducer', function () {
           _meta: {
             foo: {
               '1': {
-                customMetaProp: 'foo',
-                fetched: 'partial'
+                fetched: 'partial',
+                data: {
+                  customMetaProp: 'foo'
+                }
               }
             }
           },
@@ -515,8 +629,10 @@ describe('model-reducer', function () {
           _meta: {
             foo: {
               '1': {
-                customMetaProp: 'foo',
-                fetched: 'partial'
+                fetched: 'partial',
+                data: {
+                  customMetaProp: 'foo'
+                }
               }
             }
           },

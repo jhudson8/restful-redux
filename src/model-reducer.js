@@ -46,7 +46,21 @@ export default function (options) {
     stateEntities = state.entities;
     const metaDomain = Object.assign({}, stateEntities._meta[entityType]);
     stateEntities._meta[entityType] = metaDomain;
+    let _data = metaDomain[id] && metaDomain[id].data;
+    let _meta = meta;
     meta = Object.assign({}, metaDomain[id], meta);
+
+    // handle special `data` meta attribute
+    if (_meta.data === false) {
+      delete meta.data;
+    } else if (_data || meta.data) {
+      meta.data = _data = Object.assign({}, _data, meta.data);
+      for (let key in _data) {
+        if (_data.hasOwnProperty(key) && typeof _data[key] === 'undefined') {
+          delete _data[key];
+        }
+      }
+    }
 
     // clear out any undefined fields
     for (var key in meta) {
@@ -122,7 +136,8 @@ export default function (options) {
       type: 'ACTION_CLEAR',
       meta: {}
     }, ['actionId', 'actionPending', 'actionTimestamp', 'actionError', 'actionResponse',
-          'actionSuccess', 'actionTimestamp'])
+          'actionSuccess', 'actionTimestamp']),
+    { type: 'DATA' }
   ].map(function (data) {
     return [`${actionPrefix}_${data.type}`, data];
   });
