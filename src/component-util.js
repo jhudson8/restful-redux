@@ -101,11 +101,10 @@ function modelProvider (_Component, options) {
       const props = Object.assign({}, this.props);
       _models.forEach((options) => {
         const id = getModelId(props, options);
-        const modelOptions = {
+        const modelOptions = Object.assign({}, options, {
           id: id,
-          domain: options.domain,
           entities: props[entitiesProp]
-        };
+        });
         const model = new Model(modelOptions);
         props[options.idPropName] = model;
       });

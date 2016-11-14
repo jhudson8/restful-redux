@@ -3,22 +3,23 @@ import { checkRequiredOptions } from '../common-util';
 /**
  * IMPORTANT: Usage of [multi](https://github.com/ashaffer/redux-multi) middleware or a lib of similar nature is required
  */
-const MODEL_FETCH = 'MODEL_FETCH';
-const MODEL_ACTION = 'MODEL_ACTION';
+const FETCH = 'FETCH';
+const ACTION = 'ACTION';
 const SUCCESS = 'SUCCESS';
 const ERROR = 'ERROR';
-const MODEL_PENDING = 'MODEL_PENDING';
+const PENDING = 'PENDING';
 
-export default function (
-  domain, // the domain key used for all of the event type values
-  options // { actions: {}}; action response formatters
-) {
-  options = options || {};
-  const normalize = options.normalize;
+export default function (options) {
+  checkRequiredOptions(['actionType', 'entityType'], options);
+
+  const {
+    actionType,
+    entityType,
+    normalize
+  } = options;
 
   // return a callback handler which includes the provided id in the payload as a top level attribute
   function asyncResponseAction ({
-    domain,
     fetchOrAction,
     type,
     id,
@@ -32,23 +33,23 @@ export default function (
     return function (response) {
       callback && callback(response.value);
       // response is assumed to be in [normalize](https://github.com/paularmstrong/normalize) format of
-      // {result: _id_, entities: {_domain_: {_id_: ...}}}
+      // {result: _id_, entities: {_entityType_: {_id_: ...}}}
       let payload = response.value;
       if (type === SUCCESS) {
         if (!actionId || replaceModel) {
           if (formatter) {
-            payload = formatter(payload, id, domain);
+            payload = formatter(payload, id, entityType);
           }
           if (schema && normalize) {
             payload = normalize(payload, schema);
           } else if (!formatter) {
-            payload = defaultFormat(payload, id, domain);
+            payload = defaultFormat(payload, id, entityType);
           }
         } else {
           payload = {
             id: id,
             response: formatter
-              ? formatter(response.value, id, actionId, domain)
+              ? formatter(response.value, id, actionId, entityType)
               : response.value
           };
         }
@@ -58,14 +59,14 @@ export default function (
       if (actionId) {
         payload.actionId = actionId;
       }
-      const action = createAction(`${domain}_${fetchOrAction}_${type}`, payload);
+      const action = createAction(`${actionType}_${fetchOrAction}_${type}`, payload);
 
       if (clearAfter) {
         // requires `redux-thunk`
         return [action, function (dispatch) {
           setTimeout(function () {
             dispatch(asyncResponseAction ({
-              domain,
+              entityType,
               fetchOrAction,
               type: 'CLEAR',
               id
@@ -80,11 +81,11 @@ export default function (
 
   return {
     /* return the action to be dispatched when a model/REST document should be fetched
-     * - FETCH_SUCCESS_{domain}: the data was retrieved successfully
-     * - FETCH_ERROR_{domain}: there was an error with the request
-     * - FETCH_PENDING_{domain}: an XHR request was submitted
+     * - FETCH_SUCCESS_{entityType}: the data was retrieved successfully
+     * - FETCH_ERROR_{entityType}: there was an error with the request
+     * - FETCH_PENDING_{entityType}: an XHR request was submitted
      * parameters include
-     * - domain:
+     * - entityType:
      */
     modelFetchAction: function (options) {
       checkRequiredOptions(['id', 'url'], options);
@@ -99,12 +100,12 @@ export default function (
         onError
       } = options;
       return [
-        createPendingAction(domain, id),
+        createPendingAction(actionType, id),
         bind(
           fetch(url, payload),
           asyncResponseAction({
-            domain,
-            fetchOrAction: MODEL_FETCH,
+            entityType,
+            fetchOrAction: FETCH,
             type: SUCCESS,
             id,
             schema,
@@ -112,8 +113,8 @@ export default function (
             callback: onSuccess
           }),
           asyncResponseAction({
-            domain,
-            fetchOrAction: MODEL_FETCH,
+            entityType,
+            fetchOrAction: FETCH,
             type: ERROR,
             id,
             schema,
@@ -126,11 +127,11 @@ export default function (
 
     /**
      * return the action to be dispatched when an XHR-based action should be taken on a model/REST document
-     * - ACTION_SUCCESS_{domain}: the data was retrieved successfully
-     * - ACTION_ERROR_{domain}: there was an error with the request
-     * - ACTION_PENDING_{domain}: an XHR request was submitted
+     * - ACTION_SUCCESS_{entityType}: the data was retrieved successfully
+     * - ACTION_ERROR_{entityType}: there was an error with the request
+     * - ACTION_PENDING_{entityType}: an XHR request was submitted
      * parameters include
-     * - domain: the domain key used for all of the event type values
+     * - entityType: the entityType key used for all of the event type values
      * - id: the model id (to be added to the payloads for the reducer)
      * - url: the endpoint URI
      * - payload: [effects-fetch payload](https://github.com/redux-effects/redux-effects-fetch#creating-a-user)
@@ -149,12 +150,12 @@ export default function (
       clearAfter
     }) {
       return [
-        createPendingAction(domain, id, actionId),
+        createPendingAction(actionType, id, actionId),
         bind(
           fetch(url, payload),
           asyncResponseAction({
-            domain,
-            fetchOrAction: MODEL_ACTION,
+            entityType,
+            fetchOrAction: ACTION,
             type: SUCCESS,
             id,
             actionId,
@@ -165,8 +166,8 @@ export default function (
             clearAfter
           }),
           asyncResponseAction({
-            domain,
-            fetchOrAction: MODEL_ACTION,
+            entityType,
+            fetchOrAction: ACTION,
             type: ERROR,
             id,
             actionId,
@@ -182,13 +183,13 @@ export default function (
 
 
 // create a dispatchable action that represents a pending model/REST document action
-function createPendingAction (domain, id, actionId) {
-  const type = actionId ? MODEL_ACTION : MODEL_FETCH;
+function createPendingAction (actionType, id, actionId) {
+  const type = actionId ? ACTION : FETCH;
   const payload = { id };
   if (actionId) {
     payload.actionId = actionId;
   }
-  return createAction(`${domain}_${type}_PENDING`, payload);
+  return createAction(`${actionType}_${type}_PENDING`, payload);
 }
 
 // return an action using the given type and payload
@@ -223,13 +224,13 @@ function fetch (url = '', params = {}) {
   };
 }
 
-// // {result: _id_, entities: {_domain: {_id_: ...
-function defaultFormat (value, id, domain) {
+// // {result: _id_, entities: {_entityType: {_id_: ...
+function defaultFormat (value, id, entityType) {
   const rtn = {
     result: id,
     entities: {}
   };
-  const domainData = rtn.entities[domain] = {};
-  domainData[id] = value;
+  const entityTypeData = rtn.entities[entityType] = {};
+  entityTypeData[id] = value;
   return rtn;
 }

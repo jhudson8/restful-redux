@@ -7,6 +7,9 @@ export function deepPropValue (parts, parent) {
 }
 
 export function checkRequiredOptions (keys, options) {
+  if (!options) {
+    throw new Error('missing options');
+  }
   keys.forEach(function (key) {
     if (!options[key]) {
       throw new Error('missing "' + key + '" options value');

@@ -9,8 +9,14 @@ fooSchema.define({
   author: personSchema
 });
 
-var fooActionCreator = actionCreator('foo', { normalize: normalize });
-var normalizedFooActionCreator = actionCreator('foo', {
+var fooActionCreator = actionCreator({
+  actionType: 'FOO',
+  entityType: 'foo',
+  normalize: normalize
+});
+var normalizedFooActionCreator = actionCreator({
+  actionType: 'FOO',
+  entityType: 'foo',
   normalize: normalize
 });
 
@@ -23,7 +29,7 @@ describe('redux-effects-action-creator', function () {
       });
 
       expect(action[0]).to.deep.equal({
-        type: 'foo_MODEL_FETCH_PENDING',
+        type: 'FOO_FETCH_PENDING',
         payload: {
           id: '1'
         }
@@ -48,7 +54,7 @@ describe('redux-effects-action-creator', function () {
       var steps = action[1].meta.steps[0];
       var successAction = steps[0]({ value: { foo: 'bar' } });
       expect(successAction).to.deep.equal({
-        type: 'foo_MODEL_FETCH_SUCCESS',
+        type: 'FOO_FETCH_SUCCESS',
         payload: {
           result: '1',
           entities: {
@@ -79,7 +85,7 @@ describe('redux-effects-action-creator', function () {
         }
       }});
       expect(successAction).to.deep.equal({
-        type: 'foo_MODEL_FETCH_SUCCESS',
+        type: 'FOO_FETCH_SUCCESS',
         payload: {
           result: '1',
           entities: {
@@ -110,7 +116,7 @@ describe('redux-effects-action-creator', function () {
       var steps = action[1].meta.steps[0];
       var errorAction = steps[1]({ value: { foo: 'bar' } });
       expect(errorAction).to.deep.equal({
-        type: 'foo_MODEL_FETCH_ERROR',
+        type: 'FOO_FETCH_ERROR',
         payload: {
           id: '1',
           response: {
@@ -131,7 +137,7 @@ describe('redux-effects-action-creator', function () {
       });
 
       expect(action[0]).to.deep.equal({
-        type: 'foo_MODEL_ACTION_PENDING',
+        type: 'FOO_ACTION_PENDING',
         payload: {
           id: '1',
           actionId: 'beep'
@@ -158,7 +164,7 @@ describe('redux-effects-action-creator', function () {
       var steps = action[1].meta.steps[0];
       var successAction = steps[0]({ value: { foo: 'bar' } });
       expect(successAction).to.deep.equal({
-        type: 'foo_MODEL_ACTION_SUCCESS',
+        type: 'FOO_ACTION_SUCCESS',
         payload: {
           id: '1',
           actionId: 'beep',
@@ -178,7 +184,7 @@ describe('redux-effects-action-creator', function () {
       var steps = action[1].meta.steps[0];
       var errorAction = steps[1]({ value: { foo: 'bar' } });
       expect(errorAction).to.deep.equal({
-        type: 'foo_MODEL_ACTION_ERROR',
+        type: 'FOO_ACTION_ERROR',
         payload: {
           id: '1',
           actionId: 'beep',
