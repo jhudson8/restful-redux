@@ -26,7 +26,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(
   componentUtil.modelProvider(ProfilePage, {
     // react-router will give us the id as props.params.id because our route is `/profile/:id`
     id: 'params.id',
-    // should match the action creator `entityType` parameter (1st parameter)
+    // should match the action creator `entityType` option
     entityType: 'profiles',
     // if this is not included, the model will not be auto-fetched
     fetchProp: 'fetch'
