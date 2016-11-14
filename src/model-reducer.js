@@ -66,83 +66,64 @@ export default function (options) {
   }
 
   // prepare the action types that we'll be looking for
-  var handlers = [{
-    type: 'FETCH_SUCCESS',
-    meta: {
-      fetched: fetchType,
-      _timestamp: 'fetch',
-      fetchPending: undefined,
-      fetchError: undefined,
-      actionId: undefined,
-      actionPending: undefined,
-      actionSuccess: undefined,
-      actionError: undefined,
-      actionResponse: undefined
-    }
-  }, {
-    // same as FETCH_SUCCESS but if more semantically correct if we're setting manually
-    type: 'SET',
-    meta: {
-      fetched: fetchType,
-      _timestamp: 'fetch',
-      fetchPending: undefined,
-      fetchError: undefined,
-      actionId: undefined,
-      actionPending: undefined,
-      actionSuccess: undefined,
-      actionError: undefined,
-      actionResponse: undefined
-    }
-  }, {
-    type: 'FETCH_PENDING',
-    meta: {
-      fetched: undefined,
-      fetchTimestamp: undefined,
-      fetchPending: true
-    }
-  }, {
-    type: 'FETCH_ERROR',
-    clear: true,
-    meta: {
-      _responseProp: 'fetchError',
-      fetched: false,
-      fetchPending: undefined
-    }
-  }, {
-    type: 'ACTION_ERROR',
-    meta: {
-      _responseProp: 'actionError',
-      actionPending: undefined
-    }
-  }, {
-    type: 'ACTION_PENDING',
-    meta: {
-      actionPending: true,
-      actionTimestamp: undefined,
-      actionError: undefined,
-      actionResponse: undefined
-    }
-  }, {
-    type: 'ACTION_SUCCESS',
-    meta: {
-      _responseProp: 'actionResponse',
-      _timestamp: 'action',
-      actionPending: undefined,
-      actionError: undefined,
-      actionSuccess: true
-    }
-  }, {
-    type: 'ACTION_CLEAR',
-    meta: {
-      actionId: undefined,
-      actionPending: undefined,
-      actionTimestamp: undefined,
-      actionError: undefined,
-      actionResponse: undefined,
-      actionSuccess: undefined,
-      actionTimestamp: undefined
-    }
-  }].map(function (data) {
+  var handlers = [
+    createMeta({
+      type: 'FETCH_SUCCESS',
+      meta: {
+        fetched: fetchType,
+        _timestamp: 'fetch'
+      }
+    }, ['fetchPending', 'fetchError', 'actionId', 'actionPending', 'actionSuccess',
+          'actionError', 'actionResponse']),
+    createMeta({
+      // same as FETCH_SUCCESS but if more semantically correct if we're setting manually
+      type: 'SET',
+      meta: {
+        fetched: fetchType,
+        _timestamp: 'fetch'
+      }
+    }, ['fetchPending', 'fetchError', 'actionId', 'actionPending', 'actionSuccess',
+          'actionError', 'actionResponse']),
+    createMeta({
+      type: 'FETCH_PENDING',
+      meta: {
+        fetchPending: true
+      }
+    }, ['fetched', 'fetchTimestamp']),
+    createMeta({
+      type: 'FETCH_ERROR',
+      clear: true,
+      meta: {
+        _responseProp: 'fetchError',
+        fetched: false,
+      }
+    }, ['fetchPending']),
+    createMeta({
+      type: 'ACTION_ERROR',
+      meta: {
+        _responseProp: 'actionError'
+      }
+    }, ['actionPending']),
+    createMeta({
+      type: 'ACTION_PENDING',
+      meta: {
+        actionPending: true,
+      }
+    }, ['actionTimestamp', 'actionError', 'actionResponse']),
+    createMeta({
+      type: 'ACTION_SUCCESS',
+      meta: {
+        _responseProp: 'actionResponse',
+        _timestamp: 'action',
+        actionSuccess: true
+      }
+    }, ['actionPending', 'actionError']),
+    createMeta({
+      type: 'ACTION_CLEAR',
+      meta: {}
+    }, ['actionId', 'actionPending', 'actionTimestamp', 'actionError', 'actionResponse',
+          'actionSuccess', 'actionTimestamp'])
+  ].map(function (data) {
     return [`${actionPrefix}_${data.type}`, data];
   });
 
@@ -188,6 +169,13 @@ export default function (options) {
     }
     return state;
   }
+}
+
+function createMeta (props, clearProps) {
+  clearProps.forEach(function (propType) {
+    props.meta[propType] = undefined;
+  });
+  return props;
 }
 
 function updateEntityModels (values, entities) {
