@@ -1,6 +1,14 @@
 import sinon from 'sinon';
 import Model from '../src/model';
+import { normalize, Schema, arrayOf } from 'normalizr';
+import { denormalize } from 'denormalizr';
 var expect = require('chai').expect;
+
+var personSchema = new Schema('people');
+var fooSchema = new Schema('foo');
+fooSchema.define({
+  author: personSchema
+});
 
 var nullEntities = undefined;
 
@@ -18,7 +26,11 @@ var noMetaEntities = {
 var metaEntities = {
   _meta: {
     foo: {
-      '1': {}
+      '1': {
+        data: {
+          abc: 'def'
+        }
+      }
     }
   },
   foo: {
@@ -28,13 +40,31 @@ var metaEntities = {
   }
 };
 
-function options(entitiesOrMeta, isEntities) {
+var normalizedEntities = {
+  _meta: {},
+  people: {
+    '1': {
+      id: '1',
+      firstName: 'Joe',
+      lastName: 'Hudson'
+    }
+  },
+  foo: {
+    '1': {
+      id: '1',
+      foo: 'bar',
+      author: '1'
+    }
+  }
+};
+
+function options(entitiesOrMeta, isEntities, options) {
   var entities = isEntities ? entitiesOrMeta : copyMetaEntities(entitiesOrMeta);
-  return {
+  return Object.assign({
     id: '1',
     domain: 'foo',
     entities: entities
-  };
+  }, options);
 }
 
 function copyMetaEntities(meta) {
@@ -44,6 +74,29 @@ function copyMetaEntities(meta) {
 }
 
 describe('model', function () {
+
+  it('should denormalize the value', function () {
+    var model = new Model(options(normalizedEntities, true, {
+      schema: fooSchema,
+      denormalize
+    }));
+    expect(model.value()).to.deep.eql({
+      id: '1',
+      foo: 'bar',
+      author: {
+        id: '1',
+        firstName: 'Joe',
+        lastName: 'Hudson'
+      }
+    });
+  });
+
+  it('should return meta data', function () {
+    var model = new Model(options(metaEntities, true));
+    expect(model.data()).to.deep.eql({
+      abc: 'def'
+    });
+  });
 
   describe('value', function () {
     it('should return with a provided domain and id', function () {

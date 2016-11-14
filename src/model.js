@@ -25,8 +25,8 @@ export default class Model {
     if (!this._formatted) {
       this._formatted = true;
       const options = this.options;
-      if (options.schema && options.denormalizr) {
-        this._formattedData = options.denormalizr(
+      if (options.schema && options.denormalize) {
+        this._formattedData = options.denormalize(
           deepValue(this.entities, [this.domain, this.id]),
           this.entities,
           options.schema
