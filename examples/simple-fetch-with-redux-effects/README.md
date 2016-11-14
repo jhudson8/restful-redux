@@ -1,6 +1,8 @@
 Example project using Github API to show profile details
 --------------------------------------------------------
 
+See [./lib](./lib) for code example
+
 Small example using
 - [react](https://facebook.github.io/react/): view lib
 - [redux](https://github.com/reactjs/redux): state container
