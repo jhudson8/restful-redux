@@ -22,11 +22,17 @@ Goals of this project
 * Auto-add model object (wrapper of your plain old JSON) to your React component
 * Support additional model specific "XHR actions"
 
+
 ## Examples
 
 * [simple XHR auto-fetch and loading state indication](./examples/01-github-profile-viewer/lib/profile-page)
 * [collection (multiple allowed) loading with formatting and result meta data storage](./examples/02-github-profile-search/lib/search-page)
 * [previous collection paged out using custom model class](./examples/03-github-paged-profile-search/lib/search-page)
+
+
+## Docs
+API docs coming very soon...
+
 
 ## Installation
 ```
