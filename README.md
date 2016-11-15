@@ -1,5 +1,4 @@
-react-redux-model
-----------------
+# react-redux-model
 Simple to use XHR fetching and model-oriented utility functions.
 
 ## tl;dr
