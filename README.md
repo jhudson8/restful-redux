@@ -14,8 +14,8 @@ There are ties between action creators, reducers and state-aware components in t
 
 Goals of this project
 
-* Make XHR fetching easy and be able to support multiple XHR libs (see example)[./examples/github-profile-view/lib/profile-page/actions.js]
-* Make reducer creation easy [see example]()./examples/github-profile-view/lib/profile-page/reducer.js)
+* Make XHR fetching easy and be able to support multiple XHR libs [see example](./examples/github-profile-view/lib/profile-page/actions.js)
+* Make reducer creation easy [see example](./examples/github-profile-view/lib/profile-page/reducer.js)
 * Provide a component wrapper that will auto-fetch your models [see example](./examples/github-profile-view/lib/profile-page/index.js#L26)
 * Support [normalizr](https://github.com/paularmstrong/normalizr) (TODO example)
 * Support collections (TODO example)
