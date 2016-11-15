@@ -2,6 +2,7 @@
 import { modelProvider } from 'react-redux-model';
 import { connect } from 'react-redux';
 
+import Collection from './collection';
 import SearchPage from './search-page';
 import { fetch, showSearchPage } from './actions';
 
@@ -19,7 +20,7 @@ function mapDispatchToProps (dispatch) {
     // a `fetch` property is required and will be used to initiate the fetch
     // the property name can be overridden using the `fetchProp` modelFetcher option
     fetch: id => dispatch(fetch(id)),
-    search: keyword => dispatch(showSearchPage(keyword))
+    search: (keyword, pageNum) => dispatch(showSearchPage(keyword, pageNum))
   };
 }
 
@@ -27,9 +28,15 @@ export default connect(mapStateToProps, mapDispatchToProps)(
   modelProvider(SearchPage, {
     models: [{
       // react-router will give us route token values in `props.params`
-      id: 'params.searchTerm',
-      // the actual property value that will be passed with the search term (same as params.keyword)
-      idProp: 'searchTerm',
+      id: function (props) {
+        return props.params.searchTerm
+          ? (encodeURIComponent(props.params.searchTerm) + ':' + (props.params.page || '1'))
+          : undefined;
+      },
+      // the property name passed to our component which represents our search collection
+      modelProp: 'collection',
+      // a custom class used to wrap our collection data
+      modelClass: Collection,
       // should match the action creator `entityType` option
       entityType: 'search',
       // if this is not included, the model will not be auto-fetched

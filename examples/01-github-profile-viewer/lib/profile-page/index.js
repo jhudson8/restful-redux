@@ -24,7 +24,7 @@ function mapDispatchToProps (dispatch) {
 
 export default connect(mapStateToProps, mapDispatchToProps)(
   modelProvider(ProfilePage, {
-    // react-router will give us the id as props.params.id because our route is `/profile/:id`
+    // react-router will give us route token values in `props.params`
     id: 'params.id',
     // should match the action creator `entityType` option
     entityType: 'profiles',

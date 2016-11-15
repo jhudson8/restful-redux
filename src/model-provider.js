@@ -16,11 +16,11 @@ export default function modelProvider (_Component, options) {
   const entitiesProp = options.entitiesProp || 'entities';
   const _models = [];
   if (options.id) {
-    _models.push(organizeProps('modelProp', 'model', 'idProp', 'id', options));
+    _models.push(organizeProps(options));
   } else if (options.models) {
     for (let i = 0; i < options.models.length; i++) {
       let _model = options.models[i];
-      _models.push(organizeProps('modelProp', 'model', 'idProp', 'id', _model));
+      _models.push(organizeProps(_model));
     }
   }
 
@@ -110,11 +110,10 @@ export default function modelProvider (_Component, options) {
       _models.forEach((options) => {
         const id = getModelId(props, options);
         if (id) {
-          const modelOptions = Object.assign({}, options, {
+          const model = new options.modelClass(Object.assign({}, options, {
             id: id,
             entities: props[entitiesProp]
-          });
-          const model = new Model(modelOptions);
+          }));
           props[options.idPropName] = id;
           props[options.propName] = model;
         }
@@ -125,16 +124,16 @@ export default function modelProvider (_Component, options) {
   });
 }
 
-function organizeProps (propNameKey, propNameDefault,
-    idNameKey, idNameDefault, options) {
+function organizeProps (options) {
   checkRequiredOptions(['id', 'entityType'], options);
   const id = options.id;
   return {
     id: (typeof id === 'string') ? id.split('.') : id,
     entityType: options.entityType,
-    propName: options[propNameKey] || propNameDefault,
-    idPropName: options[idNameKey] || idNameDefault,
+    propName: options.modelProp || 'model',
+    idPropName: options.idProp || 'id',
     fetchProp: options.fetchProp,
+    modelClass: options.modelClass || Model,
     fetchOptions: Object.assign({}, options.fetchOptions)
   };
 }
