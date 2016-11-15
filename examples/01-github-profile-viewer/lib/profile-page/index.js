@@ -1,5 +1,5 @@
 // "smart / redux store connected" React component
-import { modelProvider } from 'redux-model-util';
+import { modelProvider } from 'react-redux-model';
 import { connect } from 'react-redux';
 
 import ProfilePage from './profile-page';

@@ -1,5 +1,5 @@
 // redux actions creator used to fetch the github profile data
-import { reduxEffectsActionCreator } from 'redux-model-util';
+import { reduxEffectsActionCreator } from 'react-redux-model';
 const profileActionCreator = reduxEffectsActionCreator({
   // prefix for all redux actions of this type
   actionPrefix: 'PROFILE',

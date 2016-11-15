@@ -1,9 +1,9 @@
-import { reducer } from 'redux-model-util';
+import { reducer } from 'react-redux-model';
 
 // the `profile` constant needs to match the action creator domain
 export default reducer({
   // should match the action creator `actionPrefix` option
-  actionPrefix: 'PROFILE',
+  actionPrefix: 'SEARCH',
   // should match the action creator `entityType` option
-  entityType: 'profiles'
+  entityType: 'search'
 });

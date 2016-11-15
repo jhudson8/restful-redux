@@ -63,19 +63,22 @@ export default function modelProvider (_Component, options) {
     _models.forEach((options) => {
       if (options.fetchProp) {
         const id = getModelId(props, options);
-        const modelData = getModelData(id, props, options);
-        if (!modelData && (!this.state || !this.state._fetched || !this.state._fetched[id])) {
-          const model = new Model(Object.assign({}, options, {
-            id: id,
-            entities: props[entitiesProp]
-          }));
-          if (model.canBeFetched()) {
-            fetchModel(id, props, options);
-            this.setState((state) => {
-              state._fetched = state._fetched || {};
-              state._fetched[id] = true;
-              return state;
-            });
+        if (id) {
+          // only fetch a model if the id value exists
+          const modelData = getModelData(id, props, options);
+          if (!modelData && (!this.state || !this.state._fetched || !this.state._fetched[id])) {
+            const model = new Model(Object.assign({}, options, {
+              id: id,
+              entities: props[entitiesProp]
+            }));
+            if (model.canBeFetched()) {
+              fetchModel(id, props, options);
+              this.setState((state) => {
+                state._fetched = state._fetched || {};
+                state._fetched[id] = true;
+                return state;
+              });
+            }
           }
         }
       }
@@ -106,13 +109,15 @@ export default function modelProvider (_Component, options) {
       const props = Object.assign({}, this.props);
       _models.forEach((options) => {
         const id = getModelId(props, options);
-        const modelOptions = Object.assign({}, options, {
-          id: id,
-          entities: props[entitiesProp]
-        });
-        const model = new Model(modelOptions);
-        props[options.idPropName] = id;
-        props[options.propName] = model;
+        if (id) {
+          const modelOptions = Object.assign({}, options, {
+            id: id,
+            entities: props[entitiesProp]
+          });
+          const model = new Model(modelOptions);
+          props[options.idPropName] = id;
+          props[options.propName] = model;
+        }
       });
 
       return React.createElement(_Component, props, props.children);
