@@ -14,7 +14,7 @@ Small example using
 ## Installation
 ```
 git clone https://github.com/jhudson8/redux-model-util.git
-cd redux-model-util/examples/github-profile
+cd redux-model-util/examples/github-profile-view
 npm i
 npm start
 ```
