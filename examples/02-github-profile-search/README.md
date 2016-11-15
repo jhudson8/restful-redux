@@ -9,6 +9,8 @@ This example builds upon [./01-github-profile-viewer](./01-github-profile-viewer
 * It shows how multiple models/collections can be defined with a `modelProvider`
 * Graceful handling if a model/collection has no id (default search page with no term entered)
 
+See [./lib/search-page](./lib/search-page) for more details
+
 ## Installation
 ```
 git clone https://github.com/jhudson8/react-redux-model.git
