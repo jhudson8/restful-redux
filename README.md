@@ -25,7 +25,8 @@ Goals of this project
 ## Examples
 
 * [simple XHR auto-fetch and loading state indication](./examples/01-github-profile-viewer/lib/profile-page)
-* [collection (multiple allowed) loading with formatting and page count data](./examples/01-github-profile-viewer/lib/profile-page)
+* [collection (multiple allowed) loading with formatting and result meta data storage](./examples/02-github-profile-search/lib/search-page)
+* [paged collection from example above](./examples/03-github-paged-profile-search/lib/search-page)
 
 ## Installation
 ```
