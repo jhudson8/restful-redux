@@ -1,11 +1,11 @@
 {
-  "name": "redux-model-util",
+  "name": "react-redux-model",
   "version": "0.2.0",
   "description": "",
   "main": "lib/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jhudson8/redux-model-util.git"
+    "url": "https://github.com/jhudson8/react-redux-model.git"
   },
   "dependencies": {},
   "devDependencies": {

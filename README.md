@@ -1,20 +1,32 @@
-redux-model-util
+react-redux-model
 ----------------
+Simple to use XHR fetching and model-oriented utility functions.
 
-Most web applications have models (or REST documents if you prefer) to fetch and perform actions on.  And you end up writing the same DRY `FETCHING`, `SUCCESS` and `ERROR` actions and reducers for every fetch.  This project provides a suite of action creators, reducer functions, model data wrappers (your redux state data is still just a plain old object) and a React component wrapper to auto-fetch your model data and provide consistency and reduce DRY application code.
+## tl;dr
+Most applications have common and consistent needs.  Load data using XHR and know fetch status so it can be represented with a loading indicator.  This package provides action creators, reducers and React component wrappers to make this easy and DRY up your code.
 
-Have you noticed these common redux needs?
-- there is a common pattern seen in web apps in the fact that data needs to be fetched asynchronously
-- redux state needs to represent data fetching/fetched state if the UI should show that state
-- action types need to match up with reducer expectations
-- model data needs to match a location that the components are looking for them in `mapStateToProps`
-- smart component would (usually) want to fetch the model data if it isn’t present
+## More Details
+There are ties between action creators, reducers and state-aware components in that
+
+* action creators have to supply the action type that the reducers will be scanning for
+* reducers have to save state where state-aware components will be pulling from
+* this pattern is common for almost every bit of XHR data that we retrieve so why not DRY that up?
+
+Goals of this project
+
+* Make XHR fetching easy and be able to support multiple XHR libs (see example)[./examples/github-profile-view/lib/profile-page/actions.js]
+* Make reducer creation easy (see example)[./examples/github-profile-view/lib/profile-page/reducer.js]
+* Provide a component wrapper that will auto-fetch your models (see example)[./examples/github-profile-view/lib/profile-page/index.js#L26]
+* Support [normalizr](https://github.com/paularmstrong/normalizr) (TODO example)
+* Support collections (TODO example)
+* Auto-add model object (wrapper of your plain old JSON) to your React component (see example)[./examples/github-profile-view/lib/profile-page/profile-page.js#L28]
+* Support additional model specific "XHR actions" (TODO example)
 
 [See example applications](./examples)
 
 ## Installation
 ```
-npm install --save redux-model-util redux-effects redux-effects-fetch redux-multi
+npm install --save react-redux-model redux-effects redux-effects-fetch redux-multi
 ```
 ***note*** `redux-effects`, `redux-effects-fetch` and `redux-multi` are only required if the `reduxEffectsActionCreator` is used.
 
@@ -25,90 +37,4 @@ import fetch from 'redux-effects-fetch';
 import multi from 'redux-multi';
 
 applyMiddleware(multi, effects, fetch);
-```
-
-## Usage
-
-### Reducer
-```javascript
-import { reducer } from 'redux-model-util';
-
-// "customer" is the example action prefix that would match what is provided to the action creator
-const customerReducer = modelReducer('customer');
-
-// if you don't have any additional domain specific action types, just use the line below
-export default customerReducer;
-
-// or if you do have additional action types to handle
-export default function (state = {}, action) {
-
-  const newState = customerReducer(state, action);
-  if (newState !== state) {
-    return newState;
-  }
-
-  // add your own reducer logic here or, if you have no additional action types to work with
-}
-```
-
-### Action Creator
-```javascript
-import { reduxEffectsActionCreator } from 'redux-model-util';
-const customerActionCreator = actionCreator('customer');
-
-// return a redux action that will fetch and store the customer data for the provided id
-// the use of `redux-effects`, `redux-effects-fetch` and `redux-multi` is required
-// dispatched event types are `customer_FETCH_PENDING`, `customer_FETCH_SUCCESS`, `customer_FETCH_ERROR`
-export function fetch (id) {
-  return customerActionCreator.createFetchAction({
-    id: id,
-    url: `/path/to/customer/endpoint/${id}`
-  });
-}
-```
-
-### React Component
-```javascript
-import { componentUtil } from 'redux-model-util';
-import { connect } from 'react-redux';
-// your dumb component
-import MyCustomerDumbComponent from '...';
-// your action creator (refer to the "Action Creator" example)
-import myCustomerActionCreator from '...';
-
-// redux mapStateToProps smart component function
-function mapStateToProps (state) {
-  return {
-    // `customers` should match the state for the model reducer (refer to "Reducer" example)
-    entities: state.customers
-  }
-}
-
-// redux mapDispatchToProps smart component function
-function mapDispatchToProps (dispatch) {
-  return {
-    fetch: id => dispatch(myCustomerActionCreator.fetch(id))
-  };
-}
-
-// smart components are connected to redux state
-// think of this example as a smart component that ensures the model data is fetched and the model is provided as a prop value
-export default connect(mapStateToProps, mapDispatchToProps)(
-  componentUtil.modelFetcher(MyCustomerDumbComponent, {
-    // the property path to find the model id (this example would get the id from props.params.id)
-    id: 'params.id',
-    // should match the property name passed with `mapStateToProps` representing the models domain object
-    // `customers` should match the reducer sub-state (the Reducer example would be merged using combineReducers)
-    domain: 'customers'
-  })
-);
-
-// an additional `id` and `model` property will be provided to your dumb component
-// the id in this case would be the value from `props.params.id`
-// the model object would contain the following attributes
-// - fetched: function returning the model data if it has been fetched
-// - isFetchPending: function return true if an XHR fetch is currently in progress
-// - fetchError: function returning the error if a fetch resulted in an error
-//
-// ... and other functions dealing with additional actions that can be executed on a model
 ```
