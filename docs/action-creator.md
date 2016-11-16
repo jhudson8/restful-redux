@@ -24,7 +24,7 @@ const actionCreator = reduxEffectsActionCreator({
 [../examples/01-github-profile-viewer/lib/profile-page/actions.js](../examples/01-github-profile-viewer/lib/profile-page/actions.js)
 
 ### Action Creator API
-* [link createFetchAction](#createFetchAction)
+* [link createFetchAction](#createfetchaction)
 
 
 #### createFetchAction
