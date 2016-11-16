@@ -31,11 +31,11 @@ const actionCreator = reduxEffectsActionCreator({
 Returns a dispatchable redux action used to initiate an XHR to fetch model data.
 
 ##### options
-* id: required model id
-* url: required fetch url
-* payload: optional effects-fetch payload (https://github.com/redux-effects/redux-effects-fetch#actions)
-* schema: optional normalizr schema if response should be normalized
-* formatter: optional function(payload, id) used to format the response before being evaluated by normalizr
+* ***id***: required model id
+* ***url***: required fetch url
+* ***payload***: optional effects-fetch payload (https://github.com/redux-effects/redux-effects-fetch#actions)
+* ***schema***: optional normalizr schema if response should be normalized
+* ***formatter***: optional function(payload, id) used to format the response before being evaluated by normalizr
 
 ##### example
 ```javascript
@@ -49,9 +49,9 @@ export function fetch (id) {
 
 ##### dispatched actions
 Assuming example above using `CUSTOMER` as the `actionPrefix` value
-* CUSTOMER_FETCH_PENDING: when the fetch has been initiated; ```{ payload: { id: _model id_ } }```
-* CUSTOMER_FETCH_ERROR: if the XHR fetch failed; ```{ payload: { id: _model id_, response: _error response payload_ } }```
-* CUSTOMER_FETCH_SUCCESS: if the XHR fetch succeeded; ```{ payload: { /see response shapes below/ } }```
+* ***CUSTOMER_FETCH_PENDING***: when the fetch has been initiated; ```{ payload: { id: _model id_ } }```
+* ***CUSTOMER_FETCH_ERROR***: if the XHR fetch failed; ```{ payload: { id: _model id_, response: _error response payload_ } }```
+* ***CUSTOMER_FETCH_SUCCESS***: if the XHR fetch succeeded; ```{ payload: { /see response shapes below/ } }```
 
 ##### response shapes
 Either the API response, `formatter` or `normalizr schema` should return one of the following responses.
@@ -83,14 +83,14 @@ Advanced
 Returns a dispatchable redux action used to perform an arbitrary action associated with a model.  The last successful action (and response) will be saved in redux state and available using the Model API (see Model docs).
 
 ##### options
-* id: required model id
-* actionId: required action identifier (for example `update`)
-* url: required url
-* payload: optional effects-fetch payload (https://github.com/redux-effects/redux-effects-fetch#actions)
-* schema: optional normalizr schema if response should be normalized
-* formatter: optional function(payload, id) used to format the response before being evaluated by normalizr
-* replaceModel: `true` if the model contents should be replaced with this XHR response
-* clearAfter: optional time in milis to clear out this recorded action in redux state
+* ***id***: required model id
+* ***actionId***: required action identifier (for example `update`)
+* ***url***: required url
+* ***payload***: optional effects-fetch payload (https://github.com/redux-effects/redux-effects-fetch#actions)
+* ***schema***: optional normalizr schema if response should be normalized
+* ***formatter***: optional function(payload, id) used to format the response before being evaluated by normalizr
+* ***replaceModel***: `true` if the model contents should be replaced with this XHR response
+* ***clearAfter***: optional time in milis to clear out this recorded action in redux state
 
 ##### example
 ```javascript
@@ -110,9 +110,9 @@ export function updateCustomer (id, customerData) {
 
 ##### dispatched actions
 Assuming example above using `CUSTOMER` as the `actionPrefix` value
-* CUSTOMER_ACTION_PENDING: when the fetch has been initiated; ```{ payload: { id: _model id_, actionId: _action id_ } }```
-* CUSTOMER_ACTION_ERROR: if the XHR fetch failed; ```{ payload: { id: _model id_, actionId: _action id_, response: _error response payload_ } }```
-* CUSTOMER_ACTION_SUCCESS: if the XHR fetch succeeded; ```{ payload: { id: _model id_, actionId: _action id_, response: _response payload_  } }```
+* ***CUSTOMER_ACTION_PENDING***: when the fetch has been initiated; ```{ payload: { id: _model id_, actionId: _action id_ } }```
+* ***CUSTOMER_ACTION_ERROR***: if the XHR fetch failed; ```{ payload: { id: _model id_, actionId: _action id_, response: _error response payload_ } }```
+* ***CUSTOMER_ACTION_SUCCESS***: if the XHR fetch succeeded; ```{ payload: { id: _model id_, actionId: _action id_, response: _response payload_  } }```
 *** note***: if `replaceModel` is `true`, use the `createFetchAction` response shape instead of the `response` attribute
 
 [API table of contents](#action-creator-api)
