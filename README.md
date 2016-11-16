@@ -30,7 +30,9 @@ Goals of this project
 
 
 ## Docs
-API docs coming very soon...
+* [Action Creators](./docs/action-creator.md)
+
+Full API docs coming very soon...
 
 
 ## Installation
