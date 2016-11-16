@@ -31,6 +31,7 @@ Goals of this project
 
 ## Docs
 * [Action Creators](./docs/action-creator.md)
+* [Model Class](./docs/model.md)
 
 Full API docs coming very soon...
 
