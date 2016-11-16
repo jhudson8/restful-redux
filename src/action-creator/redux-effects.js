@@ -93,7 +93,7 @@ export default function (options) {
       let {
         id, // the model id (to be added to the payloads for the reducer)
         url, // the endpoint URI
-        payload, // [effects-fetch payload](https://github.com/redux-effects/redux-effects-fetch#creating-a-user)
+        payload, // [effects-fetch payload](https://github.com/redux-effects/redux-effects-fetch#actions)
         schema,
         formatter,
         onSuccess,
