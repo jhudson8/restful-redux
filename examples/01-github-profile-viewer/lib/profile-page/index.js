@@ -30,5 +30,5 @@ export default connect(mapStateToProps, mapDispatchToProps)(
     entityType: 'profiles',
     // if this is not included, the model will not be auto-fetched
     fetchProp: 'fetch'
-  })
+  });
 );

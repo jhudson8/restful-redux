@@ -2,7 +2,7 @@ Action Creators
 ---------------
 The action creator in this project is used to easily, and with very little code, create dispatchable actions that interact with this package's reducers.
 
-There is 1 action creator impl (using [redux-effects-fetch](https://github.com/redux-effects/redux-effects-fetch)).
+This project contains 1 action creator impl (using [redux-effects-fetch](https://github.com/redux-effects/redux-effects-fetch)).
 
 You can create your own so we will discuss the interface (expected by the reducer) as well.
 
