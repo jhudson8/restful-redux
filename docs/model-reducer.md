@@ -18,12 +18,15 @@ It's as simple as that!
 
 Or you can compose several of these reducers into a single one using the `join` function
 ```
-// customer model data
+import { reducer } from 'react-redux-model';
+
+// example reducer handling customer model data
 const customerReducer = reducer({
   actionPrefix: 'CUSTOMER',
   entityType: 'customer'
 });
-// customer search collections
+
+// example reducer handling customer search collections
 const customerSearchReducer = reducer({
   actionPrefix: 'CUSTOMER_SEARCH',
   entityType: 'customerSearch'
