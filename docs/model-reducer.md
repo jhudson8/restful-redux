@@ -38,7 +38,7 @@ export default function (state = {}, action) {
     return newState;
   }
 
-  // you can add your own customer reducer logic as well
+  // you can add your own additional reducer logic as well
 }
 ```
 
