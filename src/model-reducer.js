@@ -7,7 +7,7 @@ import { checkRequiredOptions } from './common-util';
  * - entityType: the entityType used to isolate the event type names
  * - action: action
  */
-export default function (options) {
+function reducer (options) {
   checkRequiredOptions(['entityType', 'actionPrefix'], options);
 
   const {
@@ -203,3 +203,18 @@ function updateEntityModels (values, entities) {
   }
   return rtn;
 }
+
+// allow multiple reducers to be joined together
+reducer.join = function(reducers) {
+  return function (state, action) {
+    for (var i = 0; i < reducers.length; i ++) {
+      let newState = reducers[i](state, action);
+      if (newState !== state) {
+        return newState;
+      }
+    }
+    return state;
+  }
+}
+
+export default reducer;

@@ -33,6 +33,36 @@ describe('model-reducer', function () {
     entityType: 'foo'
   });
 
+  describe('join', function () {
+    var origState = {};
+    var reducer1 = function (state, action) {
+      if (action === 'foo') {
+        return 'foo';
+      }
+      return state;
+    }
+    var reducer2 = function (state, action) {
+      if (action === 'bar') {
+        return 'bar';
+      }
+      return state;
+    }
+    var joined = reducer.join([reducer1, reducer2]);
+
+    it('should return orig state if no reducers are matched', function () {
+      var state = joined(origState, 'abc');
+      expect(state).to.equal(origState);
+    });
+    it('should return new state if a reducer is matched', function () {
+      var state = joined(origState, 'foo');
+      expect(state).to.equal('foo');
+    });
+    it('should work with multiple reducers', function () {
+      var state = joined(origState, 'bar');
+      expect(state).to.equal('bar');
+    });
+  });
+
   it ('should return provided state for N/A action type', function () {
     var state = fooReducer(emptyState, {
       type: 'BAR_FETCH_SUCCESS',

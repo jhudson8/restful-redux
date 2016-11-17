@@ -2,7 +2,7 @@
 Simple to use XHR fetching and model-oriented utility functions.
 
 ## tl;dr
-Most applications have common and consistent needs.  Load data using XHR and know fetch status so it can be represented with a loading indicator.  This package provides action creators, reducers and React component wrappers to make this easy and DRY up your code.
+Most applications have common and consistent needs.  Load data using XHR and know the fetch status so it can be represented with a loading indicator.  This lib provides action creators, reducers and React component wrappers that work with each other to simplify and DRY up your code.
 
 ## More Details
 There are ties between action creators, reducers and state-aware components in that
@@ -24,17 +24,16 @@ Goals of this project
 
 ## Examples
 
-* [simple XHR auto-fetch and loading state indication](./examples/01-github-profile-viewer/lib/profile-page)
-* [collection (multiple allowed) loading with formatting and result meta data storage](./examples/02-github-profile-search/lib/search-page)
-* [previous collection paged out using custom model class](./examples/03-github-paged-profile-search/lib/search-page)
+* [simple XHR auto-fetch and loading state indication](./examples/01-github-profile-viewer)
+* [collection (multiple allowed) loading with formatting and result meta data storage](./examples/02-github-profile-search)
+* [previous collection paged out using custom model class](./examples/03-github-paged-profile-search)
 
 
 ## Docs
 * [Action Creators](./docs/action-creator.md)
 * [Model Provider React component](./docs/model-provider.md)
 * [Model Class](./docs/model.md)
-
-Full API docs coming very soon...
+* [Model Reducer](./docs/model-reducer.md)
 
 
 ## Installation
