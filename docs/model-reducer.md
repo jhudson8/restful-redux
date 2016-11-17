@@ -14,7 +14,9 @@ export default reducer({
   entityType: 'customer'
 });
 ```
-And that's it!  Or you can compose several of these reducers into a single one using the `join` function
+It's as simple as that!
+
+Or you can compose several of these reducers into a single one using the `join` function
 ```
 // customer model data
 const customerReducer = reducer({
