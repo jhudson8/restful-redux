@@ -9,7 +9,8 @@ This example builds upon [./01-github-profile-viewer](./01-github-profile-viewer
 * It shows how multiple models/collections can be defined with a `modelProvider`
 * Graceful handling if a model/collection has no id (default search page with no term entered)
 
-See [./lib/search-page](./lib/search-page) for more details
+Everything in this folder is boilerplate to get the app running.  See [./lib/search-page](./lib/search-page) for meaningful example.
+
 
 ## Installation
 ```

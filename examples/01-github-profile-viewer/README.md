@@ -2,7 +2,8 @@ Github Profile Viewer Example
 --------------------------------------------------------
 This demonstrates simple model XHR fetching, showing loading status and viewing final model details or error results.
 
-See [./lib/profile-page](./lib/profile-page) for more details
+Everything in this folder is boilerplate to get the app running.  See [./lib/profile-page](./lib/profile-page) for meaningful example.
+
 
 ## Installation
 ```

@@ -1,8 +1,8 @@
 Github Profile Search Example
 --------------------------------------------------------
-This example builds upon [./02-github-profile-search](./02-github-profile-search) with paged results.
+This example builds upon [./02-github-profile-search](./02-github-profile-search) and adds search result paging.
 
-See [./lib/search-page](./lib/search-page) for more details
+Everything in this folder is boilerplate to get the app running.  See [./lib/search-page](./lib/search-page) for meaningful example.
 
 
 ## Installation
