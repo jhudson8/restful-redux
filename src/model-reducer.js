@@ -13,8 +13,15 @@ function reducer (options) {
   const {
     entityType,
     actionPrefix,
+    debug,
     fetchType = 'full'
   } = options;
+  const verbose = debug === 'verbose';
+
+  function log () {
+    const pre = [`model-reducer "${entityType}" `];
+    console.log.apply(console, pre.concat.apply(pre, arguments));
+  }
 
   function update ({
     state,
@@ -23,8 +30,13 @@ function reducer (options) {
     entities,
     meta,
     clear,
-    type
+    type,
+    actionType
   }) {
+    if (debug) {
+      log(`${actionType} handled\n\tprevious state: `, state, '\n\t  result: ', result, '\n\t  entities: ', entities);
+    }
+
     // make sure our necessary data structure is initialized
     let stateEntities = state.entities || {};
     stateEntities._meta = stateEntities._meta || {};
@@ -76,6 +88,9 @@ function reducer (options) {
       delete(stateEntities[entityType][id]);
     }
 
+    if (debug) {
+      log(`${actionType}\n\tpost state\n\t`, state);
+    }
     return state;
   }
 
@@ -141,6 +156,9 @@ function reducer (options) {
   ].map(function (data) {
     return [`${actionPrefix}_${data.type}`, data];
   });
+  if (verbose) {
+    log('loaded\n\tlistening for ' + handlers.map(data => data[0]).join(', '));
+  }
 
   return function (state = {}, action) {
     const type = action.type;
@@ -179,10 +197,15 @@ function reducer (options) {
           meta,
           clear: options.clear,
           type: options.type,
+          actionType: type
         });
       }
     }
     return state;
+  }
+
+  if (verbose) {
+    log(`action *not* handled: ${type}`);
   }
 }
 
