@@ -87,6 +87,8 @@ describe('redux-effects-action-creator', function () {
       expect(successAction).to.deep.equal({
         type: 'FOO_FETCH_SUCCESS',
         payload: {
+          data: undefined,
+          id: '1',
           result: '1',
           entities: {
             people: {
