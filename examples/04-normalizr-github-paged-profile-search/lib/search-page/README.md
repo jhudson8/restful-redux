@@ -35,7 +35,8 @@ This example builds upon [./03-github-paged-profile-search](./03-github-paged-pr
         ],
         ...
       },
-      repositories: {
+      // "repository" from the schema definition in ./schema.js
+      repository: {
         repo_id_1: {
           ...
         },
