@@ -41,7 +41,10 @@ export default function (options) {
             payload = formatter(payload, id, entityType);
           }
           if (schema && normalize) {
-            payload = normalize(payload, schema);
+            payload = Object.assign(normalize(payload.result || payload, schema), {
+              id: payload.id,
+              data: payload.data
+            });
           } else if (!formatter) {
             payload = defaultFormat(payload, id, entityType);
           }

@@ -127,7 +127,7 @@ export default function modelProvider (_Component, options) {
 function organizeProps (options) {
   checkRequiredOptions(['id', 'entityType'], options);
   const id = options.id;
-  return {
+  return Object.assign({}, options, {
     id: (typeof id === 'string') ? id.split('.') : id,
     entityType: options.entityType,
     propName: options.modelProp || 'model',
@@ -135,5 +135,5 @@ function organizeProps (options) {
     fetchProp: options.fetchProp,
     modelClass: options.modelClass || Model,
     fetchOptions: Object.assign({}, options.fetchOptions)
-  };
+  });
 }
