@@ -34,8 +34,11 @@ const customerSearchReducer = reducer({
   entityType: 'customerSearch'
 });
 
+const allReducers = reducer.join([customerReducer, customerSearchReducer]);
+
 export default function (state = {}, action) {
-  const newState = reducer.join([customerReducer, customerSearchReducer]);
+  const newState = allReducers(state, action);
+  // or, if you have no custom reducer logic... export default allReducers
   if (newState !== state) {
     return newState;
   }
