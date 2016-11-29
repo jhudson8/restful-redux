@@ -9,6 +9,7 @@ A React class used to auto-fetch and inject Model objects (which wrap your model
 import { modelProvider } from 'react-redux-model';
 import { connect } from 'react-redux';
 
+// referring to your custom code here
 import CustomerPage from './customer-page';
 import { fetch } from './customer-actions';
 
