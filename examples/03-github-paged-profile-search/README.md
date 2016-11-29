@@ -8,7 +8,7 @@ Everything in this folder is boilerplate to get the app running.  See [./lib/sea
 ## Installation
 ```
 git clone https://github.com/jhudson8/react-redux-model.git
-cd react-redux-model/examples/02-github-profile-search
+cd react-redux-model/examples/03-github-paged-profile-search
 npm i
 npm start
 ```
