@@ -14,10 +14,12 @@ import { reduxEffectsActionCreator } from 'react-redux-model';
 const actionCreator = reduxEffectsActionCreator({
   // prefix for all redux actions of this type
   actionPrefix: 'CUSTOMER',
-  // root domain for model data; store data structure is { entities: { profiles: { _id_: {_model_data} } } }
+  // root domain for model data; redux store data structure would be { entities: { customer: { _id_: {_model_data} } } }
   entityType: 'customer',
-  // optional normalizr normalize method (see https://github.com/paularmstrong/normalizr... `import { normalize } from 'normalizr';`)
-  normalize: normalize
+  // optional normalizr normalize method (see https://github.com/paularmstrong/normalizr;  `import { normalize } from 'normalizr';`)
+  normalize: normalize,
+  // optional value to help log info to console if you are having trouble getting things working
+  debug: true
 });
 ```
 ### Example

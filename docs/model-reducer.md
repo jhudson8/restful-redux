@@ -11,7 +11,9 @@ export default reducer({
   // should match the action creator `actionPrefix` option
   actionPrefix: 'CUSTOMER',
   // should match the action creator `entityType` option
-  entityType: 'customer'
+  entityType: 'customer',
+  // optional value to help log info to console if you are having trouble getting things working
+  debug: true
 });
 ```
 It's as simple as that!
@@ -46,4 +48,4 @@ export default function (state = {}, action) {
 ### options
 * ***actionPrefix***: required identifier for all actions which must match the `actionPrefix` config option in the associated action creator
 * ***entityType***: required identifier (used for root state key of domain specific models) which must match the `entityType` config option in the associated action creator
-* ***
+* ***debug***: optional value to help log info to console if you are having trouble getting things working.  Can be `true` or `verbose` for more detailed console logs.

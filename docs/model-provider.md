@@ -37,10 +37,27 @@ export default connect(mapStateToProps, mapDispatchToProps)(
     // should match the action creator `entityType` option
     entityType: 'customer',
     // if this is not included, the model will not be auto-fetched
-    fetchProp: 'fetch'
+    fetchProp: 'fetch',
+    // optional value to help log info to console if you are having trouble getting things working
+    debug: true
   });
 
 );
+```
+or if you have multiple models to work with
+```javascript
+...
+
+modelProvider(CustomerPage, {
+  models: [{
+    id: 'params.id',
+    entityType: 'customer',
+    fetchProp: 'fetch',
+    debug: true
+  }, {
+    ...
+  }]
+});
 ```
 
 ### options
