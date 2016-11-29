@@ -49,11 +49,11 @@ or if you have multiple models to work with
 ...
 
 modelProvider(CustomerPage, {
+  debug: true,
   models: [{
     id: 'params.id',
     entityType: 'customer',
-    fetchProp: 'fetch',
-    debug: true
+    fetchProp: 'fetch'
   }, {
     ...
   }]
