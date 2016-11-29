@@ -5,6 +5,7 @@ This example builds upon [03-github-paged-profile-search](../../../03-github-pag
 
 ### Differences from previous example
 
+* added `normalizr` and `denormalizr` as dependencies
 * a normalizr schema was created in [./schema](./schema.js)
 * the `normalize` function from `normalizr` and `./schema` are provided as options in the [action creator](./actions.js)
 * the `denormalize` function from `denormalizr` and `./schema` are provided as options in the [model provider](./index.js)
