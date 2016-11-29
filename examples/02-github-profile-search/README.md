@@ -1,6 +1,6 @@
 Github Profile Search Example
 --------------------------------------------------------
-This example builds upon [./01-github-profile-viewer](./01-github-profile-viewer) with the following differences
+This example builds upon what we learned with [01-github-profile-viewer](./01-github-profile-viewer) with the following differences
 
 * Added redux router middleware to capture dynamic URI push events (when search term changes)
 * It retrieves a collection of data rather a single model

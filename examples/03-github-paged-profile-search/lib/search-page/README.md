@@ -1,6 +1,6 @@
 Github Profile Search Example
 --------------------------------------------------------
-This is very similar to [../../../02-github-profile-search](../../../02-github-profile-search) except that now we page out the results with `previous` and `next` buttons.
+This is similar to [02-github-profile-search](../../../02-github-profile-search) except that now we page out the results with `previous` and `next` buttons.
 
 
 ### Differences from previous example
