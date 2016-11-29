@@ -16,3 +16,10 @@ export function checkRequiredOptions (keys, options) {
     }
   });
 }
+
+export function logger (prefix) {
+  const pre = [`${prefix} `];
+  return function () {
+    console.log.apply(console, pre.concat.apply(pre, arguments));
+  }
+}

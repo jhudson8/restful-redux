@@ -30,6 +30,7 @@ function mapDispatchToProps (dispatch) {
 
 export default connect(mapStateToProps, mapDispatchToProps)(
   modelProvider(SearchPage, {
+    debug: true,
     models: [{
       // react-router will give us route token values in `props.params`
       id: function (props) {

@@ -1,4 +1,4 @@
-import { checkRequiredOptions } from './common-util';
+import { checkRequiredOptions, logger } from './common-util';
 
 /**
  * Utility method for a consistent fetch pattern.  Return the state if applicable and false otherwise.
@@ -17,11 +17,7 @@ function reducer (options) {
     fetchType = 'full'
   } = options;
   const verbose = debug === 'verbose';
-
-  function log () {
-    const pre = [`model-reducer "${entityType}" `];
-    console.log.apply(console, pre.concat.apply(pre, arguments));
-  }
+  const log = logger(`model-reducer "${entityType}"`);
 
   function update ({
     state,
@@ -33,10 +29,6 @@ function reducer (options) {
     type,
     actionType
   }) {
-    if (debug) {
-      log(`${actionType} handled\n\tprevious state: `, state, '\n\t  result: ', result, '\n\t  entities: ', entities);
-    }
-
     // make sure our necessary data structure is initialized
     let stateEntities = state.entities || {};
     stateEntities._meta = stateEntities._meta || {};
@@ -89,7 +81,7 @@ function reducer (options) {
     }
 
     if (debug) {
-      log(`${actionType}\n\tpost state\n\t`, state);
+      log(`${actionType} (${id}) handled\n\tprevious state:\n\t`, state, '\n\tpost state:\n\t', state, '\n\tresult:\n\t', result, '\n\tentities:\n\t', entities);
     }
     return state;
   }

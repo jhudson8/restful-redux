@@ -5,5 +5,6 @@ export default reducer({
   // should match the action creator `actionPrefix` option
   actionPrefix: 'SEARCH',
   // should match the action creator `entityType` option
-  entityType: 'search'
+  entityType: 'search',
+  debug: true
 });

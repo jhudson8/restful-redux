@@ -1,5 +1,5 @@
 import React from 'react';
-import { deepPropValue, checkRequiredOptions } from './common-util';
+import { deepPropValue, checkRequiredOptions, logger } from './common-util';
 import Model from './model';
 
 /**
@@ -11,6 +11,10 @@ export default function modelProvider (_Component, options) {
   if (!_Component) {
     throw new Error('Undefined modelProvider component');
   }
+
+  const debug = options.debug;
+  const verbose = debug === 'verbose';
+  const log = logger('model-provider');
 
   // organize up our model and collection requirements
   const entitiesProp = options.entitiesProp || 'entities';
@@ -78,6 +82,8 @@ export default function modelProvider (_Component, options) {
                 state._fetched[id] = true;
                 return state;
               });
+            } else if (verbose) {
+              log(`model ${id} is not available but "canBeFetched" returned false`);
             }
           }
         }
@@ -92,6 +98,9 @@ export default function modelProvider (_Component, options) {
       if (fetchOptionsDef.hasOwnProperty(key)) {
         fetchOptions[key] = deepPropValue(fetchOptionsDef[key], props);
       }
+    }
+    if (debug) {
+      log(`triggering fetch for model "${id}" using "${options.fetchProp}" prop"`);
     }
     props[options.fetchProp](id, fetchOptions);
   }

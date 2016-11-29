@@ -8,6 +8,7 @@ This example builds upon [./03-github-paged-profile-search](./03-github-paged-pr
 * a normalizr schema was created in [./schema](./schema.js)
 * the `normalize` function from `normalizr` and `./schema` are provided as options in the [action creator](./actions.js)
 * the `denormalize` function from `denormalizr` and `./schema` are provided as options in the [model provider](./index.js)
+* to demonstrate debugging capabilities, added the `debug: true` to the [action creator](./actions.js), [model provider](./index.js), and [model reducer](./reducer.js) (see console logging when viewing the web app)
 
 ### Populated Redux State
 ```

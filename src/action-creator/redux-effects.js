@@ -1,4 +1,4 @@
-import { checkRequiredOptions } from '../common-util';
+import { checkRequiredOptions, logger } from '../common-util';
 
 /**
  * IMPORTANT: Usage of [multi](https://github.com/ashaffer/redux-multi) middleware or a lib of similar nature is required
@@ -15,8 +15,11 @@ export default function (options) {
   const {
     actionPrefix,
     entityType,
-    normalize
+    normalize,
+    debug
   } = options;
+  const verbose = debug === 'verbose';
+  const log = logger(`action-creator-redux-effects "${entityType}"`);
 
   // return a callback handler which includes the provided id in the payload as a top level attribute
   function asyncResponseAction ({
@@ -62,12 +65,20 @@ export default function (options) {
       if (actionId) {
         payload.actionId = actionId;
       }
-      const action = createAction(`${actionPrefix}_${fetchOrAction}_${type}`, payload);
+      const actionType = `${actionPrefix}_${fetchOrAction}_${type}`;
+      const action = createAction(actionType, payload);
+
+      if (debug) {
+        log(`triggering ${actionType} with `, action);
+      }
 
       if (clearAfter) {
         // requires `redux-thunk`
         return [action, function (dispatch) {
           setTimeout(function () {
+            if (debug) {
+              log(`action timeout ${entityType}:${id}`);
+            }
             dispatch(asyncResponseAction ({
               entityType,
               fetchOrAction,
@@ -102,7 +113,7 @@ export default function (options) {
         onSuccess,
         onError
       } = options;
-      return [
+      const rtn = [
         createPendingAction(actionPrefix, id),
         bind(
           fetch(url, payload),
@@ -126,6 +137,10 @@ export default function (options) {
           }),
         )
       ];
+      if (debug) {
+        log(`creating fetch action (${id}) with:\n\t`, rtn);
+      }
+      return rtn;
     },
 
     /**
@@ -152,7 +167,7 @@ export default function (options) {
       onError,
       clearAfter
     }) {
-      return [
+      const rtn = [
         createPendingAction(actionPrefix, id, actionId),
         bind(
           fetch(url, payload),
@@ -180,6 +195,10 @@ export default function (options) {
           })
         )
       ];
+      if (debug) {
+        log(`creating XHR action (${id}:${actionId}) with:\n\t`, rtn);
+      }
+      return rtn;
     }
   };
 }
