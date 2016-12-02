@@ -1,17 +1,19 @@
 {
-  "name": "01-github-profile-viewer",
+  "name": "03-github-paged-profile-search",
   "version": "1.0.0",
   "description": "",
   "dependencies": {
+    "denormalizr": "^0.4.1",
+    "normalizr": "^2.2.1",
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
     "react-redux": "^4.4.5",
+    "react-redux-model": "^0.4.0",
     "react-router": "^2.8.1",
     "react-router-redux": "^4.0.6",
     "redux": "^3.6.0",
     "redux-effects": "^0.4.3",
     "redux-effects-fetch": "^0.5.5",
-    "react-redux-model": "^0.4.0",
     "redux-multi": "^0.1.12"
   },
   "devDependencies": {
