@@ -28,9 +28,7 @@
   },
   "scripts": {
     "test": "rm -rf .test mkdir .test && babel src --out-dir .test/src && babel tests --out-dir .test/tests && mocha --recursive .test/tests",
-    "build": "babel src --out-dir lib",
-    "postpublish": "rm -rf lib",
-    "prepublish": "rm -rf lib && rm -rf .test && npm run build"
+    "build": "rm -rf lib && rm -rf .test && babel src --out-dir lib"
   },
   "author": "Joe Hudson <joehud@gmail.com>",
   "license": "MIT"
