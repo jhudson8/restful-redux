@@ -8,7 +8,7 @@ Everything in this folder is boilerplate to get the app running.  See [./lib](./
 ## Installation
 ```
 git clone https://github.com/jhudson8/react-redux-model.git
-cd react-redux-model/examples/04-normalizr-github-paged-project-search
+cd react-redux-model/examples/05-normalizr-github-paged-project-search-and-viewer
 npm i
 npm start
 ```
