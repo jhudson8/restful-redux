@@ -2,7 +2,7 @@ Github Project Search Example
 --------------------------------------------------------
 This example builds upon [02-github-project-search](./02-github-project-search) and adds search result paging.
 
-Everything in this folder is boilerplate to get the app running.  See [./lib/search-page](./lib/search-page) for meaningful example.
+There are only meta files here.  See [./lib/search-page](./lib/search-page) for meaningful example.
 
 
 ## Installation

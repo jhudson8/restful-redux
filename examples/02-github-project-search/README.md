@@ -11,7 +11,7 @@ Some notable differences are
 * It shows how multiple models/collections can be defined with a `modelProvider`
 * Graceful handling if a model/collection has no id (default search page with no term entered)
 
-Everything in this folder is boilerplate to get the app running.  See [./lib/search-page](./lib/search-page) for meaningful example.
+There are only meta files here.  See [./lib/search-page](./lib/search-page) for meaningful example.
 
 
 ## Installation
