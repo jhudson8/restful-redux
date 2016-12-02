@@ -24,10 +24,11 @@ Goals of this project
 
 ## Examples
 
-* [simple XHR auto-fetch and loading state indication](./examples/01-github-profile-viewer)
-* [collection (multiple allowed) loading with formatting and result meta data storage](./examples/02-github-profile-search)
-* [previous collection paged out using custom model class](./examples/03-github-paged-profile-search)
-* [paged collection data normalized with normalizr with helpful debug settings](./examples/04-normalizr-github-paged-profile-search)
+* [simple github profile page viewer (demonstrating XHR auto-fetch and loading state indication)](./examples/01-github-profile-viewer)
+* [simple github project search (demonstrating collections)](./examples/02-github-project-search)
+* [github project search with paging using custom model class](./examples/03-github-paged-project-search)
+* [paged github project search with normalized entities using normalizr and helpful debug settings](./examples/04-normalizr-github-paged-project-search)
+* [previous project with additional project viewer page from search (demonstrating no additional XHR fetch because of normalized entities) ](./examples/05-normalizr-github-paged-project-search-and-viewer)
 
 
 ## Docs
