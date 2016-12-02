@@ -32,7 +32,7 @@ Goals of this project
 
 
 ## Docs
-* [Action Creator (impl using redux-effects)](./docs/action-creator.md)
+* [Action Creator (using redux-effects)](./docs/action-creator.md)
 * [Model Provider React component](./docs/model-provider.md)
 * [Model Class](./docs/model.md)
 * [Model Reducer](./docs/model-reducer.md)
