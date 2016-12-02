@@ -42,7 +42,7 @@ Goals of this project
 ```
 npm install --save react-redux-model
 ```
-If using the [redux-effects](https://github.com/redux-effects/redux-effects) based action creator(./docs/action-creator.md)
+If using the [redux-effects](https://github.com/redux-effects/redux-effects) based action creator
 ```
 npm install --save react-redux-model redux-effects redux-effects-fetch redux-multi
 ```
