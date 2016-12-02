@@ -2,7 +2,7 @@
 import { modelProvider } from 'react-redux-model';
 import { connect } from 'react-redux';
 
-import RepositoryPage from './repository-page';
+import ProjectDetailsPage from './project-details-page';
 import { fetch } from './actions';
 
 // redux mapStateToProps smart component function
@@ -23,8 +23,8 @@ function mapDispatchToProps (dispatch) {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(
-  modelProvider(RepositoryPage, {
-    // react-router will give us route token values in `props.params`
+  modelProvider(ProjectDetailsPage, {
+    // project-details-router will give us route token values in `props.params`
     id: function (props) {
       const params = props.params;
       return `${params.org}/${params.id}`;

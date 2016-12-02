@@ -52,7 +52,7 @@ export default function ({ collection, search, params }) {
           <ul>
             {searchResults.map(item => (
               <li key={item.full_name}>
-                <Link to={`/repository/${item.full_name}`}>{item.full_name}</Link>
+                <Link to={`/project/${item.full_name}`}>{item.full_name}</Link>
               </li>
             ))}
           </ul>

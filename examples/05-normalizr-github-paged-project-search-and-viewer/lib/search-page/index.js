@@ -8,7 +8,7 @@ import { fetch, showSearchPage } from './actions';
 
 // imports to denormalize the normalized data
 import { denormalize } from 'denormalizr';
-import schema from '../repository-page/schema';
+import schema from '../project-details-page/schema';
 
 // redux mapStateToProps smart component function
 function mapStateToProps (state) {

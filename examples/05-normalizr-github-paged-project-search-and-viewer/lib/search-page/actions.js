@@ -4,7 +4,7 @@ import { push } from 'react-router-redux';
 import { resultsPerPage } from './collection';
 
 // include our search schema and normalize function
-import schema from '../repository-page/schema';
+import schema from '../project-details-page/schema';
 import { normalize } from 'normalizr';
 
 const profileActionCreator = reduxEffectsActionCreator({

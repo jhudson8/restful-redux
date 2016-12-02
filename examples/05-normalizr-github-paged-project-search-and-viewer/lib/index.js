@@ -8,7 +8,7 @@ import { Router, Route, browserHistory } from 'react-router';
 import middleware from './middleware';
 import reducers from './reducers';
 import SearchPage from './search-page';
-import RepositoryPage from './repository-page';
+import ProjectDetailsPage from './project-details-page';
 
 // redux store
 let store = createStore(
@@ -21,7 +21,7 @@ ReactDOM.render(
   <Provider store={store}>
     <Router history={browserHistory}>
       <Route path="/search(/:searchTerm)(/:page)" component={SearchPage}/>
-      <Route path="/repository/:org/:id" component={RepositoryPage}/>
+      <Route path="/project/:org/:id" component={ProjectDetailsPage}/>
     </Router>
   </Provider>,
   document.getElementById('root')

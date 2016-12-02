@@ -1,6 +1,6 @@
 Github Project Search Example
 --------------------------------------------------------
-This example builds upon [03-github-paged-profile-search](../../../03-github-paged-profile-search) with additional [normalizr](https://github.com/paularmstrong/normalizr) support.
+This example builds upon [04-normalizr-github-paged-profile-search](../../../04-normalizr-github-paged-profile-search) with additional [normalizr](https://github.com/paularmstrong/normalizr) support.
 
 
 ### Differences from previous example
