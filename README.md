@@ -32,7 +32,7 @@ Goals of this project
 
 
 ## Docs
-* [Action Creators](./docs/action-creator.md)
+* [Action Creator (impl using redux-effects)](./docs/action-creator.md)
 * [Model Provider React component](./docs/model-provider.md)
 * [Model Class](./docs/model.md)
 * [Model Reducer](./docs/model-reducer.md)
@@ -42,7 +42,7 @@ Goals of this project
 ```
 npm install --save react-redux-model
 ```
-If using the [redux-effects based action creator](./docs/action-creator.md)
+If using the [redux-effects](https://github.com/redux-effects/redux-effects) based action creator(./docs/action-creator.md)
 ```
 npm install --save react-redux-model redux-effects redux-effects-fetch redux-multi
 ```
