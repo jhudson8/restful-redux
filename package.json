@@ -1,6 +1,6 @@
 {
   "name": "react-redux-model",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "",
   "main": "lib/index.js",
   "repository": {
@@ -28,7 +28,8 @@
   },
   "scripts": {
     "test": "rm -rf .test mkdir .test && babel src --out-dir .test/src && babel tests --out-dir .test/tests && mocha --recursive .test/tests",
-    "build": "rm -rf lib && rm -rf .test && babel src --out-dir lib"
+    "build": "rm -rf lib && rm -rf .test && babel src --out-dir lib",
+    "prepublish": "npm run build"
   },
   "author": "Joe Hudson <joehud@gmail.com>",
   "license": "MIT"
