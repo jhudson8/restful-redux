@@ -40,9 +40,12 @@ Goals of this project
 
 ## Installation
 ```
+npm install --save react-redux-model
+```
+If using the [redux-effects based action creator](./docs/action-creator.md)
+```
 npm install --save react-redux-model redux-effects redux-effects-fetch redux-multi
 ```
-***note*** `redux-effects`, `redux-effects-fetch` and `redux-multi` are only required if the `reduxEffectsActionCreator` is used.
 
 And apply the middleware dependencies
 ```
