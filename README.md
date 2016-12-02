@@ -28,7 +28,7 @@ Goals of this project
 * [simple github project search using github API (demonstrating collections)](./examples/02-github-project-search)
 * [previous example with paging using custom model class](./examples/03-github-paged-project-search)
 * [previous example with normalized entities using normalizr and helpful debug settings](./examples/04-normalizr-github-paged-project-search)
-* [previous example with additional project details page (demonstrating no additional XHR fetch because of normalized entities) ](./examples/05-normalizr-github-paged-project-search-and-viewer)
+* [previous example with additional project details page (demonstrating no additional XHR fetch for details page because of normalized entities) ](./examples/05-normalizr-github-paged-project-search-and-viewer)
 
 
 ## Docs
