@@ -94,6 +94,18 @@ export default function (options) {
   }
 
   return {
+
+    /* return an action which will set meta data to be associated with a model */
+    createDataAction: function (id, data) {
+      return {
+        type: `${actionPrefix}_DATA`,
+        payload: {
+          id: id,
+          data: data
+        }
+      };
+    },
+
     /* return the action to be dispatched when a model/REST document should be fetched
      * - FETCH_SUCCESS_{entityType}: the data was retrieved successfully
      * - FETCH_ERROR_{entityType}: there was an error with the request

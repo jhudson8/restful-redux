@@ -28,6 +28,7 @@ const actionCreator = reduxEffectsActionCreator({
 ### Action Creator API
 * [createFetchAction](#createfetchaction)
 * [createXHRAction](#createxhraction)
+* [createDataAction](#createdataaction)
 
 #### createFetchAction
 Returns a dispatchable redux action used to initiate an XHR to fetch model data.
@@ -116,5 +117,24 @@ Assuming example above using `CUSTOMER` as the `actionPrefix` value
 * ***CUSTOMER_ACTION_ERROR***: if the XHR fetch failed; ```{ payload: { id: _model id_, actionId: _action id_, response: _error response payload_ } }```
 * ***CUSTOMER_ACTION_SUCCESS***: if the XHR fetch succeeded; ```{ payload: { id: _model id_, actionId: _action id_, response: _response payload_  } }```
 *** note***: if `replaceModel` is `true`, use the `createFetchAction` response shape instead of the `response` attribute
+
+[API table of contents](#action-creator-api)
+
+
+#### createDataAction
+Returns a dispatchable redux action used to apply model specific meta data.  This data will persist even if the model is updated and can be retrieved using the `data()` function on a model.
+
+##### example
+```javascript
+export function setLocalCustomerPreference (id, preferenceInfo) {
+  // this will be able to retrieved in your React class (assuming the use of the model provider)
+  // using model.data().preferenceInfo
+  return actionCreator.createDataAction(id, {preferences: preferenceInfo});
+}
+```
+
+##### dispatched actions
+Assuming example above using `CUSTOMER` as the `actionPrefix` value
+* ***CUSTOMER_DATA***: when the fetch has been initiated; ```{ payload: { id: _model id_, data: _data_ } }```
 
 [API table of contents](#action-creator-api)
