@@ -1,5 +1,5 @@
 // redux actions creator used to fetch the github profile data
-import { reduxEffectsActionCreator } from 'react-redux-model';
+import { reduxEffectsActionCreator } from 'restful-redux';
 import { push } from 'react-router-redux';
 import { resultsPerPage } from './collection';
 

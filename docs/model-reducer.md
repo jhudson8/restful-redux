@@ -4,7 +4,7 @@ An automated reducer which understands dispatched actions created by the [action
 
 This can either be used as a standalone reducer
 ```
-import { reducer } from 'react-redux-model';
+import { reducer } from 'restful-redux';
 
 // simple example demonstrating a reducer dealing with "customer" data
 export default reducer({
@@ -20,7 +20,7 @@ It's as simple as that!
 
 Or you can compose several of these reducers into a single one using the `join` function
 ```
-import { reducer } from 'react-redux-model';
+import { reducer } from 'restful-redux';
 
 // example reducer handling customer model data
 const customerReducer = reducer({

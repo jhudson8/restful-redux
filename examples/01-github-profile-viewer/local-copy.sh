@@ -1,6 +1,6 @@
 #!/bin/bash
 
-rm -rf node_modules/react-redux-model/lib/*
+rm -rf node_modules/restful-redux/lib/*
 cd ../..
 npm run build
-cp -rf lib examples/01-github-profile-viewer/node_modules/react-redux-model
+cp -rf lib examples/01-github-profile-viewer/node_modules/restful-redux

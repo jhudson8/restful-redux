@@ -1,6 +1,6 @@
 import { Router, Route, browserHistory } from 'react-router';
 import { syncHistoryWithStore, routerReducer } from 'react-router-redux';
-import { reducer } from 'react-redux-model';
+import { reducer } from 'restful-redux';
 
 import searchReducer from './search-page/reducer';
 import projectDetailsReducer from './project-details-page/reducer';

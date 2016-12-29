@@ -1,3 +1,5 @@
+/* global it, describe */
+
 import React from 'react';
 import sinon from 'sinon';
 import { shallow } from 'enzyme';
@@ -5,8 +7,6 @@ import modelProvider from '../src/model-provider';
 var expect = require('chai').expect;
 
 function Stub () {}
-
-import { normalize, Schema, arrayOf } from 'normalizr';
 
 describe('model-provider', function () {
   const Component = modelProvider(Stub, {
@@ -35,7 +35,7 @@ describe('model-provider', function () {
     it('should trigger fetch when mounted', function () {
       const fetch1 = sinon.spy();
       const fetch2 = sinon.spy();
-      const impl = shallow(React.createElement(ComponentMultipleModels, {
+      shallow(React.createElement(ComponentMultipleModels, {
         id1: '1',
         id2: '2',
         entities: {
@@ -50,7 +50,7 @@ describe('model-provider', function () {
     it('should not trigger fetch if models already exists', function () {
       const fetch1 = sinon.spy();
       const fetch2 = sinon.spy();
-      const impl = shallow(React.createElement(ComponentMultipleModels, {
+      shallow(React.createElement(ComponentMultipleModels, {
         id1: '1',
         id2: '2',
         entities: {
@@ -70,7 +70,7 @@ describe('model-provider', function () {
 
   it('should trigger fetch when mounted', function () {
     const fetch = sinon.spy();
-    const impl = shallow(React.createElement(Component, {
+    shallow(React.createElement(Component, {
       id: '1',
       entities: {
         foo: {}
@@ -85,7 +85,7 @@ describe('model-provider', function () {
 
   it('should handle nested ids', function () {
     const fetch = sinon.spy();
-    const impl = shallow(React.createElement(ComponentNestedId, {
+    shallow(React.createElement(ComponentNestedId, {
       params: { id: '1' },
       entities: {
         foo: {}
@@ -100,7 +100,7 @@ describe('model-provider', function () {
 
   it('should trigger fetch when id changes', function () {
     const fetch = sinon.spy();
-    const impl = shallow(React.createElement(Component, {
+    shallow(React.createElement(Component, {
       id: '1',
       entities: {
         foo: {}
@@ -128,7 +128,7 @@ describe('model-provider', function () {
 
   it('should not trigger fetch if model already exists', function () {
     const fetch = sinon.spy();
-    const impl = shallow(React.createElement(Component, {
+    shallow(React.createElement(Component, {
       id: '1',
       entities: {
         foo: { '1': {} }
@@ -141,7 +141,7 @@ describe('model-provider', function () {
 
   it('should gracefully handle the parent state', function () {
     const fetch = sinon.spy();
-    const impl = shallow(React.createElement(Component, {
+    shallow(React.createElement(Component, {
       id: '1',
       entities: {
         entities: {
@@ -180,7 +180,7 @@ describe('model-provider', function () {
 
     it ('should fetch if model is not provided', function () {
       const fetch = sinon.spy();
-      const impl = shallow(React.createElement(Component, {
+      shallow(React.createElement(Component, {
         id: '1',
         foo: {},
         fetch: fetch,
@@ -223,7 +223,7 @@ describe('model-provider', function () {
 
     it ('should set id value on child component', function () {
       const fetch = sinon.spy();
-      const impl = shallow(React.createElement(Component, {
+      shallow(React.createElement(Component, {
         id: '1',
         foo: {},
         bar: fetch
@@ -259,7 +259,7 @@ describe('model-provider', function () {
       const renderedProps = impl.find(Stub).first().props;
       expect(renderedProps.model = 'right');
     });
-  })
+  });
 
   describe('should obey "fetchOptions"', function () {
     const Component = modelProvider(Stub, {
@@ -274,7 +274,7 @@ describe('model-provider', function () {
 
     it ('should pass values as 2nd fetch parameter', function () {
       const fetch = sinon.spy();
-      const impl = shallow(React.createElement(Component, {
+      shallow(React.createElement(Component, {
         id: '1',
         foo: {},
         fetch: fetch,

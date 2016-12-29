@@ -1,4 +1,4 @@
-import { Model } from 'react-redux-model';
+import { Model } from 'restful-redux';
 
 // the default number of results per page
 export const resultsPerPage = 50;

@@ -7,7 +7,28 @@ const FETCH = 'FETCH';
 const ACTION = 'ACTION';
 const SUCCESS = 'SUCCESS';
 const ERROR = 'ERROR';
-const PENDING = 'PENDING';
+
+var REST_METHODS = [{
+  name: 'Fetch',
+  method: 'GET',
+  fetchOrAction: FETCH
+}, {
+  name: 'Delete',
+  method: 'DELETE',
+  isDelete: true
+}, {
+  name: 'Put',
+  method: 'PUT'
+}, {
+  name: 'Patch',
+  method: 'PATCH'
+}, {
+  name: 'Delete',
+  method: 'DELETE'
+}, {
+  name: 'Post',
+  method: 'POST'
+}];
 
 export default function (options) {
   checkRequiredOptions(['actionPrefix', 'entityType'], options);
@@ -18,7 +39,6 @@ export default function (options) {
     normalize,
     debug
   } = options;
-  const verbose = debug === 'verbose';
   const log = logger(`action-creator-redux-effects "${entityType}"`);
 
   // return a callback handler which includes the provided id in the payload as a top level attribute
@@ -28,6 +48,7 @@ export default function (options) {
     id,
     actionId,
     replaceModel,
+    isDelete,
     schema,
     formatter,
     callback,
@@ -65,6 +86,9 @@ export default function (options) {
       if (actionId) {
         payload.actionId = actionId;
       }
+      if (isDelete) {
+        payload.delete = true;
+      }
       const actionType = `${actionPrefix}_${fetchOrAction}_${type}`;
       const action = createAction(actionType, payload);
 
@@ -90,11 +114,10 @@ export default function (options) {
       } else {
         return action;
       }
-    }
+    };
   }
 
-  return {
-
+  var rtn = {
     /* return an action which will set meta data to be associated with a model */
     createDataAction: function (id, data) {
       return {
@@ -104,57 +127,10 @@ export default function (options) {
           data: data
         }
       };
-    },
+    }
+  };
 
-    /* return the action to be dispatched when a model/REST document should be fetched
-     * - FETCH_SUCCESS_{entityType}: the data was retrieved successfully
-     * - FETCH_ERROR_{entityType}: there was an error with the request
-     * - FETCH_PENDING_{entityType}: an XHR request was submitted
-     * parameters include
-     * - entityType:
-     */
-    createFetchAction: function (options) {
-      checkRequiredOptions(['id', 'url'], options);
-
-      let {
-        id, // the model id (to be added to the payloads for the reducer)
-        url, // the endpoint URI
-        payload, // [effects-fetch payload](https://github.com/redux-effects/redux-effects-fetch#actions)
-        schema,
-        formatter,
-        onSuccess,
-        onError
-      } = options;
-      const rtn = [
-        createPendingAction(actionPrefix, id),
-        bind(
-          fetch(url, payload),
-          asyncResponseAction({
-            entityType,
-            fetchOrAction: FETCH,
-            type: SUCCESS,
-            id,
-            schema,
-            formatter,
-            callback: onSuccess
-          }),
-          asyncResponseAction({
-            entityType,
-            fetchOrAction: FETCH,
-            type: ERROR,
-            id,
-            schema,
-            formatter,
-            callback: onError
-          }),
-        )
-      ];
-      if (debug) {
-        log(`creating fetch action (${id}) with:\n\t`, rtn);
-      }
-      return rtn;
-    },
-
+  REST_METHODS.forEach(function (options) {
     /**
      * return the action to be dispatched when an XHR-based action should be taken on a model/REST document
      * - ACTION_SUCCESS_{entityType}: the data was retrieved successfully
@@ -167,7 +143,7 @@ export default function (options) {
      * - payload: [effects-fetch payload](https://github.com/redux-effects/redux-effects-fetch#creating-a-user)
      * - clearAfter: clear the action results after N milliseconds (optional)
      */
-    createXHRAction: function ({
+    rtn[`create${options.name}Action`] = function ({
       id,
       actionId,
       url,
@@ -179,17 +155,23 @@ export default function (options) {
       onError,
       clearAfter
     }) {
+      const fetchOrAction = options.fetchOrAction || ACTION;
+      payload = Object.assign({}, payload, {
+        method: options.method
+      });
+
       const rtn = [
         createPendingAction(actionPrefix, id, actionId),
         bind(
           fetch(url, payload),
           asyncResponseAction({
             entityType,
-            fetchOrAction: ACTION,
+            fetchOrAction: fetchOrAction,
             type: SUCCESS,
             id,
             actionId,
             replaceModel,
+            isDelete: options.isDelete,
             schema,
             formatter,
             callback: onSuccess,
@@ -197,7 +179,7 @@ export default function (options) {
           }),
           asyncResponseAction({
             entityType,
-            fetchOrAction: ACTION,
+            fetchOrAction: fetchOrAction,
             type: ERROR,
             id,
             actionId,
@@ -211,8 +193,10 @@ export default function (options) {
         log(`creating XHR action (${id}:${actionId}) with:\n\t`, rtn);
       }
       return rtn;
-    }
-  };
+    };
+  });
+
+  return rtn;
 }
 
 
@@ -235,8 +219,8 @@ function createAction (type, response) {
 }
 
 // duplicate a little redix-effects/redux-effects-fetch/redux-actions code so this lib is not dependant on either lib
-const EFFECT_COMPOSE = 'EFFECT_COMPOSE'
-const EFFECT_FETCH = 'EFFECT_FETCH'
+const EFFECT_COMPOSE = 'EFFECT_COMPOSE';
+const EFFECT_FETCH = 'EFFECT_FETCH';
 
 function bind (action, ...args) {
   return {

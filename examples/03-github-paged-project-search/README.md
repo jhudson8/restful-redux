@@ -7,8 +7,8 @@ There are only meta files here.  See [./lib/search-page](./lib/search-page) for 
 
 ## Installation
 ```
-git clone https://github.com/jhudson8/react-redux-model.git
-cd react-redux-model/examples/03-github-paged-project-search
+git clone https://github.com/jhudson8/restful-redux.git
+cd restful-redux/examples/03-github-paged-project-search
 npm i
 npm start
 ```

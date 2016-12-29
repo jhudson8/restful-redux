@@ -20,6 +20,8 @@ export function checkRequiredOptions (keys, options) {
 export function logger (prefix) {
   const pre = [`${prefix} `];
   return function () {
+    /* eslint-disable no-console */
     console.log.apply(console, pre.concat.apply(pre, arguments));
-  }
+    /* eslint-enable no-console */
+  };
 }

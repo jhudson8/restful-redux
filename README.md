@@ -1,10 +1,12 @@
-# react-redux-model
-Simple to use XHR fetching and model-oriented utility functions.
+# restful-redux
+RESTful oriented action creators, reducers and model utilities.
 
 ## tl;dr
-Most applications have common and consistent needs.  Load data using XHR and know the fetch status so it can be represented with a loading indicator.  This lib provides action creators, reducers and React component wrappers that work with each other to simplify and DRY up your code.
+Most applications have common and consistent needs.  Load data using XHR and know the fetch status so it can be represented with a loading indicator.  This package provides action creators, reducers and React component wrappers that work with each other to simplify and DRY up your code.
 
 ## More Details
+GraphQL has it's place.  Many applications still use a REST-based service API for a variety of reasons.
+
 There are ties between action creators, reducers and state-aware components in that
 
 * action creators have to supply the action type that the reducers will be scanning for
@@ -15,9 +17,9 @@ Goals of this project
 
 * Make XHR fetching easy and be able to support multiple XHR libs
 * Make reducer creation easy
-* Provide a component wrapper that will auto-fetch your models
-* Support [normalizr](https://github.com/paularmstrong/normalizr)
+* Provide a component wrapper that will auto-fetch your model data
 * Support collections
+* Support [normalizr](https://github.com/paularmstrong/normalizr)
 * Auto-add model object (wrapper of your plain old JSON) to your React component
 * Support additional model specific "XHR actions"
 
@@ -40,11 +42,11 @@ Goals of this project
 
 ## Installation
 ```
-npm install --save react-redux-model
+npm install --save restful-redux
 ```
 If using the [redux-effects](https://github.com/redux-effects/redux-effects) based action creator
 ```
-npm install --save react-redux-model redux-effects redux-effects-fetch redux-multi
+npm install --save restful-redux redux-effects redux-effects-fetch redux-multi
 ```
 
 And apply the middleware dependencies

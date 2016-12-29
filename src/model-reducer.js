@@ -26,7 +26,6 @@ function reducer (options) {
     entities,
     meta,
     clear,
-    type,
     actionType
   }) {
     // make sure our necessary data structure is initialized
@@ -95,7 +94,7 @@ function reducer (options) {
         _timestamp: 'fetch'
       }
     }, ['fetchPending', 'fetchError', 'actionId', 'actionPending', 'actionSuccess',
-          'actionError', 'actionResponse']),
+      'actionError', 'actionResponse']),
     createMeta({
       // same as FETCH_SUCCESS but if more semantically correct if we're setting manually
       type: 'SET',
@@ -104,7 +103,7 @@ function reducer (options) {
         _timestamp: 'fetch'
       }
     }, ['fetchPending', 'fetchError', 'actionId', 'actionPending', 'actionSuccess',
-          'actionError', 'actionResponse']),
+      'actionError', 'actionResponse']),
     createMeta({
       type: 'FETCH_PENDING',
       meta: {
@@ -143,7 +142,7 @@ function reducer (options) {
       type: 'ACTION_CLEAR',
       meta: {}
     }, ['actionId', 'actionPending', 'actionTimestamp', 'actionError', 'actionResponse',
-          'actionSuccess', 'actionTimestamp']),
+      'actionSuccess', 'actionTimestamp']),
     { type: 'DATA' }
   ].map(function (data) {
     return [`${actionPrefix}_${data.type}`, data];
@@ -193,12 +192,12 @@ function reducer (options) {
         });
       }
     }
-    return state;
-  }
 
-  if (verbose) {
-    log(`action *not* handled: ${type}`);
-  }
+    if (verbose) {
+      log(`action *not* handled: ${type}`);
+    }
+    return state;
+  };
 }
 
 function createMeta (props, clearProps) {
@@ -209,8 +208,7 @@ function createMeta (props, clearProps) {
 }
 
 function updateEntityModels (values, entities) {
-  var rtn = Object.assign({}, entities);
-  var index = {};
+  const rtn = Object.assign({}, entities);
   for (let entityType in values) {
     if (values.hasOwnProperty(entityType)) {
       rtn[entityType] = Object.assign({}, rtn[entityType], values[entityType]);
@@ -229,7 +227,7 @@ reducer.join = function(reducers) {
       }
     }
     return state;
-  }
-}
+  };
+};
 
 export default reducer;

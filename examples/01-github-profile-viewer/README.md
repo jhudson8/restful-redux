@@ -7,8 +7,8 @@ There are only meta files here.  See [./lib/profile-page](./lib/profile-page) fo
 
 ## Installation
 ```
-git clone https://github.com/jhudson8/react-redux-model.git
-cd react-redux-model/examples/01-github-profile-viewer
+git clone https://github.com/jhudson8/restful-redux.git
+cd restful-redux/examples/01-github-profile-viewer
 npm i
 npm start
 ```

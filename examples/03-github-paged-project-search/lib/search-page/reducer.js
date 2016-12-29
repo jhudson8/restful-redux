@@ -1,4 +1,4 @@
-import { reducer } from 'react-redux-model';
+import { reducer } from 'restful-redux';
 
 // the `profile` constant needs to match the action creator domain
 export default reducer({

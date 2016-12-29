@@ -1,6 +1,7 @@
-import sinon from 'sinon';
+/* global it, describe */
+
 import actionCreator from '../../src/action-creator/redux-effects';
-import { normalize, Schema, arrayOf } from 'normalizr';
+import { normalize, Schema } from 'normalizr';
 var expect = require('chai').expect;
 
 var personSchema = new Schema('people');
@@ -39,7 +40,9 @@ describe('redux-effects-action-creator', function () {
         type: 'EFFECT_FETCH',
         payload: {
           url: 'http://foo.com/thing/1',
-          params: {}
+          params: {
+            method: 'GET'
+          }
         }
       });
       var steps = action[1].meta.steps;
@@ -130,9 +133,9 @@ describe('redux-effects-action-creator', function () {
 
   });
 
-  describe('actions', function() {
-    it('should handle simple XHR action', function () {
-      var action = fooActionCreator.createXHRAction({
+  describe('other XHR actions', function() {
+    it('should handle simple XHR POST action', function () {
+      var action = fooActionCreator.createPostAction({
         id: '1',
         actionId: 'beep',
         url: 'http://foo.com/thing/1'
@@ -150,7 +153,9 @@ describe('redux-effects-action-creator', function () {
         type: 'EFFECT_FETCH',
         payload: {
           url: 'http://foo.com/thing/1',
-          params: {}
+          params: {
+            method: 'POST'
+          }
         }
       });
       var steps = action[1].meta.steps;
@@ -158,7 +163,7 @@ describe('redux-effects-action-creator', function () {
     });
 
     it('should handle success event', function () {
-      var action = fooActionCreator.createXHRAction({
+      var action = fooActionCreator.createPostAction({
         id: '1',
         actionId: 'beep',
         url: 'http://foo.com/thing/1'
@@ -178,7 +183,7 @@ describe('redux-effects-action-creator', function () {
     });
 
     it('should handle error event', function () {
-      var action = fooActionCreator.createXHRAction({
+      var action = fooActionCreator.createPostAction({
         id: '1',
         actionId: 'beep',
         url: 'http://foo.com/thing/1'

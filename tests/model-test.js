@@ -1,6 +1,7 @@
-import sinon from 'sinon';
+/* global it, describe */
+
 import Model from '../src/model';
-import { normalize, Schema, arrayOf } from 'normalizr';
+import { Schema } from 'normalizr';
 import { denormalize } from 'denormalizr';
 var expect = require('chai').expect;
 
@@ -11,9 +12,6 @@ fooSchema.define({
 });
 
 var nullEntities = undefined;
-
-var emptyEntities = {
-};
 
 var noMetaEntities = {
   foo: {

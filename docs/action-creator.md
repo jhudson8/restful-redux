@@ -9,7 +9,7 @@ You can create your own so we will discuss the interface (expected by the reduce
 ## Redux Effects Action Creator
 ### Import and Create New Action Creator
 ```javascript
-import { reduxEffectsActionCreator } from 'react-redux-model';
+import { reduxEffectsActionCreator } from 'restful-redux';
 
 const actionCreator = reduxEffectsActionCreator({
   // prefix for all redux actions of this type
@@ -27,7 +27,10 @@ const actionCreator = reduxEffectsActionCreator({
 
 ### Action Creator API
 * [createFetchAction](#createfetchaction)
-* [createXHRAction](#createxhraction)
+* [createPostAction](#createpostaction)
+* [createDeleteAction](#createdeleteaction)
+* [createPutAction](#createputaction)
+* [createPatchAction](#createpatchaction)
 * [createDataAction](#createdataaction)
 
 #### createFetchAction
@@ -82,8 +85,33 @@ Advanced
 ```
 [API table of contents](#action-creator-api)
 
-#### createXHRAction
-Returns a dispatchable redux action used to perform an arbitrary action associated with a model.  The last successful action (and response) will be saved in redux state and available using the Model API (see Model docs).
+
+#### createPostAction
+Returns a redux action used to initiate a `POST` request.  See [XHR action details](#xhr-action) for more details.
+
+[API table of contents](#action-creator-api)
+
+
+#### createDeleteAction
+Returns a redux action used to initiate an DELETE request.  See [XHR action details](#xhr-action) for more details.
+
+[API table of contents](#action-creator-api)
+
+
+#### createPutAction
+Returns a redux action used to initiate a `PUT` request.  See [XHR action details](#xhr-action) for more details.
+
+[API table of contents](#action-creator-api)
+
+
+#### createPatchAction
+Returns a redux action used to initiate a `PATCH` request.  See [XHR action details](#xhr-action) for more details.
+
+[API table of contents](#action-creator-api)
+
+
+#### XHR Action
+Returns a dispatchable redux action used to perform an arbitrary XHR request associated with a model.  The last successful action (and response) will be saved in redux state and available using the Model API (see Model docs).
 
 ##### options
 * ***id***: required model id

@@ -1,4 +1,5 @@
-import sinon from 'sinon';
+/* global it, describe */
+
 import reducer from '../src/model-reducer';
 var expect = require('chai').expect;
 
@@ -40,13 +41,13 @@ describe('model-reducer', function () {
         return 'foo';
       }
       return state;
-    }
+    };
     var reducer2 = function (state, action) {
       if (action === 'bar') {
         return 'bar';
       }
       return state;
-    }
+    };
     var joined = reducer.join([reducer1, reducer2]);
 
     it('should return orig state if no reducers are matched', function () {
@@ -224,7 +225,7 @@ describe('model-reducer', function () {
             }
           }
         }
-      });;
+      });
       expect(initialState1).to.deep.equal(savedInitialState1);
       delete state.entities._meta.foo['1'].fetchTimestamp;
       expect(state).to.deep.equal({

@@ -6,7 +6,7 @@ A React class used to auto-fetch and inject Model objects (which wrap your model
 [../examples/01-github-profile-viewer/lib/profile-page/index.js](../examples/01-github-profile-viewer/lib/profile-page/index.js)
 
 ```javascript
-import { modelProvider } from 'react-redux-model';
+import { modelProvider } from 'restful-redux';
 import { connect } from 'react-redux';
 
 // referring to your custom code here
@@ -68,5 +68,5 @@ modelProvider(CustomerPage, {
 * ***propName***: property name used for the model object (defaults to `model`)
 * ***idPropName***: the property name used for the model id (defaults to `id`)
 * ***fetchProp***: the property used to fetch the model if necessary (the model will not be auto-fetched if this is not set)
-* ***modelClass***: the model class to use (defaults to { Model } from 'react-redux-model`;  see [Model docs]('./model.md))
+* ***modelClass***: the model class to use (defaults to { Model } from 'restful-redux`;  see [Model docs]('./model.md))
 * ***fetchOptions***: optional function(props) used to provide a 2nd parameter to the fetch method if the `id` is not sufficient
