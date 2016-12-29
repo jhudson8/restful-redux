@@ -44,7 +44,7 @@ Goals of this project
 ```
 npm install --save restful-redux
 ```
-If using the [redux-effects](https://github.com/redux-effects/redux-effects) based action creator
+Following is only required if using the [redux-effects](https://github.com/redux-effects/redux-effects)-based action creator
 ```
 npm install --save restful-redux redux-effects redux-effects-fetch redux-multi
 ```

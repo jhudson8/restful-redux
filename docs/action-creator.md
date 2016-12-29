@@ -126,11 +126,12 @@ Returns a dispatchable redux action used to perform an arbitrary XHR request ass
 ##### example
 ```javascript
 export function updateCustomer (id, customerData) {
-  return actionCreator.createXHRAction({
+  // we're using `createPostAction` for example but could be any of
+  // createPostAction, createDeleteAction, createPutAction, createPatchAction
+  return actionCreator.createPostAction({
     id: id,
     url: `/customer/endpoint/${id}`,
     payload: { // see https://github.com/redux-effects/redux-effects-fetch#actions
-      method: 'POST',
       body: customerData
     },
     replaceModel: true,
