@@ -203,9 +203,9 @@ describe('redux-effects-action-creator', function () {
     });
   });
 
-  describe('createDataAction', function() {
+  describe('createModelDataAction', function() {
     it('should handle data action', function () {
-      var action = fooActionCreator.createDataAction('1', {foo: 'bar'});
+      var action = fooActionCreator.createModelDataAction('1', {foo: 'bar'});
       expect(action).to.deep.equal({
         type: 'FOO_DATA',
         payload: {

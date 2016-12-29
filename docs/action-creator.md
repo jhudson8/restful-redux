@@ -31,7 +31,7 @@ const actionCreator = reduxEffectsActionCreator({
 * [createDeleteAction](#createdeleteaction)
 * [createPutAction](#createputaction)
 * [createPatchAction](#createpatchaction)
-* [createDataAction](#createdataaction)
+* [createModelDataAction](#createmodeldataaction)
 
 #### createFetchAction
 Returns a dispatchable redux action used to initiate an XHR to fetch model data.
@@ -150,7 +150,7 @@ Assuming example above using `CUSTOMER` as the `actionPrefix` value
 [API table of contents](#action-creator-api)
 
 
-#### createDataAction
+#### createModelDataAction
 Returns a dispatchable redux action used to apply model specific meta data.  This data will persist even if the model is updated and can be retrieved using the `data()` function on a model.
 
 ##### example
@@ -158,7 +158,7 @@ Returns a dispatchable redux action used to apply model specific meta data.  Thi
 export function setLocalCustomerPreference (id, preferenceInfo) {
   // this will be able to retrieved in your React class (assuming the use of the model provider)
   // using model.data().preferenceInfo
-  return actionCreator.createDataAction(id, {preferences: preferenceInfo});
+  return actionCreator.createModelDataAction(id, {preferences: preferenceInfo});
 }
 ```
 

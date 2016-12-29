@@ -119,7 +119,7 @@ export default function (options) {
 
   var rtn = {
     /* return an action which will set meta data to be associated with a model */
-    createDataAction: function (id, data) {
+    createModelDataAction: function (id, data) {
       return {
         type: `${actionPrefix}_DATA`,
         payload: {
