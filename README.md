@@ -10,7 +10,7 @@ GraphQL has it's place but many applications use REST-based service APIs for a v
 There are always commonalities between action creators, reducers and smart components in that
 
 * action creators have to supply the action type that the reducers will be scanning for
-* reducers have to save state where smart components will be pulling from
+* reducers have to save state where smart components will be looking
 
 Goals of this project
 
