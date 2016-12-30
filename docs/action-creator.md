@@ -26,14 +26,15 @@ const actionCreator = reduxEffectsActionCreator({
 [../examples/01-github-profile-viewer/lib/profile-page/actions.js](../examples/01-github-profile-viewer/lib/profile-page/actions.js)
 
 ### Action Creator API
-* [createFetchAction](#createfetchaction)
+* [createFetchAction / createGetAction](#createfetchaction)
 * [createPostAction](#createpostaction)
 * [createDeleteAction](#createdeleteaction)
 * [createPutAction](#createputaction)
 * [createPatchAction](#createpatchaction)
 * [createModelDataAction](#createmodeldataaction)
 
-#### createFetchAction
+#### createFetchAction / createGetAction
+*createFetchAction* or *createGetAction*
 Returns a dispatchable redux action used to initiate an XHR to fetch model data.
 
 ##### options
@@ -47,6 +48,7 @@ Returns a dispatchable redux action used to initiate an XHR to fetch model data.
 ```javascript
 export function fetch (id) {
   return actionCreator.createFetchAction({
+    // or return actionCreator.createGetAction({
     id: id,
     url: `/customer/endpoint/${id}`
   });

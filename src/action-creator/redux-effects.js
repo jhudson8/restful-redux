@@ -13,6 +13,10 @@ var REST_METHODS = [{
   method: 'GET',
   fetchOrAction: FETCH
 }, {
+  name: 'Get',
+  method: 'GET',
+  fetchOrAction: FETCH
+}, {
   name: 'Delete',
   method: 'DELETE',
   isDelete: true
