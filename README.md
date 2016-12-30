@@ -1,27 +1,25 @@
 # restful-redux
-RESTful oriented action creators, reducers and model utilities.
 
 ## tl;dr
-Most applications have common and consistent needs.  Load data using XHR and know the fetch status so it can be represented with a loading indicator.  This package provides action creators, reducers and React component wrappers that work with each other to simplify and DRY up your code.
+REST oriented action creators, reducers and model utilities to DRY up boilerplate XHR functionality.
+
 
 ## More Details
-GraphQL has it's place.  Many applications still use a REST-based service API for a variety of reasons.
+GraphQL has it's place but many applications use REST-based service APIs for a variety of reasons.
 
-There are ties between action creators, reducers and state-aware components in that
+There are always commonalities between action creators, reducers and smart components in that
 
 * action creators have to supply the action type that the reducers will be scanning for
-* reducers have to save state where state-aware components will be pulling from
-* this pattern is common for almost every bit of XHR data that we retrieve so why not DRY that up?
+* reducers have to save state where smart components will be pulling from
 
 Goals of this project
 
-* Make XHR fetching easy and be able to support multiple XHR libs
-* Make reducer creation easy
-* Provide a component wrapper that will auto-fetch your model data
+* Make document/model oriented REST-based XHR action creation simple
+* Make associated reducer creation simple
+* Provide a component wrapper that will auto-fetch your document/model data
 * Support collections
 * Support [normalizr](https://github.com/paularmstrong/normalizr)
-* Auto-add model object (wrapper of your plain old JSON) to your React component
-* Support additional model specific "XHR actions"
+* Auto-add document/model object (wrapper of your plain old JSON) to your React component
 
 
 ## Examples
