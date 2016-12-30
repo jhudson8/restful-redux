@@ -34,8 +34,7 @@ const actionCreator = reduxEffectsActionCreator({
 * [createModelDataAction](#createmodeldataaction)
 
 #### createFetchAction / createGetAction
-*createFetchAction* or *createGetAction*
-Returns a dispatchable redux action used to initiate an XHR to fetch model data.
+Both functions are the same (depending on if you prefer a rest method-based name or a standard `fetch` name).  Returns a redux action used to initiate an XHR to fetch model data.
 
 ##### options
 * ***id***: required model id
