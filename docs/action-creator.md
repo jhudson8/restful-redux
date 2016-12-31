@@ -158,8 +158,8 @@ Returns a dispatchable redux action used to apply model specific meta data.  Thi
 ```javascript
 export function setLocalCustomerPreference (id, preferenceInfo) {
   // this will be able to retrieved in your React class (assuming the use of the model provider)
-  // using model.data().preferenceInfo
-  return actionCreator.createModelDataAction(id, {preferences: preferenceInfo});
+  // using model.data().customerPreference
+  return actionCreator.createModelDataAction(id, { customerPreference: preferenceInfo });
 }
 ```
 
