@@ -7,10 +7,10 @@ REST oriented action creators, reducers and model utilities to DRY up boilerplat
 ## More Details
 GraphQL has it's place but many applications use REST-based service APIs for a variety of reasons.
 
-There are always commonalities between action creators, reducers and smart components in that
+There are always commonalities between action creators, reducers and smart components with redux like
 
-* action creators have to supply the action type that the reducers will be scanning for
-* reducers have to save state where smart components will be looking
+* action creators have to supply the action type that the associated reducers will be scanning for
+* reducers have to save state where data consuming smart components will be looking
 
 Goals of this project
 
