@@ -14,12 +14,12 @@ There are always commonalities between action creators, reducers and smart compo
 
 Goals of this project
 
-* Make document/model oriented REST-based XHR action creation simple
-* Make associated reducer creation simple
-* Provide a component wrapper that will auto-fetch your document/model data
+* Simplify and DRY up REST document/model oriented XHR action creation
+* Simplify and DRY up associated reducers
+* Provide a React component wrapper that will auto-fetch your document/model data
 * Support collections
+* Support additional model metadata (which can be set if the document/model has not yet been retrieved)
 * Support [normalizr](https://github.com/paularmstrong/normalizr)
-* Auto-add document/model object (wrapper of your plain old JSON) to your React component
 
 
 ## Examples
