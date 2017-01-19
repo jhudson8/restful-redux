@@ -4,41 +4,59 @@
  * @param {string} id: the model id if `modelOrDomain` represents the entityType state object
  */
 export default class Model {
-  constructor (options) {
-    const id = this.id = options.id;
-    const entityType = this.entityType = options.entityType;
-    let entities = options.entities || {};
-    // allow for the root state to be provided as entities object
-    this.entities = entities.entities || entities;
-    this.options = options;
-    this._meta = deepValue(this.entities, ['_meta', entityType, id]) || {};
+  constructor (options, value) {
+    let entities;
+    let id;
+    let entityType;
+    let meta;
+    if (value) {
+      // (id, value)
+      id = options;
+      options = undefined;
+      meta = value._meta;
+      options = {};
+    } else {
+      // (options)
+      id = options.id;
+      entities = options.entities;
+      entityType = options.entityType;
+      value = deepValue(entities, [entityType, id]);
+      meta = deepValue(entities, ['_meta', entityType, id]);
+    }
+
+    this.id = id;
+    this._entities = entities ? entities.entities || entities : entities;
+    this._value = value;
+    this._options = options;
+    this._meta = meta || {};
+    this._metadata = this._meta.data || {};
   }
 
   data () {
-    return this._meta.data;
+    return this._metadata;
   }
 
   /**
    * Return the (optionally formatted) model data
    */
   value () {
-    if (!this._formatted) {
+    if (!this._formattedValue) {
       this._formatted = true;
-      const options = this.options;
+      const options = this._options;
       if (options.schema && options.denormalize) {
-        this._formattedData = options.denormalize(
-          deepValue(this.entities, [this.entityType, this.id]),
-          this.entities,
+        this._formattedValue = options.denormalize(
+          this._value,
+          this._entities,
           options.schema
         );
       } else {
         const formatter = options.formatter;
-        this._formattedData = formatter
+        this._formattedValue = formatter
           ? formatter(options)
-          : deepValue(this.entities, [this.entityType, this.id]);
+          : this._value;
       }
     }
-    return this._formattedData;
+    return this._formattedValue;
   }
 
   /**

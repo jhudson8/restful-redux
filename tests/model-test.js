@@ -109,6 +109,15 @@ describe('model', function () {
   });
 
 
+  describe('alternative constructors', function () {
+    it('(id, value)', function () {
+      var model = new Model('1', {_meta: {data: {abc: 'def'}}, foo: 'bar'});
+      expect(model.value()).to.deep.eql({_meta: {data: {abc: 'def'}}, foo: 'bar'});
+      expect(model.data()).to.deep.eql({abc: 'def'});
+    });
+  });
+
+
   describe('wasFetched', function () {
     it('should return "exists" if the model exists with no meta value', function () {
       var model = new Model(options(noMetaEntities, true));
