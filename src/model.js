@@ -19,13 +19,17 @@ export default class Model {
       // (options)
       id = options.id;
       entities = options.entities;
+      if (entities) {
+        // allow for root state to be passed
+        entities = entities.entities || entities;
+      }
       entityType = options.entityType;
       value = deepValue(entities, [entityType, id]);
       meta = deepValue(entities, ['_meta', entityType, id]);
     }
 
     this.id = id;
-    this._entities = entities ? entities.entities || entities : entities;
+    this._entities = entities;
     this._value = value;
     this._options = options;
     this._meta = meta || {};
