@@ -44,7 +44,7 @@ npm install --save restful-redux
 ```
 Following is only required if using the [redux-effects](https://github.com/redux-effects/redux-effects)-based action creator
 ```
-npm install --save restful-redux redux-effects redux-effects-fetch redux-multi
+npm install --save restful-redux redux-effects redux-effects-fetch redux-multi redux-thunk
 ```
 
 And apply the middleware dependencies
@@ -52,6 +52,7 @@ And apply the middleware dependencies
 import effects from 'redux-effects';
 import fetch from 'redux-effects-fetch';
 import multi from 'redux-multi';
+import thunk from 'redux-thunk';
 
-applyMiddleware(multi, effects, fetch);
+applyMiddleware(multi, thunk, effects, fetch);
 ```

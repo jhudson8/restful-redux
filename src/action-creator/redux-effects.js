@@ -55,11 +55,11 @@ export default function (options) {
     isDelete,
     schema,
     formatter,
-    callback,
+    resolver,
+    reduxAction,
     clearAfter
   }) {
     return function (response) {
-      callback && callback(response.value);
       // response is assumed to be in [normalize](https://github.com/paularmstrong/normalize) format of
       // {result: _id_, entities: {_entityType_: {_id_: ...}}}
       let payload = response.value;
@@ -93,16 +93,26 @@ export default function (options) {
       if (isDelete) {
         payload.delete = true;
       }
+
       const actionType = `${actionPrefix}_${fetchOrAction}_${type}`;
-      const action = createAction(actionType, payload);
+      let action = createAction(actionType, payload);
 
       if (debug) {
         log(`triggering ${actionType} with `, action);
       }
 
+      const rtn = [action, function (dispatch) {
+        if (resolver) {
+          resolver(payload);
+        }
+        if (reduxAction) {
+          dispatch(reduxAction);
+        }
+      }];
+
       if (clearAfter) {
         // requires `redux-thunk`
-        return [action, function (dispatch) {
+        rtn.push(function (dispatch) {
           setTimeout(function () {
             if (debug) {
               log(`action timeout ${entityType}:${id}`);
@@ -114,10 +124,10 @@ export default function (options) {
               id
             }));
           }, clearAfter);
-        }];
-      } else {
-        return action;
+        });
       }
+
+      return rtn;
     };
   }
 
@@ -155,14 +165,24 @@ export default function (options) {
       schema,
       formatter,
       replaceModel,
-      onSuccess,
-      onError,
+      successAction,
+      errorAction,
       clearAfter
     }) {
       const fetchOrAction = options.fetchOrAction || ACTION;
       payload = Object.assign({}, payload, {
         method: options.method
       });
+
+      let resolve, reject, promise;
+      if (typeof Promise !== 'undefined') {
+        promise = new Promise(function(_resolve, _reject) {
+          resolve = function (payload) {
+            _resolve(payload);
+          };
+          reject = _reject;
+        });
+      }
 
       const rtn = [
         createPendingAction(actionPrefix, id, actionId),
@@ -178,7 +198,8 @@ export default function (options) {
             isDelete: options.isDelete,
             schema,
             formatter,
-            callback: onSuccess,
+            resolver: resolve,
+            reduxAction: successAction,
             clearAfter
           }),
           asyncResponseAction({
@@ -188,11 +209,13 @@ export default function (options) {
             id,
             actionId,
             formatter,
-            callback: onError,
+            resolver: reject,
+            reduxAction: errorAction,
             clearAfter
           })
         )
       ];
+      rtn.promise = promise;
       if (debug) {
         log(`creating XHR action (${id}:${actionId}) with:\n\t`, rtn);
       }

@@ -34,7 +34,8 @@ const actionCreator = reduxEffectsActionCreator({
 * [createModelDataAction](#createmodeldataaction)
 
 #### createFetchAction / createGetAction
-Both functions are the same (depending on if you prefer a rest method-based name or a standard `fetch` name).  Returns a redux action used to initiate an XHR to fetch model data.
+Both functions are the same (depending on if you prefer a rest method-based name or a standard `fetch` name).  Returns a redux action used to initiate an XHR to fetch model data.  A Promise is also available as an attribute
+on all actions if needed.
 
 ##### options
 * ***id***: required model id
@@ -42,15 +43,23 @@ Both functions are the same (depending on if you prefer a rest method-based name
 * ***payload***: optional effects-fetch payload (https://github.com/redux-effects/redux-effects-fetch#actions)
 * ***schema***: optional normalizr schema if response should be normalized
 * ***formatter***: optional function(payload, id) used to format the response before being evaluated by normalizr
+* ***successAction***: optional action to be dispatched if the XHR is successful: funtion(_normalized_payload_)
+* ***errorAction***: optional action to be dispatched if the XHR is not successful
 
 ##### example
 ```javascript
 export function fetch (id) {
-  return actionCreator.createFetchAction({
+  const action = actionCreator.createFetchAction({
     // or return actionCreator.createGetAction({
     id: id,
-    url: `/customer/endpoint/${id}`
+    url: `/customer/endpoint/${id}`,
+    // if you want to do something with action dispatching
+    successAction: ...,
+    errorAction: ...
   });
+  // if you want to do something without action dispatching
+  const promise = action.promise;
+  return action;
 }
 ```
 
