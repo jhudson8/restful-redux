@@ -153,7 +153,7 @@ export function updateCustomer (id, customerData) {
 ##### dispatched actions
 Assuming example above using `CUSTOMER` as the `actionPrefix` value
 * ***CUSTOMER_ACTION_PENDING***: when the fetch has been initiated; ```{ payload: { id: _model id_, actionId: _action id_ } }```
-* ***CUSTOMER_ACTION_ERROR***: if the XHR fetch failed; ```{ payload: { id: _model id_, actionId: _action id_, response: _error response payload_ } }```
+* ***CUSTOMER_ACTION_ERROR***: if the XHR fetch failed; ```{ payload: { id: _model id_, actionId: _action id_, response: { headers, status, statusText, url, value } } }```
 * ***CUSTOMER_ACTION_SUCCESS***: if the XHR fetch succeeded; ```{ payload: { id: _model id_, actionId: _action id_, response: _response payload_  } }```
 *** note***: if `replaceModel` is `true`, use the `createFetchAction` response shape instead of the `response` attribute
 

@@ -58,6 +58,19 @@ describe('redux-effects-action-creator', function () {
       var steps = action.meta.steps[0];
       var successAction = steps[0]({ value: { foo: 'bar' } });
       expect(successAction[0]).to.deep.equal({
+        type: 'FETCH_SUCCESS',
+        payload: {
+          result: '1',
+          entities: {
+            foo: {
+              '1': {
+                foo: 'bar'
+              }
+            }
+          }
+        }
+      });
+      expect(successAction[1]).to.deep.equal({
         type: 'FOO_FETCH_SUCCESS',
         payload: {
           result: '1',
@@ -71,7 +84,7 @@ describe('redux-effects-action-creator', function () {
         }
       });
       var dispatch = sinon.spy();
-      successAction[1](dispatch);
+      successAction[2](dispatch);
       expect(dispatch.callCount).to.equal(1);
       expect(dispatch.firstCall.args).to.deep.equal([{foo: 'success'}]);
     });
@@ -92,7 +105,7 @@ describe('redux-effects-action-creator', function () {
           lastName: 'Hudson'
         }
       }});
-      expect(successAction[0]).to.deep.equal({
+      expect(successAction[1]).to.deep.equal({
         type: 'FOO_FETCH_SUCCESS',
         payload: {
           data: undefined,
@@ -126,11 +139,24 @@ describe('redux-effects-action-creator', function () {
       var steps = action.meta.steps[0];
       var errorAction = steps[1]({ value: { foo: 'bar' } });
       expect(errorAction[0]).to.deep.equal({
+        type: 'FETCH_ERROR',
+        payload: {
+          id: '1',
+          response: {
+            value : {
+              foo: 'bar'
+            }
+          }
+        }
+      });
+      expect(errorAction[1]).to.deep.equal({
         type: 'FOO_FETCH_ERROR',
         payload: {
           id: '1',
           response: {
-            foo: 'bar'
+            value : {
+              foo: 'bar'
+            }
           }
         }
       });
@@ -175,7 +201,7 @@ describe('redux-effects-action-creator', function () {
       });
       var steps = action.meta.steps[0];
       var successAction = steps[0]({ value: { foo: 'bar' } });
-      expect(successAction[0]).to.deep.equal({
+      expect(successAction[1]).to.deep.equal({
         type: 'FOO_ACTION_SUCCESS',
         payload: {
           id: '1',
@@ -195,13 +221,15 @@ describe('redux-effects-action-creator', function () {
       });
       var steps = action.meta.steps[0];
       var errorAction = steps[1]({ value: { foo: 'bar' } });
-      expect(errorAction[0]).to.deep.equal({
+      expect(errorAction[1]).to.deep.equal({
         type: 'FOO_ACTION_ERROR',
         payload: {
           id: '1',
           actionId: 'beep',
           response: {
-            foo: 'bar'
+            value: {
+              foo: 'bar'
+            }
           }
         }
       });

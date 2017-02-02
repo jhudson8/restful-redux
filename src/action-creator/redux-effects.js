@@ -84,7 +84,7 @@ export default function (options) {
           };
         }
       } else {
-        payload = { id: id, response: response.value };
+        payload = { id: id, response: response };
       }
       if (actionId) {
         payload.actionId = actionId;
@@ -94,13 +94,14 @@ export default function (options) {
       }
 
       const actionType = `${actionPrefix}_${fetchOrAction}_${type}`;
-      let action = createAction(actionType, payload);
+      const action = createAction(actionType, payload);
+      const genericAction = createAction(`${fetchOrAction}_${type}`, payload);
 
       if (debug) {
         log(`triggering ${actionType} with `, action);
       }
 
-      const rtn = [action, function (dispatch) {
+      const rtn = [genericAction, action, function (dispatch) {
         if (reduxAction) {
           dispatch(reduxAction);
         }
