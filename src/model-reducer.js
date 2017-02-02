@@ -152,6 +152,11 @@ function reducer (options) {
   }
 
   return function (state = {}, action) {
+    // allow for restful-redux actions to be embedded within other actions
+    if (action.payload && action.payload._restfulReduxAction) {
+      action = action.payload._restfulReduxAction;
+    }
+
     const type = action.type;
     for (var i = 0; i < handlers.length; i++) {
       if (handlers[i][0] === type) {

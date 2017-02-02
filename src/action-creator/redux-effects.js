@@ -55,7 +55,6 @@ export default function (options) {
     isDelete,
     schema,
     formatter,
-    resolver,
     reduxAction,
     clearAfter
   }) {
@@ -102,9 +101,6 @@ export default function (options) {
       }
 
       const rtn = [action, function (dispatch) {
-        if (resolver) {
-          resolver(payload);
-        }
         if (reduxAction) {
           dispatch(reduxAction);
         }
@@ -161,7 +157,7 @@ export default function (options) {
       id,
       actionId,
       url,
-      payload,
+      params,
       schema,
       formatter,
       replaceModel,
@@ -170,56 +166,44 @@ export default function (options) {
       clearAfter
     }) {
       const fetchOrAction = options.fetchOrAction || ACTION;
-      payload = Object.assign({}, payload, {
+      params = Object.assign({}, params, {
         method: options.method
       });
 
-      let resolve, reject, promise;
-      if (typeof Promise !== 'undefined') {
-        promise = new Promise(function(_resolve, _reject) {
-          resolve = function (payload) {
-            _resolve(payload);
-          };
-          reject = _reject;
-        });
-      }
+      const pendingAction = createPendingAction(actionPrefix, id, actionId);
+      const fetchAction = fetch(url, params);
+      fetchAction.payload._restfulReduxAction = pendingAction;
+      const composedAction = bind(fetchAction,
+        asyncResponseAction({
+          entityType,
+          fetchOrAction: fetchOrAction,
+          type: SUCCESS,
+          id,
+          actionId,
+          replaceModel,
+          isDelete: options.isDelete,
+          schema,
+          formatter,
+          reduxAction: successAction,
+          clearAfter
+        }),
+        asyncResponseAction({
+          entityType,
+          fetchOrAction: fetchOrAction,
+          type: ERROR,
+          id,
+          actionId,
+          formatter,
+          reduxAction: errorAction,
+          clearAfter
+        })
+      );
+      fetchAction.payload._restfulReduxAction = pendingAction;
 
-      const rtn = [
-        createPendingAction(actionPrefix, id, actionId),
-        bind(
-          fetch(url, payload),
-          asyncResponseAction({
-            entityType,
-            fetchOrAction: fetchOrAction,
-            type: SUCCESS,
-            id,
-            actionId,
-            replaceModel,
-            isDelete: options.isDelete,
-            schema,
-            formatter,
-            resolver: resolve,
-            reduxAction: successAction,
-            clearAfter
-          }),
-          asyncResponseAction({
-            entityType,
-            fetchOrAction: fetchOrAction,
-            type: ERROR,
-            id,
-            actionId,
-            formatter,
-            resolver: reject,
-            reduxAction: errorAction,
-            clearAfter
-          })
-        )
-      ];
-      rtn.promise = promise;
       if (debug) {
         log(`creating XHR action (${id}:${actionId}) with:\n\t`, rtn);
       }
-      return rtn;
+      return composedAction;
     };
   });
 

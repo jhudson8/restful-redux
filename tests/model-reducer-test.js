@@ -27,7 +27,6 @@ var initialState1 = {
 };
 var savedInitialState1 = JSON.parse(JSON.stringify(initialState1));
 
-
 describe('model-reducer', function () {
   var fooReducer = reducer({
     actionPrefix: 'FOO',
@@ -173,7 +172,48 @@ describe('model-reducer', function () {
         }
       });
     });
+  });
 
+  describe('embedded action "_restfulReduxAction"', function () {
+    it ('should listen for embedded actions', function () {
+      var state = fooReducer(emptyState, {
+        type: 'NOT_REAL',
+        payload: {
+          _restfulReduxAction: {
+            type: 'FOO_FETCH_SUCCESS',
+            payload: {
+              result: '1',
+              entities: {
+                foo: {
+                  '1': {
+                    beep: 'boop'
+                  }
+                }
+              }
+            }
+          }
+        }
+      });
+      expect(emptyState).to.deep.equal(savedEmptyState);
+      // don't deal with dymanic value
+      delete state.entities._meta.foo['1'].fetchTimestamp;
+      expect(state).to.deep.equal({
+        entities: {
+          _meta: {
+            foo: {
+              '1': {
+                fetched: 'full',
+              }
+            }
+          },
+          foo: {
+            '1': {
+              beep: 'boop'
+            }
+          }
+        }
+      });
+    });
   });
 
   describe('FETCH_SUCCESS', function () {

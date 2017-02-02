@@ -43,8 +43,8 @@ on all actions if needed.
 * ***payload***: optional effects-fetch payload (https://github.com/redux-effects/redux-effects-fetch#actions)
 * ***schema***: optional normalizr schema if response should be normalized
 * ***formatter***: optional function(payload, id) used to format the response before being evaluated by normalizr
-* ***successAction***: optional action to be dispatched if the XHR is successful: funtion(_normalized_payload_)
-* ***errorAction***: optional action to be dispatched if the XHR is not successful
+* ***successAction***: optional action to be dispatched if the XHR is successful: function(_normalized_payload_)
+* ***errorAction***: optional action to be dispatched if the XHR is not successful: function({id, actionId, response})
 
 ##### example
 ```javascript
