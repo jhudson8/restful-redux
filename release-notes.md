@@ -1,3 +1,6 @@
+## v1.3.2
+- fix issue with returned action.promise not resolving
+
 ## v1.3.1
 - fixed bug with error response handling
 
