@@ -40,7 +40,7 @@ on all actions if needed.
 ##### options
 * ***id***: required model id
 * ***url***: required fetch url
-* ***payload***: optional effects-fetch payload (https://github.com/redux-effects/redux-effects-fetch#actions)
+* ***params***: optional effects-fetch parameters (https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch)
 * ***schema***: optional normalizr schema if response should be normalized
 * ***formatter***: optional function(payload, id) used to format the response before being evaluated by normalizr
 * ***successAction***: optional action to be dispatched if the XHR is successful: function(_normalized_payload_)
@@ -127,7 +127,7 @@ Returns a dispatchable redux action used to perform an arbitrary XHR request ass
 * ***id***: required model id
 * ***actionId***: required action identifier (for example `update`)
 * ***url***: required url
-* ***payload***: optional effects-fetch payload (https://github.com/redux-effects/redux-effects-fetch#actions)
+* ***params***: optional effects-fetch params (https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch)
 * ***schema***: optional normalizr schema if response should be normalized
 * ***formatter***: optional function(payload, id) used to format the response before being evaluated by normalizr
 * ***replaceModel***: `true` if the model contents should be replaced with this XHR response

@@ -1,3 +1,6 @@
+## v1.3.0
+- use "params" attribute instead of "payload" for XHR actions.  This value represents the 2nd parameter of the [fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch)
+
 ## v1.2.0
 - Added `successAction` and `errorAction` as optional attributes to the action creator
 - Added `promise` as an attribute of the returned action from the creator
