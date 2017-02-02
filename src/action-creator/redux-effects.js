@@ -54,6 +54,7 @@ export default function (options) {
     replaceModel,
     isDelete,
     schema,
+    resolver,
     formatter,
     reduxAction,
     clearAfter
@@ -102,6 +103,9 @@ export default function (options) {
       }
 
       const rtn = [genericAction, action, function (dispatch) {
+        if (resolver) {
+          resolver(payload);
+        }
         if (reduxAction) {
           dispatch(reduxAction);
         }
@@ -171,9 +175,18 @@ export default function (options) {
         method: options.method
       });
 
+      let resolve, reject, promise;
+      if (typeof Promise !== 'undefined') {
+        promise = new Promise(function(_resolve, _reject) {
+          resolve = function (payload) {
+            _resolve(payload);
+          };
+          reject = _reject;
+        });
+      }
+
       const pendingAction = createPendingAction(actionPrefix, id, actionId);
       const fetchAction = fetch(url, params);
-      fetchAction.payload._restfulReduxAction = pendingAction;
       const composedAction = bind(fetchAction,
         asyncResponseAction({
           entityType,
@@ -185,6 +198,7 @@ export default function (options) {
           isDelete: options.isDelete,
           schema,
           formatter,
+          resolver: resolve,
           reduxAction: successAction,
           clearAfter
         }),
@@ -195,16 +209,19 @@ export default function (options) {
           id,
           actionId,
           formatter,
+          resolver: reject,
           reduxAction: errorAction,
           clearAfter
         })
       );
-      fetchAction.payload._restfulReduxAction = pendingAction;
+
+      var rtn = [composedAction, pendingAction];
+      rtn.promise = promise;
 
       if (debug) {
         log(`creating XHR action (${id}:${actionId}) with:\n\t`, rtn);
       }
-      return composedAction;
+      return rtn;
     };
   });
 

@@ -29,23 +29,17 @@ describe('redux-effects-action-creator', function () {
         url: 'http://foo.com/thing/1'
       });
 
-      expect(action.type).to.equal('EFFECT_COMPOSE');
-      expect(action.payload).to.deep.equal({
+      expect(action[0].type).to.equal('EFFECT_COMPOSE');
+      expect(action[0].payload).to.deep.equal({
         type: 'EFFECT_FETCH',
         payload: {
           url: 'http://foo.com/thing/1',
           params: {
             method: 'GET'
-          },
-          _restfulReduxAction: {
-            type: 'FOO_FETCH_PENDING',
-            payload: {
-              id: '1'
-            }
           }
         }
       });
-      var steps = action.meta.steps;
+      var steps = action[0].meta.steps;
       expect(steps.length).to.equal(1);
     });
 
@@ -55,7 +49,7 @@ describe('redux-effects-action-creator', function () {
         url: 'http://foo.com/thing/1',
         successAction: {foo: 'success'}
       });
-      var steps = action.meta.steps[0];
+      var steps = action[0].meta.steps[0];
       var successAction = steps[0]({ value: { foo: 'bar' } });
       expect(successAction[0]).to.deep.equal({
         type: 'FETCH_SUCCESS',
@@ -95,7 +89,7 @@ describe('redux-effects-action-creator', function () {
         url: 'http://foo.com/thing/1',
         schema: fooSchema
       });
-      var steps = action.meta.steps[0];
+      var steps = action[0].meta.steps[0];
       var successAction = steps[0]({ value: {
         id: '1',
         foo: 'bar',
@@ -136,7 +130,7 @@ describe('redux-effects-action-creator', function () {
         id: '1',
         url: 'http://foo.com/thing/1'
       });
-      var steps = action.meta.steps[0];
+      var steps = action[0].meta.steps[0];
       var errorAction = steps[1]({ value: { foo: 'bar' } });
       expect(errorAction[0]).to.deep.equal({
         type: 'FETCH_ERROR',
@@ -172,24 +166,24 @@ describe('redux-effects-action-creator', function () {
         url: 'http://foo.com/thing/1'
       });
 
-      expect(action.type).to.equal('EFFECT_COMPOSE');
-      expect(action.payload).to.deep.equal({
+      expect(action[0].type).to.equal('EFFECT_COMPOSE');
+      expect(action[0].payload).to.deep.equal({
         type: 'EFFECT_FETCH',
         payload: {
           url: 'http://foo.com/thing/1',
           params: {
             method: 'POST'
-          },
-          _restfulReduxAction: {
-            type: 'FOO_ACTION_PENDING',
-            payload: {
-              id: '1',
-              actionId: 'beep'
-            }
           }
         }
       });
-      var steps = action.meta.steps;
+      expect(action[1]).to.deep.equal({
+        type: 'FOO_ACTION_PENDING',
+        payload: {
+          id: '1',
+          actionId: 'beep'
+        }
+      });
+      var steps = action[0].meta.steps;
       expect(steps.length).to.equal(1);
     });
 
@@ -199,7 +193,7 @@ describe('redux-effects-action-creator', function () {
         actionId: 'beep',
         url: 'http://foo.com/thing/1'
       });
-      var steps = action.meta.steps[0];
+      var steps = action[0].meta.steps[0];
       var successAction = steps[0]({ value: { foo: 'bar' } });
       expect(successAction[1]).to.deep.equal({
         type: 'FOO_ACTION_SUCCESS',
@@ -219,7 +213,7 @@ describe('redux-effects-action-creator', function () {
         actionId: 'beep',
         url: 'http://foo.com/thing/1'
       });
-      var steps = action.meta.steps[0];
+      var steps = action[0].meta.steps[0];
       var errorAction = steps[1]({ value: { foo: 'bar' } });
       expect(errorAction[1]).to.deep.equal({
         type: 'FOO_ACTION_ERROR',
