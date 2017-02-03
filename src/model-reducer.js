@@ -1,5 +1,7 @@
 import { checkRequiredOptions, logger } from './common-util';
 
+const NO_ID = '_noid_';
+
 /**
  * Utility method for a consistent fetch pattern.  Return the state if applicable and false otherwise.
  * Options
@@ -166,7 +168,7 @@ function reducer (options) {
         const entities = payload.entities;
         const response = payload.response;
         const result = payload.result;
-        const id = payload.id || result;
+        const id = (payload.id === false ? NO_ID : payload.id) || result;
         const actionId = payload.actionId;
         const meta = Object.assign({}, options.meta);
         const responseProp = meta._responseProp;

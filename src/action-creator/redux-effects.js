@@ -1,5 +1,7 @@
 import { checkRequiredOptions, logger } from '../common-util';
 
+const NO_ID = '_noid_';
+
 /**
  * IMPORTANT: Usage of [multi](https://github.com/ashaffer/redux-multi) middleware or a lib of similar nature is required
  */
@@ -170,6 +172,9 @@ export default function (options) {
       errorAction,
       clearAfter
     }) {
+      if (id === false) {
+        id = NO_ID;
+      }
       const fetchOrAction = options.fetchOrAction || ACTION;
       params = Object.assign({}, params, {
         method: options.method

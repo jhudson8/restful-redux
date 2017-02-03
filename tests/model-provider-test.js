@@ -111,6 +111,9 @@ describe('model-provider', function () {
     // now change id values
     Component.prototype.componentWillReceiveProps.call({
       setState: sinon.spy(),
+      state: {
+        modelCache: {}
+      },
       props: {
         id: '1'
       }

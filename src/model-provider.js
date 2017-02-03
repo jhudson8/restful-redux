@@ -2,6 +2,8 @@ import React from 'react';
 import { deepPropValue, checkRequiredOptions, logger } from './common-util';
 import Model from './model';
 
+const NO_ID = '_noid_';
+
 /**
  * smart component utility function to ensure a component-specific model will be fetched if it doesn't
  * exist in the store.  A `fetch` prop value is expected to be provided with `mapDispatchToProps`
@@ -42,7 +44,9 @@ export default function modelProvider (_Component, options) {
 
   function getModelId (props, options) {
     const id = options.id;
-    if (typeof id === 'function') {
+    if (id === false) {
+      return NO_ID;
+    } else if (typeof id === 'function') {
       return id(props);
     } else {
       return deepPropValue(id, props);
@@ -63,7 +67,8 @@ export default function modelProvider (_Component, options) {
     }
   }
 
-  function maybeFetchModels (props) {
+  function maybeFetchModels (props, allowForceFetch) {
+    var self = this;
     _models.forEach((options) => {
       if (options.fetchProp) {
         const id = getModelId(props, options);
@@ -71,11 +76,13 @@ export default function modelProvider (_Component, options) {
           // only fetch a model if the id value exists
           const modelData = getModelData(id, props, options);
           if (!modelData && (!this.state || !this.state._fetched || !this.state._fetched[id])) {
-            const model = new Model(Object.assign({}, options, {
+            const modelOptions = Object.assign({}, options, {
               id: id,
               entities: props[entitiesProp]
-            }));
-            if (model.canBeFetched()) {
+            });
+            const modelCache = self.state.modelCache;
+            const model = Model.fromCache(modelOptions, modelCache);
+            if (model.canBeFetched() || (options.forceFetch && allowForceFetch)) {
               fetchModel(id, props, options);
               this.setState((state) => {
                 state._fetched = state._fetched || {};
@@ -106,8 +113,14 @@ export default function modelProvider (_Component, options) {
   }
 
   return React.createClass({
+    getInitialState: function () {
+      return {
+        modelCache: {}
+      };
+    },
+
     componentWillMount () {
-      maybeFetchModels.call(this, this.props);
+      maybeFetchModels.call(this, this.props, true);
     },
 
     componentWillReceiveProps (props) {
@@ -116,13 +129,17 @@ export default function modelProvider (_Component, options) {
 
     render () {
       const props = Object.assign({}, this.props);
+      const modelCache = this.state.modelCache;
+
       _models.forEach((options) => {
         const id = getModelId(props, options);
         if (id) {
-          const model = new options.modelClass(Object.assign({}, options, {
+          const modelOptions = Object.assign({}, options, {
             id: id,
             entities: props[entitiesProp]
-          }));
+          });
+          // reuse the same model object if we can
+          let model = Model.fromCache(modelOptions, modelCache);
           props[options.idPropName] = id;
           props[options.propName] = model;
         }

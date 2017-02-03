@@ -63,7 +63,7 @@ modelProvider(CustomerPage, {
 
 ### options
 * ***models***: (if more than 1 model should be referenced, array of objects with following options)
-* ***id***: function(props) or string (nesting using `.`) to identify the model id from React component properties
+* ***id***: function(props) or string (nesting using `.`) to identify the model id from React component properties.  This can also be `false` for entities that have an unknown id - like the authenticated user of an application.
 * ***entityType***: arbitrary string value (but should be meaningful to the model type) which should match the `entityType` value in your reducer and action creator
 * ***propName***: property name used for the model object (defaults to `model`)
 * ***idPropName***: the property name used for the model id (defaults to `id`)

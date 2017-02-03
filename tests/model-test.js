@@ -72,6 +72,120 @@ function copyMetaEntities(meta) {
 }
 
 describe('model', function () {
+  describe('fromCache', function () {
+    it('should return a new model if cache is empty and entities are empty', function () {
+      var model = Model.fromCache({ id: '1', entityType: 'foo' }, {});
+      expect(model.value()).to.equal(undefined);
+      expect(model.data()).to.deep.equal({});
+    });
+
+    it('should return the same model if cache is empty and entities are empty', function () {
+      var cache = {};
+      var model1 = Model.fromCache({ id: '1', entityType: 'foo' }, cache);
+      var model2 = Model.fromCache({ id: '1', entityType: 'foo' }, cache);
+      expect(model1).to.equal(model2);
+    });
+
+    it('should return the same model if cache is empty and entities are populated', function () {
+      var state = {
+        entities: {
+          _meta: {
+            foo: {
+              '1': {
+                data: {
+                  ghi: 'jkl'
+                }
+              }
+            }
+          },
+          foo: {
+            '1': {
+              abc: 'def'
+            }
+          }
+        }
+      };
+      var cache = {};
+      var model1 = Model.fromCache({ id: '1', entityType: 'foo', entities: state }, cache);
+      expect(model1.value()).to.deep.equal({ abc: 'def' });
+      expect(model1.data()).to.deep.equal({ ghi: 'jkl' });
+      var model2 = Model.fromCache({ id: '1', entityType: 'foo', entities: state }, cache);
+      expect(model1).to.equal(model2);
+    });
+
+    it('should return a new model if the model value changes', function () {
+      var value = {
+        data: {
+          ghi: 'jfk'
+        }
+      };
+      var meta = {
+        abc: 'def'
+      };
+      var state = {
+        entities: {
+          _meta: {
+            foo: {
+              '1': meta
+            }
+          },
+          foo: {
+            '1': value
+          }
+        }
+      };
+      var newState = {
+        entities: {
+          _meta: {
+            foo: {
+              '1': meta
+            }
+          },
+          foo: {
+            '1': value
+          }
+        }
+      };
+      var cache = {};
+      var model1 = Model.fromCache({ id: '1', entityType: 'foo', entities: state }, cache);
+      var model2 = Model.fromCache({ id: '1', entityType: 'foo', entities: newState }, cache);
+      expect(model1 === model2).to.equal(true);
+
+      cache = {};
+      newState = {
+        entities: {
+          _meta: {
+            foo: {
+              '1': Object.assign({}, meta)
+            }
+          },
+          foo: {
+            '1': value
+          }
+        }
+      };
+      model1 = Model.fromCache({ id: '1', entityType: 'foo', entities: state }, cache);
+      model2 = Model.fromCache({ id: '1', entityType: 'foo', entities: newState }, cache);
+      expect(model1 === model2).to.equal(false);
+
+      newState = {
+        entities: {
+          _meta: {
+            foo: {
+              '1': meta
+            }
+          },
+          foo: {
+            '1': Object.assign({}, value)
+          }
+        }
+      };
+      cache = {};
+      model1 = Model.fromCache({ id: '1', entityType: 'foo', entities: state }, cache);
+      model2 = Model.fromCache({ id: '1', entityType: 'foo', entities: newState }, cache);
+      expect(model1 === model2).to.equal(false);
+    });
+  });
 
   it('should denormalize the value', function () {
     var model = new Model(options(normalizedEntities, true, {

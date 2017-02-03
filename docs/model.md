@@ -23,6 +23,19 @@ Anytime the [./model-provider.md](model provider) wrapper React class is used, a
 ```
 
 ### API
+#### Model.fromCache
+This is a static function on the Model class (options, cache) which will return a model from the `cache` if it exists.  The model
+would be placed into cache by using `Model.fromCache` at a previous time.  The model will be returned new if any model data changes.
+The `options` are the same as the model constructor with 1 additional `modelClass` optional value that represents the model class object (if something other than this Model).
+```javascript
+// cache must always be the same object
+var cache = {};
+var myModel = Model.fromCache({
+  id: '1',
+  entityType: 'user',
+  entities: state
+}, cache);
+```
 
 #### data
 Return any meta data which can be set using the [action creator](./action-creator.md).  This is handy when your model is actually an array and you want to keep track of the total count or other related information.

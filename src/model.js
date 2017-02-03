@@ -127,6 +127,38 @@ export default class Model {
   }
 }
 
+Model.fromCache = function(options, cache) {
+  const id = options.id;
+  const entityType = options.entityType;
+  const ModelClass = options.modelClass || Model;
+  let entities = options.entities || {};
+  // allow for root state to be provided
+  entities = entities.entities || entities;
+  const cachedEntities = cache[entityType] = cache[entityType] || {};
+  const cachedMeta = cache._meta = cache._meta || {};
+  const cachedModels = cachedEntities.__models = cachedEntities.__models || {};
+
+  let cachedModel = cachedModels[id];
+  const cachedData = getMetaAndValue(id, cache, entityType);
+  const checkData = getMetaAndValue(id, entities, entityType);
+  if (!cachedModel || cachedData.meta !== checkData.meta || cachedData.value !== checkData.value) {
+    // we need to cache and return a new model
+    cachedEntities[id] = checkData.value;
+    const cachedMetaEntity = cachedMeta[entityType] = cachedMeta[entityType] || {};
+    cachedMetaEntity[id] = checkData.meta;
+    cachedModel = new ModelClass(options);
+    cachedModels[id] = cachedModel;
+  }
+  return cachedModel;
+};
+
+function getMetaAndValue (id, entities, entityType) {
+  return {
+    meta: deepValue(entities, ['_meta', entityType, id]) || null,
+    value: deepValue(entities, [entityType, id]) || null
+  };
+}
+
 function deepValue (parent, parts) {
   for (let i = 0; i < parts.length && parent; i++) {
     parent = parent[parts[i]];

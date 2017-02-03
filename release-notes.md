@@ -1,3 +1,7 @@
+## v1.4.0
+- added a `Model.fromCache` function to reuse cached models if possible
+- model providers will now cache models (so no `componentWillReceiveProps`) execution for every render
+
 ## v1.3.2
 - fix issue with returned action.promise not resolving
 
@@ -30,4 +34,3 @@ const myModel = new Model('_modelid_', {
   someModelValue: 'bar'
 });
 ```
-

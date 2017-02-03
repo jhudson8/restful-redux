@@ -38,7 +38,7 @@ Both functions are the same (depending on if you prefer a rest method-based name
 on all actions if needed.
 
 ##### options
-* ***id***: required model id
+* ***id***: required model id  This can also be `false` for entities that have an unknown id - like the authenticated user of an application.
 * ***url***: required fetch url
 * ***params***: optional effects-fetch parameters (https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch)
 * ***schema***: optional normalizr schema if response should be normalized
