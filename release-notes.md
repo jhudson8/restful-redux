@@ -1,3 +1,6 @@
+## v1.4.1
+bug fix - allow Model.fromCache to use id: false to match an action creator
+
 ## v1.4.0
 - added a `Model.fromCache` function to reuse cached models if possible
 - model providers will now cache models (so no `componentWillReceiveProps`) execution for every render
