@@ -21,7 +21,7 @@ export default function modelProvider (_Component, options) {
   // organize up our model and collection requirements
   const entitiesProp = options.entitiesProp || 'entities';
   const _models = [];
-  if (options.id) {
+  if (options.id || options.id === false) {
     _models.push(organizeProps(options));
   } else if (options.models) {
     for (let i = 0; i < options.models.length; i++) {
@@ -48,8 +48,8 @@ export default function modelProvider (_Component, options) {
       return NO_ID;
     } else if (typeof id === 'function') {
       return id(props);
-    } else {
-      return deepPropValue(id, props);
+    } else if (id) {
+      return deepPropValue(id, props) || id;
     }
   }
 

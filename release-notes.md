@@ -1,4 +1,7 @@
 ## v1.4.2
+not really a bug fix but not worth a minor release;  allow model provider id to be a static value (it will check props first but, if not found, will be the value provided)
+
+## v1.4.2
 bug fix - support id=false in modelProvider
 
 ## v1.4.1
