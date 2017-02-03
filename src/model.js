@@ -3,6 +3,9 @@
  * @param {object} modelOrDomain: the model object or entityType state object (if model `id` is provided)
  * @param {string} id: the model id if `modelOrDomain` represents the entityType state object
  */
+
+const NO_ID = '_noid_';
+
 export default class Model {
   constructor (options, value) {
     let entities;
@@ -11,13 +14,13 @@ export default class Model {
     let meta;
     if (value) {
       // (id, value)
-      id = options;
+      id = determineId(options);
       options = undefined;
       meta = value._meta;
       options = {};
     } else {
       // (options)
-      id = options.id;
+      id = determineId(options.id);
       entities = options.entities;
       if (entities) {
         // allow for root state to be passed
@@ -128,7 +131,7 @@ export default class Model {
 }
 
 Model.fromCache = function(options, cache) {
-  const id = options.id;
+  const id = determineId(options.id);
   const entityType = options.entityType;
   const ModelClass = options.modelClass || Model;
   let entities = options.entities || {};
@@ -151,6 +154,10 @@ Model.fromCache = function(options, cache) {
   }
   return cachedModel;
 };
+
+function determineId (id) {
+  return id === false ? NO_ID : id;
+}
 
 function getMetaAndValue (id, entities, entityType) {
   return {
