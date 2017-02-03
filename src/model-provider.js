@@ -154,7 +154,7 @@ function organizeProps (options) {
   checkRequiredOptions(['id', 'entityType'], options);
   const id = options.id;
   return Object.assign({}, options, {
-    id: (typeof id === 'string') ? id.split('.') : id,
+    id: id === false ? NO_ID : ((typeof id === 'string') ? id.split('.') : id),
     entityType: options.entityType,
     propName: options.modelProp || 'model',
     idPropName: options.idProp || 'id',
