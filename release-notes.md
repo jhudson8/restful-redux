@@ -1,3 +1,6 @@
+## v1.4.4
+allow false when checking for required fields
+
 ## v1.4.3
 not really a bug fix but not worth a minor release;  allow model provider id to be a static value (it will check props first but, if not found, will be the value provided)
 

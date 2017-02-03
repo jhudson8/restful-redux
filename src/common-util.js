@@ -11,7 +11,7 @@ export function checkRequiredOptions (keys, options) {
     throw new Error('missing options');
   }
   keys.forEach(function (key) {
-    if (!options[key]) {
+    if (typeof options[key] === 'undefined') {
       throw new Error('missing "' + key + '" options value');
     }
   });
