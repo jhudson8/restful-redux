@@ -1,3 +1,6 @@
+## v1.4.2
+bug fix - support id=false in modelProvider
+
 ## v1.4.1
 bug fix - allow Model.fromCache to use id: false to match an action creator
 
