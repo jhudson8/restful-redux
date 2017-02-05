@@ -2,6 +2,106 @@ import { checkRequiredOptions, logger } from './common-util';
 
 const NO_ID = '_noid_';
 
+function actions (state) {
+  var entities = Object.assign({}, state);
+  if (entities.entities) {
+    state = entities;
+    entities = state.entities = Object.assign({}, state.entities);
+  } else {
+    state = entities;
+  }
+  entities._meta = Object.assign({}, entities._meta);
+  var operations = {};
+
+  function operation (entityType, callback) {
+    var ops = operations[entityType];
+    if (!ops) {
+      ops = operations[entityType] = [];
+    }
+    callback(ops);
+  }
+
+  var rtn = {
+    delete: function (id, entityType) {
+      operation(entityType, function (ops) {
+        ops.push({
+          action: 'delete',
+          id: id
+        });
+      });
+      return rtn;
+    },
+    replace: function (id, entityType, value, data) {
+      operation(entityType, function (ops) {
+        ops.push({ action: 'replace', id: 'id', value: value, data: data });
+      });
+      return rtn;
+    },
+    // clear out all entities
+    clear: function (entityType) {
+      operation('_global', function (ops) {
+        ops.push({
+          action: 'delete',
+          entityType: entityType
+        });
+      });
+      return rtn;
+    },
+    // iterate through each entityType
+    iterate: function (entityType, callback) {
+      var modelEntities = entities[entityType];
+      var modelMeta = entities._meta && entities._meta[entityType] || {};
+      if (modelEntities) {
+        for (var id in modelEntities) {
+          callback.call(rtn, id, modelEntities[id], modelMeta && modelMeta[id]);
+        }
+      }
+      return rtn;
+    },
+    execute: function () {
+      // entity specific operations
+      for (var entityType in operations) {
+        var entityOperations = operations[entityType];
+        if (entityType === '_global') {
+          // global operations
+          entityOperations.forEach(function (operation) {
+            var action = operation.action;
+            var entityType = operation.entityType;
+            if (action === 'delete') {
+              delete entities[entityType];
+              delete entities._meta[entityType];
+            }
+          });
+        } else {
+          // entity specific operaiont
+          var _entities = entities[entityType] = Object.assign({}, entities[entityType]);
+          var _meta = entities._meta[entityType] = Object.assign({}, entities._meta[entityType]);
+          entityOperations.forEach(function (operation) {
+            var id = operation.id;
+            var action = operation.action;
+            var value = operation.value;
+            var data = operation.data;
+
+            if (action === 'delete') {
+              delete _entities[id];
+              delete _meta[id];
+            } else if (action === 'replace') {
+              if (value) {
+                _entities[id] = value;
+              }
+              if (data) {
+                _meta[id] = Object.assign({}, _meta[id], { data: data });
+              }
+            }
+          });
+        }
+      }
+      return state;
+    }
+  };
+  return rtn;
+}
+
 /**
  * Utility method for a consistent fetch pattern.  Return the state if applicable and false otherwise.
  * Options
@@ -15,14 +115,16 @@ function reducer (options) {
   const {
     entityType,
     actionPrefix,
-    debug,
-    fetchType = 'full'
+    beforeReduce,
+    afterReduce,
+    debug
   } = options;
   const verbose = debug === 'verbose';
   const log = logger(`model-reducer "${entityType}"`);
 
   function update ({
     state,
+    action,
     id,
     result,
     entities,
@@ -31,32 +133,35 @@ function reducer (options) {
     actionType
   }) {
     // make sure our necessary data structure is initialized
-    let stateEntities = state.entities || {};
-    stateEntities._meta = stateEntities._meta || {};
+    let stateEntities = Object.assign({}, state.entities);
+    state = Object.assign({}, state, { entities: stateEntities});
+    stateEntities._meta = Object.assign({}, stateEntities._meta);
 
-    // make sure we are immutable
-    state = Object.assign({}, state);
+    if (beforeReduce) {
+      var context = actions(state.entities);
+      beforeReduce(action, context);
+      state.entities = context.execute();
+    }
+
     if (result) {
       // our collection entity value is the results
-      entities = entities || {};
-      entities[entityType] = entities[entityType] || {};
-      entities[entityType][id] = entities[entityType][id] || result;
+      stateEntities[entityType] = Object.assign({}, entities[entityType]);
+      stateEntities[entityType][id] = result;
+    } else if (entities) {
+      result = entities[entityType][id];
     }
-    state.entities = Object.assign({}, entities
-      ? updateEntityModels(entities, stateEntities)
-      : stateEntities);
-    state.entities._meta = Object.assign({}, state.entities._meta);
+
+    if (entities) {
+      state.entities = stateEntities = updateEntityModels(entities, stateEntities, id, entityType, meta.fetched);
+    }
 
     // update the metadata
-    stateEntities = state.entities;
-    const metaDomain = Object.assign({}, stateEntities._meta[entityType]);
-    stateEntities._meta[entityType] = metaDomain;
+    const metaDomain = stateEntities._meta[entityType] = Object.assign({}, stateEntities._meta[entityType]);
     let _data = metaDomain[id] && metaDomain[id].data;
-    let _meta = meta;
-    meta = Object.assign({}, metaDomain[id], meta);
+    meta = metaDomain[id] = Object.assign({}, metaDomain[id], meta);
 
     // handle special `data` meta attribute
-    if (_meta.data === false) {
+    if (meta.data === false) {
       delete meta.data;
     } else if (_data || meta.data) {
       meta.data = _data = Object.assign({}, _data, meta.data);
@@ -73,12 +178,17 @@ function reducer (options) {
         delete meta[key];
       }
     }
-    metaDomain[id] = meta;
 
     if (clear) {
       // just delete the model if this action requires it
       stateEntities[entityType] = Object.assign({}, stateEntities[entityType]);
       delete(stateEntities[entityType][id]);
+    }
+
+    if (afterReduce) {
+      context = actions(state.entities);
+      afterReduce(context);
+      state.entities = context.execute();
     }
 
     if (debug) {
@@ -92,8 +202,7 @@ function reducer (options) {
     createMeta({
       type: 'FETCH_SUCCESS',
       meta: {
-        fetched: fetchType,
-        _timestamp: 'fetch'
+        fetched: true
       }
     }, ['fetchPending', 'fetchError', 'actionId', 'actionPending', 'actionSuccess',
       'actionError', 'actionResponse']),
@@ -101,8 +210,7 @@ function reducer (options) {
       // same as FETCH_SUCCESS but if more semantically correct if we're setting manually
       type: 'SET',
       meta: {
-        fetched: fetchType,
-        _timestamp: 'fetch'
+        fetched: true
       }
     }, ['fetchPending', 'fetchError', 'actionId', 'actionPending', 'actionSuccess',
       'actionError', 'actionResponse']),
@@ -111,7 +219,7 @@ function reducer (options) {
       meta: {
         fetchPending: true
       }
-    }, ['fetched', 'fetchTimestamp']),
+    }, ['fetched']),
     createMeta({
       type: 'FETCH_ERROR',
       clear: true,
@@ -136,7 +244,6 @@ function reducer (options) {
       type: 'ACTION_SUCCESS',
       meta: {
         _responseProp: 'actionResponse',
-        _timestamp: 'action',
         actionSuccess: true
       }
     }, ['actionPending', 'actionError']),
@@ -154,11 +261,6 @@ function reducer (options) {
   }
 
   return function (state = {}, action) {
-    // allow for restful-redux actions to be embedded within other actions
-    if (action.payload && action.payload._restfulReduxAction) {
-      action = action.payload._restfulReduxAction;
-    }
-
     const type = action.type;
     for (var i = 0; i < handlers.length; i++) {
       if (handlers[i][0] === type) {
@@ -172,7 +274,15 @@ function reducer (options) {
         const actionId = payload.actionId;
         const meta = Object.assign({}, options.meta);
         const responseProp = meta._responseProp;
-        const timestampProp = meta._timestamp;
+
+        if (meta.fetched) {
+          meta.fetched = {
+            type: 'full',
+            timestamp: new Date().getTime(),
+            entityType: entityType,
+            id: id
+          };
+        }
 
         if (actionId) {
           meta.actionId = actionId;
@@ -182,13 +292,10 @@ function reducer (options) {
           delete meta._responseProp;
           meta[responseProp] = response;
         }
-        if (timestampProp) {
-          delete meta._timestamp;
-          meta[`${timestampProp}Timestamp`] = new Date().getTime();
-        }
 
         return update({
           state,
+          action,
           id,
           result,
           entities,
@@ -206,6 +313,7 @@ function reducer (options) {
     return state;
   };
 }
+reducer.actions = actions;
 
 function createMeta (props, clearProps) {
   clearProps.forEach(function (propType) {
@@ -214,11 +322,22 @@ function createMeta (props, clearProps) {
   return props;
 }
 
-function updateEntityModels (values, entities) {
+function updateEntityModels (values, entities, primaryId, primaryEntityType, fetchData) {
   const rtn = Object.assign({}, entities);
+  const _meta = rtn._meta = Object.assign({}, entities._meta);
   for (let entityType in values) {
     if (values.hasOwnProperty(entityType)) {
       rtn[entityType] = Object.assign({}, rtn[entityType], values[entityType]);
+      if (fetchData) {
+        var entitiesMeta = _meta[entityType] = Object.assign({}, _meta[entityType]);
+        for (var id in values[entityType]) {
+          if (id === primaryId && entityType === primaryEntityType) {
+            entitiesMeta[id] = Object.assign({ fetched: fetchData }, entitiesMeta[id]);
+          } else {
+            entitiesMeta[id] = Object.assign({ fetched: { type: 'partial' } }, entitiesMeta[id], { fetchedBy: fetchData });
+          }
+        }
+      }
     }
   }
   return rtn;
@@ -227,11 +346,9 @@ function updateEntityModels (values, entities) {
 // allow multiple reducers to be joined together
 reducer.join = function(reducers) {
   return function (state, action) {
+    var isNew = typeof state === 'undefined';
     for (var i = 0; i < reducers.length; i ++) {
-      let newState = reducers[i](state, action);
-      if (newState !== state) {
-        return newState;
-      }
+      state = reducers[i](state, action, isNew);
     }
     return state;
   };

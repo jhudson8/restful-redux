@@ -1,7 +1,9 @@
 /* global it, describe */
 
 import reducer from '../src/model-reducer';
+var actions = reducer.actions;
 var expect = require('chai').expect;
+var sinon = require('sinon');
 
 var emptyState = {};
 var savedEmptyState = JSON.parse(JSON.stringify(emptyState));
@@ -10,7 +12,6 @@ var initialState1 = {
     _meta: {
       foo: {
         '1': {
-          fetched: 'partial',
           data: {
             customMetaProp: 'foo'
           }
@@ -26,11 +27,81 @@ var initialState1 = {
   }
 };
 var savedInitialState1 = JSON.parse(JSON.stringify(initialState1));
+var initialState2 = {
+  entities: {
+    _meta: {
+      foo: {
+        '1': {
+          data: {
+            customMetaProp: 'foo'
+          }
+        },
+        '2': {
+          data: {
+            customMetaProp: 'bar'
+          }
+        },
+      }
+    },
+    foo: {
+      '1': {
+        foo: 'abc',
+        beep: 'boop'
+      },
+      '2': {
+        abc: 'def',
+        ghi: 'jkl'
+      }
+    }
+  }
+};
+var savedInitialState2 = JSON.parse(JSON.stringify(initialState2));
 
 describe('model-reducer', function () {
   var fooReducer = reducer({
     actionPrefix: 'FOO',
     entityType: 'foo'
+  });
+
+  describe('actions', function () {
+    it('clear', function () {
+      var state = actions(initialState2).clear('foo').execute();
+      expect(state).to.deep.equal({entities:{_meta:{}}});
+      expect(initialState2).to.deep.equal(savedInitialState2);
+    });
+
+    describe('item operations', function () {
+      it('replace', function () {
+        var state = actions(initialState2)
+          .replace('1', 'foo', { test1: 'test1' })
+          .replace('2', 'foo', { test2: 'test2' }, { meta2: 'test2' })
+          .replace('3', 'foo', { test3: 'test3' })
+          .execute();
+        expect(state).to.deep.equal({entities:{_meta:{foo:{
+          '1':{data:{customMetaProp:'foo'}},
+          '2':{data:{customMetaProp:'bar'}},
+          id:{'data':{'meta2':'test2'}}}},'foo':{'1':{'foo':'abc','beep':'boop'},'2':{'abc':'def','ghi':'jkl'},'id':{'test3':'test3'}}}});
+      });
+      it('delete', function () {
+        var spy = sinon.spy();
+        var state = actions(initialState2)
+          .iterate('foo', function (id, value, meta) {
+            spy(id, value, meta);
+            if (id === '1') {
+              this.delete(id, 'foo');
+            }
+          })
+          .execute();
+        expect(spy.callCount).to.equal(2);
+        expect(spy.firstCall.args).to.deep.equal([
+          '1',
+          { foo: 'abc', beep: 'boop' },
+          { data: { customMetaProp: 'foo' } }
+        ]);
+        expect(state).to.deep.equal({entities:{_meta:{foo:{'2':{data:{customMetaProp:'bar'}}}},foo:{'2':{abc:'def',ghi:'jkl'}}}});
+        expect(initialState2).to.deep.equal(savedInitialState2);
+      });
+    });
   });
 
   describe('join', function () {
@@ -93,7 +164,6 @@ describe('model-reducer', function () {
           _meta: {
             foo: {
               '1': {
-                fetched: 'partial',
                 data: {
                   customMetaProp: 'foo',
                   boop: 'beep'
@@ -128,7 +198,6 @@ describe('model-reducer', function () {
           _meta: {
             foo: {
               '1': {
-                fetched: 'partial',
                 data: {
                   boop: 'beep'
                 }
@@ -159,55 +228,12 @@ describe('model-reducer', function () {
           _meta: {
             foo: {
               '1': {
-                fetched: 'partial'
               }
             }
           },
           foo: {
             '1': {
               foo: 'abc',
-              beep: 'boop'
-            }
-          }
-        }
-      });
-    });
-  });
-
-  describe('embedded action "_restfulReduxAction"', function () {
-    it ('should listen for embedded actions', function () {
-      var state = fooReducer(emptyState, {
-        type: 'NOT_REAL',
-        payload: {
-          _restfulReduxAction: {
-            type: 'FOO_FETCH_SUCCESS',
-            payload: {
-              result: '1',
-              entities: {
-                foo: {
-                  '1': {
-                    beep: 'boop'
-                  }
-                }
-              }
-            }
-          }
-        }
-      });
-      expect(emptyState).to.deep.equal(savedEmptyState);
-      // don't deal with dymanic value
-      delete state.entities._meta.foo['1'].fetchTimestamp;
-      expect(state).to.deep.equal({
-        entities: {
-          _meta: {
-            foo: {
-              '1': {
-                fetched: 'full',
-              }
-            }
-          },
-          foo: {
-            '1': {
               beep: 'boop'
             }
           }
@@ -233,13 +259,18 @@ describe('model-reducer', function () {
       });
       expect(emptyState).to.deep.equal(savedEmptyState);
       // don't deal with dymanic value
-      delete state.entities._meta.foo['1'].fetchTimestamp;
+      expect(!!state.entities._meta.foo['1'].fetched.timestamp).to.equal(true);
+      delete state.entities._meta.foo['1'].fetched.timestamp;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
             foo: {
               '1': {
-                fetched: 'full',
+                fetched: {
+                  entityType: 'foo',
+                  id: '1',
+                  type: 'full'
+                }
               }
             }
           },
@@ -267,13 +298,17 @@ describe('model-reducer', function () {
         }
       });
       expect(initialState1).to.deep.equal(savedInitialState1);
-      delete state.entities._meta.foo['1'].fetchTimestamp;
+      delete state.entities._meta.foo['1'].fetched.timestamp;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
             foo: {
               '1': {
-                fetched: 'full',
+                fetched: {
+                  entityType: 'foo',
+                  id: '1',
+                  type: 'full'
+                },
                 data: {
                   customMetaProp: 'foo'
                 }
@@ -283,6 +318,69 @@ describe('model-reducer', function () {
           foo: {
             '1': {
               beep: 'boop'
+            }
+          }
+        }
+      });
+    });
+
+    it('should update/add normalized entities', function () {
+      var state = fooReducer(initialState1, {
+        type: 'FOO_FETCH_SUCCESS',
+        payload: {
+          result: '1',
+          entities: {
+            foo: {
+              '1': {
+                beep: 'boop'
+              }
+            },
+            bar: {
+              '1': {
+                a: 'b'
+              }
+            }
+          }
+        }
+      });
+      expect(initialState1).to.deep.equal(savedInitialState1);
+      delete state.entities._meta.foo['1'].fetched.timestamp;
+      expect(state).to.deep.equal({
+        entities: {
+          _meta: {
+            foo: {
+              '1': {
+                fetched: {
+                  entityType: 'foo',
+                  id: '1',
+                  type: 'full'
+                },
+                data: {
+                  customMetaProp: 'foo'
+                }
+              }
+            },
+            bar: {
+              '1': {
+                fetched: {
+                  type: 'partial'
+                },
+                fetchedBy: {
+                  entityType: 'foo',
+                  id: '1',
+                  type: 'full'
+                }
+              }
+            }
+          },
+          foo: {
+            '1': {
+              beep: 'boop'
+            }
+          },
+          bar: {
+            '1': {
+              a: 'b'
             }
           }
         }
@@ -307,13 +405,17 @@ describe('model-reducer', function () {
         }
       });
       // don't deal with dymanic value
-      delete state.entities._meta.foo['1'].fetchTimestamp;
+      delete state.entities._meta.foo['1'].fetched.timestamp;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
             foo: {
               '1': {
-                fetched: 'full',
+                fetched: {
+                  entityType: 'foo',
+                  id: '1',
+                  type: 'full'
+                },
                 data: {
                   abc: 'def'
                 }
@@ -493,7 +595,6 @@ describe('model-reducer', function () {
           _meta: {
             foo: {
               '1': {
-                fetched: 'partial',
                 actionId: 'test',
                 actionSuccess: true,
                 data: {
@@ -552,7 +653,6 @@ describe('model-reducer', function () {
               '1': {
                 actionId: 'bar',
                 actionPending: true,
-                fetched: 'partial',
                 data: {
                   customMetaProp: 'foo'
                 }
@@ -619,7 +719,6 @@ describe('model-reducer', function () {
                 actionError: {
                   abc: 'def'
                 },
-                fetched: 'partial',
                 data: {
                   customMetaProp: 'foo'
                 }
@@ -666,7 +765,6 @@ describe('model-reducer', function () {
           _meta: {
             foo: {
               '1': {
-                fetched: 'partial',
                 data: {
                   customMetaProp: 'foo'
                 }
@@ -700,7 +798,6 @@ describe('model-reducer', function () {
           _meta: {
             foo: {
               '1': {
-                fetched: 'partial',
                 data: {
                   customMetaProp: 'foo'
                 }
