@@ -2,7 +2,8 @@ import { checkRequiredOptions, logger } from './common-util';
 
 const NO_ID = '_noid_';
 
-function util (state) {
+function util (origState) {
+  var state = origState;
   var entities = Object.assign({}, state);
   if (entities.entities) {
     state = entities;
@@ -59,6 +60,7 @@ function util (state) {
       return rtn;
     },
     execute: function () {
+      var changeMade = false;
       // entity specific operations
       for (var entityType in operations) {
         var entityOperations = operations[entityType];
@@ -68,6 +70,7 @@ function util (state) {
             var action = operation.action;
             var entityType = operation.entityType;
             if (action === 'delete') {
+              changeMade = true;
               delete entities[entityType];
               delete entities._meta[entityType];
             }
@@ -85,6 +88,7 @@ function util (state) {
             if (action === 'delete') {
               delete _entities[id];
               delete _meta[id];
+              changeMade = true;
             } else if (action === 'replace') {
               if (value) {
                 _entities[id] = value;
@@ -92,11 +96,16 @@ function util (state) {
               if (data) {
                 _meta[id] = Object.assign({}, _meta[id], { data: data });
               }
+              changeMade = true;
             }
           });
         }
       }
-      return state;
+      if (changeMade) {
+        return state;
+      } else {
+        return origState;
+      }
     }
   };
   return rtn;
@@ -139,7 +148,7 @@ function reducer (options) {
 
     if (beforeReduce) {
       var context = util(state.entities);
-      beforeReduce(action, util, { action, id, entities, result });
+      beforeReduce(action, util, { action, id, entities, value: result });
       state.entities = context.execute();
     }
 
@@ -187,7 +196,7 @@ function reducer (options) {
 
     if (afterReduce) {
       context = util(state.entities);
-      afterReduce(action, context, action, util, { action, id, entities, result });
+      afterReduce(action, context, action, util, { action, id, entities, value: result });
       state.entities = context.execute();
     }
 
@@ -334,7 +343,7 @@ function updateEntityModels (values, entities, primaryId, primaryEntityType, fet
           if (id === primaryId && entityType === primaryEntityType) {
             entitiesMeta[id] = Object.assign({ fetched: fetchData }, entitiesMeta[id]);
           } else {
-            entitiesMeta[id] = Object.assign({ fetched: { type: 'partial' } }, entitiesMeta[id], { fetchedBy: fetchData });
+            entitiesMeta[id] = Object.assign({ fetched: { type: 'normalized' } }, entitiesMeta[id], { fetchedBy: fetchData });
           }
         }
       }
@@ -346,9 +355,8 @@ function updateEntityModels (values, entities, primaryId, primaryEntityType, fet
 // allow multiple reducers to be joined together
 reducer.join = function(reducers) {
   return function (state, action) {
-    var isNew = typeof state === 'undefined';
     for (var i = 0; i < reducers.length; i ++) {
-      state = reducers[i](state, action, isNew);
+      state = reducers[i](state, action);
     }
     return state;
   };

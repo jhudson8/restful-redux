@@ -363,7 +363,7 @@ describe('model-reducer', function () {
             bar: {
               '1': {
                 fetched: {
-                  type: 'partial'
+                  type: 'normalized'
                 },
                 fetchedBy: {
                   entityType: 'foo',

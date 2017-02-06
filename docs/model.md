@@ -61,12 +61,13 @@ Return the model content or undefined if it does not exist.  ***note*** as long 
 ```
 
 #### wasFetched
-Return `true` if the model has been sucessfully fetched.  If `true`, the `value` function will always return the model contents.
+Return a `truthy` if the model has been sucessfully fetched.
 ```javascript
   render: function () {
     const model = this.props.model;
     if (model.wasFetched()) {
-      // ...
+      // the actual return value contains fetch details { timestamp, type: 'full'|'normalized':'set' }
+      // 'full' if the model was fetched, 'normalized' if the model was set from a model fetch normalization, 'set' if the model was created using new Model(...)
     }
   }
 ```
