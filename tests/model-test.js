@@ -235,7 +235,7 @@ describe('model', function () {
   describe('wasFetched', function () {
     it('should return "exists" if the model exists with no meta value', function () {
       var model = new Model(options(noMetaEntities, true));
-      expect(model.wasFetched()).to.equal('exists');
+      expect(model.wasFetched()).to.deep.equal({ type: 'set' });
     });
 
     it('should return the meta "fetched" if exists', function () {

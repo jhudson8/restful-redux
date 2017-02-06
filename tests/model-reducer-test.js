@@ -1,7 +1,7 @@
 /* global it, describe */
 
 import reducer from '../src/model-reducer';
-var actions = reducer.actions;
+var util = reducer.util;
 var expect = require('chai').expect;
 var sinon = require('sinon');
 
@@ -65,14 +65,14 @@ describe('model-reducer', function () {
 
   describe('actions', function () {
     it('clear', function () {
-      var state = actions(initialState2).clear('foo').execute();
+      var state = util(initialState2).clear('foo').execute();
       expect(state).to.deep.equal({entities:{_meta:{}}});
       expect(initialState2).to.deep.equal(savedInitialState2);
     });
 
     describe('item operations', function () {
       it('replace', function () {
-        var state = actions(initialState2)
+        var state = util(initialState2)
           .replace('1', 'foo', { test1: 'test1' })
           .replace('2', 'foo', { test2: 'test2' }, { meta2: 'test2' })
           .replace('3', 'foo', { test3: 'test3' })
@@ -84,7 +84,7 @@ describe('model-reducer', function () {
       });
       it('delete', function () {
         var spy = sinon.spy();
-        var state = actions(initialState2)
+        var state = util(initialState2)
           .iterate('foo', function (id, value, meta) {
             spy(id, value, meta);
             if (id === '1') {

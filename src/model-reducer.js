@@ -2,7 +2,7 @@ import { checkRequiredOptions, logger } from './common-util';
 
 const NO_ID = '_noid_';
 
-function actions (state) {
+function util (state) {
   var entities = Object.assign({}, state);
   if (entities.entities) {
     state = entities;
@@ -138,8 +138,8 @@ function reducer (options) {
     stateEntities._meta = Object.assign({}, stateEntities._meta);
 
     if (beforeReduce) {
-      var context = actions(state.entities);
-      beforeReduce(action, context);
+      var context = util(state.entities);
+      beforeReduce(action, util, { action, id, entities, result });
       state.entities = context.execute();
     }
 
@@ -186,8 +186,8 @@ function reducer (options) {
     }
 
     if (afterReduce) {
-      context = actions(state.entities);
-      afterReduce(context);
+      context = util(state.entities);
+      afterReduce(action, context, action, util, { action, id, entities, result });
       state.entities = context.execute();
     }
 
@@ -313,7 +313,7 @@ function reducer (options) {
     return state;
   };
 }
-reducer.actions = actions;
+reducer.util = util;
 
 function createMeta (props, clearProps) {
   clearProps.forEach(function (propType) {

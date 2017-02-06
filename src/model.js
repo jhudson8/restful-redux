@@ -37,6 +37,7 @@ export default class Model {
     this._options = options;
     this._meta = meta || {};
     this._metadata = this._meta.data || {};
+    this._fetchedInfo = this._meta.fetched ? this._meta.fetched : this._value ? { type: 'set' } : false;
   }
 
   data () {
@@ -70,10 +71,7 @@ export default class Model {
    * Return true if the model has been fetched
    */
   wasFetched () {
-    if (this.value()) {
-      return this._meta.fetched ? this._meta.fetched : 'exists';
-    }
-    return false;
+    return this._fetchedInfo;
   }
 
   canBeFetched () {
