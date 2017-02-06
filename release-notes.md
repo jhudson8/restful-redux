@@ -1,3 +1,7 @@
+## v1.5.0
+Added useful entity manipulation reducer utility functions and beforeReduce/afterReduce reducer attributes
+See https://github.com/jhudson8/restful-redux/blob/master/docs/model-reducer.md (Util section) for more details
+
 ## v1.4.4
 allow false when checking for required fields
 
