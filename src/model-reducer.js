@@ -196,7 +196,7 @@ function reducer (options) {
 
     // dirty parent entity if applicable
     const fetchedBy = meta.fetchedBy;
-    if (fetchedBy) {
+    if (fetchedBy && action.payload.bubbleUp !== false) {
       const fetchedByEntityType = fetchedBy.entityType;
       if (stateEntities[fetchedByEntityType]) {
         const fetchedById = fetchedBy.id;

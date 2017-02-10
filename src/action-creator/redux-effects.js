@@ -43,6 +43,7 @@ export default function (options) {
     actionPrefix,
     entityType,
     normalize,
+    bubbleUp,
     debug
   } = options;
   const log = logger(`action-creator-redux-effects "${entityType}"`);
@@ -92,6 +93,9 @@ export default function (options) {
       }
       if (isDelete) {
         payload.delete = true;
+      }
+      if (bubbleUp === false) {
+        payload.bubbleUp = false;
       }
 
       const actionType = `${actionPrefix}_${fetchOrAction}_${type}`;
