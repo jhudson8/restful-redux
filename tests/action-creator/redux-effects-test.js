@@ -1,11 +1,11 @@
 /* global it, describe */
 import sinon from 'sinon';
 import actionCreator from '../../src/action-creator/redux-effects';
-import { normalize, Schema } from 'normalizr';
+import { normalize, schema } from 'normalizr';
 var expect = require('chai').expect;
 
-var personSchema = new Schema('people');
-var fooSchema = new Schema('foo');
+var personSchema = new schema.Entity('people');
+var fooSchema = new schema.Entity('foo');
 fooSchema.define({
   author: personSchema
 });
@@ -54,26 +54,18 @@ describe('redux-effects-action-creator', function () {
       expect(successAction[0]).to.deep.equal({
         type: 'FETCH_SUCCESS',
         payload: {
-          result: '1',
-          entities: {
-            foo: {
-              '1': {
-                foo: 'bar'
-              }
-            }
+          id: '1',
+          result: {
+            foo: 'bar'
           }
         }
       });
       expect(successAction[1]).to.deep.equal({
         type: 'FOO_FETCH_SUCCESS',
         payload: {
-          result: '1',
-          entities: {
-            foo: {
-              '1': {
-                foo: 'bar'
-              }
-            }
+          id: '1',
+          result: {
+            foo: 'bar'
           }
         }
       });
@@ -102,7 +94,6 @@ describe('redux-effects-action-creator', function () {
       expect(successAction[1]).to.deep.equal({
         type: 'FOO_FETCH_SUCCESS',
         payload: {
-          data: undefined,
           id: '1',
           result: '1',
           entities: {

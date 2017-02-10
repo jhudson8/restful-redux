@@ -1,12 +1,11 @@
 /* global it, describe */
 
 import Model from '../src/model';
-import { Schema } from 'normalizr';
-import { denormalize } from 'denormalizr';
+import { schema, denormalize } from 'normalizr';
 var expect = require('chai').expect;
 
-var personSchema = new Schema('people');
-var fooSchema = new Schema('foo');
+var personSchema = new schema.Entity('people');
+var fooSchema = new schema.Entity('foo');
 fooSchema.define({
   author: personSchema
 });

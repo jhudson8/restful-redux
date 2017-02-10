@@ -65,30 +65,28 @@ export default function (options) {
       // response is assumed to be in [normalize](https://github.com/paularmstrong/normalize) format of
       // {result: _id_, entities: {_entityType_: {_id_: ...}}}
       let payload = response.value;
+      const _formatter = formatter || defaultFormat(!actionId || replaceModel ? 'result' : 'response');
+      const formatterOptions = {
+        id: id,
+        actionId: actionId,
+        entityType: entityType
+      };
       if (type === SUCCESS) {
         if (!actionId || replaceModel) {
-          if (formatter) {
-            payload = formatter(payload, id, entityType);
-          }
-          if (schema && normalize) {
-            payload = Object.assign(normalize(payload.result || payload, schema), {
-              id: payload.id,
-              data: payload.data
-            });
-          } else if (!formatter) {
-            payload = defaultFormat(payload, id, entityType);
+          payload = _formatter(payload, formatterOptions);
+          if (schema && normalize && payload) {
+            payload = Object.assign(payload, normalize(payload.result, schema));
           }
         } else {
-          payload = {
-            id: id,
-            response: formatter
-              ? formatter(response.value, id, actionId, entityType)
-              : response.value
-          };
+          payload = _formatter(response.value, formatterOptions);
         }
       } else {
-        payload = { id: id, response: response };
+        payload = { response: response };
       }
+      if (!payload) {
+        payload = {};
+      }
+      payload.id = id;
       if (actionId) {
         payload.actionId = actionId;
       }
@@ -276,13 +274,10 @@ function fetch (url = '', params = {}) {
   };
 }
 
-// // {result: _id_, entities: {_entityType: {_id_: ...
-function defaultFormat (value, id, entityType) {
-  const rtn = {
-    result: id,
-    entities: {}
+function defaultFormat (type) {
+  return function (value) {
+    var rtn = {};
+    rtn[type] = value;
+    return rtn;
   };
-  const entityTypeData = rtn.entities[entityType] = {};
-  entityTypeData[id] = value;
-  return rtn;
 }

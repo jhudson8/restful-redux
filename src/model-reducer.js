@@ -154,7 +154,7 @@ function reducer (options) {
 
     if (result) {
       // our collection entity value is the results
-      stateEntities[entityType] = Object.assign({}, entities[entityType]);
+      stateEntities[entityType] = entities ? Object.assign({}, entities[entityType]) : {};
       stateEntities[entityType][id] = result;
     } else if (entities) {
       result = entities[entityType][id];
@@ -192,6 +192,22 @@ function reducer (options) {
       // just delete the model if this action requires it
       stateEntities[entityType] = Object.assign({}, stateEntities[entityType]);
       delete(stateEntities[entityType][id]);
+    }
+
+    // dirty parent entity if applicable
+    const fetchedBy = meta.fetchedBy;
+    if (fetchedBy) {
+      const fetchedByEntityType = fetchedBy.entityType;
+      if (stateEntities[fetchedByEntityType]) {
+        const fetchedById = fetchedBy.id;
+        const fetchedByEntities = stateEntities[fetchedByEntityType] = Object.assign({}, stateEntities[fetchedByEntityType]);
+        const fetchedBySource = fetchedByEntities[fetchedById];
+        if (fetchedBySource) {
+          fetchedByEntities[fetchedById] = Array.isArray(fetchedBySource)
+            ? fetchedBySource.slice(0)
+            : Object.assign({}, fetchedBySource);
+        }
+      }
     }
 
     if (afterReduce) {

@@ -51,17 +51,32 @@ export default class Model {
     if (!this._formattedValue) {
       this._formatted = true;
       const options = this._options;
-      if (options.schema && options.denormalize) {
+      if (this._value && options.schema && options.denormalize) {
         this._formattedValue = options.denormalize(
           this._value,
-          this._entities,
-          options.schema
+          options.schema,
+          this._entities
         );
       } else {
         const formatter = options.formatter;
         this._formattedValue = formatter
           ? formatter(options)
           : this._value;
+      }
+      let arrayEntrySchema = options.arrayEntrySchema;
+      let ArrayEntryModel = Model;
+      if (arrayEntrySchema && this._formattedValue) {
+        if (arrayEntrySchema.model) {
+          ArrayEntryModel = arrayEntrySchema.model || Model;
+          arrayEntrySchema = arrayEntrySchema.schema;
+        }
+        this._formattedValue = this._formattedValue.map((data) => {
+          return new ArrayEntryModel({
+            entities: this._entities,
+            id: arrayEntrySchema.getId(data),
+            entityType: arrayEntrySchema.key
+          });
+        });
       }
     }
     return this._formattedValue;
@@ -128,7 +143,7 @@ export default class Model {
   }
 }
 
-Model.fromCache = function(options, cache) {
+Model.fromCache = function (options, cache) {
   const id = determineId(options.id);
   const entityType = options.entityType;
   const ModelClass = options.modelClass || Model;
@@ -151,6 +166,22 @@ Model.fromCache = function(options, cache) {
     cachedModels[id] = cachedModel;
   }
   return cachedModel;
+};
+
+Model.clearCache = function (id, entityType, cache) {
+  id = determineId(id);
+  var metaTypes = deepValue(cache, ['_meta', entityType]);
+  if (metaTypes) {
+    delete metaTypes[id];
+  }
+  const entityTypes = cache[entityType];
+  if (entityTypes) {
+    delete entityTypes[id];
+  }
+  const models = deepValue(cache, [entityType, '__models']);
+  if (models) {
+    delete models[id];
+  }
 };
 
 function determineId (id) {
