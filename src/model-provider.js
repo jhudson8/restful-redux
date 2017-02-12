@@ -53,45 +53,28 @@ export default function modelProvider (_Component, options) {
     }
   }
 
-  function getModelData (id, props, options) {
-    // if a model is provided directly, we short circuit
-    if (props[options.propName]) {
-      return props[options.propName];
-    }
-    let entities = props[entitiesProp];
-    // gracefully handle the parent state
-    entities = entities && (entities.entities || entities);
-    if (entities) {
-      const entityModels = entities[options.entityType];
-      return entityModels && entityModels[id];
-    }
-  }
-
   function maybeFetchModels (props, allowForceFetch) {
-    var self = this;
+    const self = this;
+    const state = this.state;
     _models.forEach((options) => {
-      if (options.fetchProp) {
+      if (options.fetchProp && !props[options.modelProp || 'model']) {
         const id = getModelId(props, options);
         if (id) {
-          // only fetch a model if the id value exists
-          const modelData = getModelData(id, props, options);
-          if (!modelData && (!this.state || !this.state._fetched || !this.state._fetched[id])) {
+          const isDifferentId = !state.fetched[options.fetchProp] || state.fetched[options.fetchProp] !== id;
+          const shouldForceFetch = options.forceFetch && allowForceFetch;
+          if (isDifferentId) {
             const modelOptions = Object.assign({}, options, {
               id: id,
               entities: props[entitiesProp]
             });
             const modelCache = self.state.modelCache;
             const model = Model.fromCache(modelOptions, modelCache);
-            if (model.canBeFetched() || (options.forceFetch && allowForceFetch)) {
+            if (model.canBeFetched() || shouldForceFetch) {
               fetchModel(id, props, options);
-              this.setState((state) => {
-                state._fetched = state._fetched || {};
-                state._fetched[id] = true;
-                return state;
-              });
-            } else if (verbose) {
-              log(`model ${id} is not available but "canBeFetched" returned false`);
+              state.fetched[options.fetchProp] = id;
             }
+          } else if (verbose) {
+            log(`model ${id} is not available but "canBeFetched" returned false`);
           }
         }
       }
@@ -115,7 +98,8 @@ export default function modelProvider (_Component, options) {
   return React.createClass({
     getInitialState: function () {
       return {
-        modelCache: {}
+        modelCache: {},
+        fetched: {}
       };
     },
 

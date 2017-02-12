@@ -112,7 +112,8 @@ describe('model-provider', function () {
     Component.prototype.componentWillReceiveProps.call({
       setState: sinon.spy(),
       state: {
-        modelCache: {}
+        modelCache: {},
+        fetched: {}
       },
       props: {
         id: '1'
