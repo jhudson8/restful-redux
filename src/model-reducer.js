@@ -128,6 +128,7 @@ function reducer (options) {
     afterReduce,
     debug
   } = options;
+  const bubbleUp = typeof options.bubbleUp === 'undefined' ? true : options.bubbleUp;
   const verbose = debug === 'verbose';
   const log = logger(`model-reducer "${entityType}"`);
 
@@ -196,7 +197,7 @@ function reducer (options) {
 
     // dirty parent entity if applicable
     const fetchedBy = meta.fetchedBy;
-    if (fetchedBy && action.payload.bubbleUp !== false) {
+    if (fetchedBy && (action.payload.bubbleUp !== false || !bubbleUp)) {
       const fetchedByEntityType = fetchedBy.entityType;
       if (stateEntities[fetchedByEntityType]) {
         const fetchedById = fetchedBy.id;
