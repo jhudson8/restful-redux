@@ -45,6 +45,8 @@ const actionCreator = reduxEffectsActionCreator({
   entityType: 'customer',
   // optional normalizr normalize method (see https://github.com/paularmstrong/normalizr;  `import { normalize } from 'normalizr';`)
   normalize: normalize,
+  // optional flag (default to true) to indicate if normalized collections should be cloned if a collection entity has changed
+  bubbleUp: false,
   // optional value to help log info to console if you are having trouble getting things working
   debug: true
 });
