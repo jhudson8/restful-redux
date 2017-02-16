@@ -139,3 +139,31 @@ const newState = reducer.util(state).iterate(_entityType_, function (id, value, 
   }
 }).execute();
 ```
+
+## Redux State
+This reducer uses a normalized data structure (see [normalizr](https://github.com/paularmstrong/normalizr)).  Assuming the following reducer
+```javascript
+export default reducer({
+  actionPrefix: 'CUSTOMER',
+  entityType: 'customer'
+});
+```
+Assuming a model with an entityType of "foo" with id of "123" was fetched the resulting state would be
+```
+{
+  entities: {
+    _meta: {
+      foo: {
+        '123' : {
+          ...model metadata indicating XHR status (available with the Model class)
+        }
+      }
+    },
+    foo {
+      '123': {
+        ...fetched model data
+      }
+    }
+  }
+}
+```

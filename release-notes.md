@@ -1,3 +1,11 @@
+## v2.0.0
+- *only* support new 3.x denormalizr function provided by normalizr (import { denormalizrs } from 'normalizr' - not external `denormalizr` package)
+- add `arrayEntrySchema` modelProvider option to allow for collections models value() function to return an array of Models
+- standardize action creator formatting { data, result, entities }
+- added Model.clearCache(id, entityType, cache)
+- if a denormalized entity from a collection is updated, the collection is shallow copied to allow collection consumers to know about the change
+
+
 ## v1.5.0
 Added useful entity manipulation reducer utility functions and beforeReduce/afterReduce reducer attributes
 See https://github.com/jhudson8/restful-redux/blob/master/docs/model-reducer.md (Util section) for more details

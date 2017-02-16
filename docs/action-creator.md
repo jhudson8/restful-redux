@@ -1,12 +1,39 @@
 Action Creators
 ---------------
-The action creator in this project is used to easily, and with very little code, create dispatchable actions that interact with this package's reducers.
+The action creator in this project is used to easily, and with very little code, create dispatchable actions that interact with this package's reducers.  This uses [redux-effects-fetch](https://github.com/redux-effects/redux-effects-fetch)) but you could create your own by following the [./redux-actions](./redux-actions) interface.
 
-This project contains 1 action creator impl (using [redux-effects-fetch](https://github.com/redux-effects/redux-effects-fetch)).
+## Promises
+If you would like your `store.dispatch` function to return a promise for these actions, include the following code
+```javascript
+// "store" is the redux store
+const _dispatch = store.dispatch;
+store.dispatch = function (action) {
+  const rtn = _dispatch.call(store, action);
+  if (action.promise) {
+    return action.promise;
+  }
+  return rtn;
+}
+```
 
-You can create your own so we will discuss the interface (expected by the reducer) as well.
+Also, I find that this middleware makes JSON posts easier (auto-detection of object/array payload and allows cookies).
+```javascript
+const EFFECT_FETCH = 'EFFECT_FETCH';
+const enhanceFetchMiddleware = (store) => (next) => (action) {
+  if (action.type === EFFECT_FETCH) {
+    const params = action.payload.params || {};
+    action.payload.params = Object.assign({
+      credentials: 'same-origin',
+      headers: Object.assign(typeof params.body === 'object' || Array.isArray(params.body)
+        ? {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json;charset=UTF-8'
+        } : {}, params.headers)
+    }, params);
+  }
+}
+```
 
-## Redux Effects Action Creator
 ### Import and Create New Action Creator
 ```javascript
 import { reduxEffectsActionCreator } from 'restful-redux';
@@ -26,30 +53,34 @@ const actionCreator = reduxEffectsActionCreator({
 [../examples/01-github-profile-viewer/lib/profile-page/actions.js](../examples/01-github-profile-viewer/lib/profile-page/actions.js)
 
 ### Action Creator API
-* [createFetchAction / createGetAction](#createfetchaction--creategetaction)
+* [createFetchAction](#createfetchaction)
+* [createGetAction](#creategetaction)
 * [createPostAction](#createpostaction)
 * [createDeleteAction](#createdeleteaction)
 * [createPutAction](#createputaction)
 * [createPatchAction](#createpatchaction)
 * [createModelDataAction](#createmodeldataaction)
 
-#### createFetchAction / createGetAction
-Both functions are the same (depending on if you prefer a rest method-based name or a standard `fetch` name).  Returns a redux action used to initiate an XHR to fetch model data.  A Promise is also available as an attribute
-on all actions if needed.
+#### createFetchAction
+The `fetch` action will replace the contents of your model data with the XHR response.
+
+Any other (`get`, `post`, `delete`, `put`, `patch`) will only replace the model data if the `replaceModel` option is provided.  See below for more details.
+
+See [./redux-actions.md](./redux-actions.md) if you want to know the action shapes that are dispatched.  Useful for debugging or to create a different implementation of this action creator.
 
 ##### options
 * ***id***: required model id  This can also be `false` for entities that have an unknown id - like the authenticated user of an application.
 * ***url***: required fetch url
 * ***params***: optional effects-fetch parameters (https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch)
-* ***schema***: optional normalizr schema if response should be normalized
-* ***formatter***: optional function(payload, id) used to format the response before being evaluated by normalizr
+* ***schema***: optional [normalizr](https://github.com/paularmstrong/normalizr) schema if response should be normalized
+* ***formatter***: optional function(payload, id) used to format the response before being evaluated by [normalizr](https://github.com/paularmstrong/normalizr); [see return format](#response-format)
 * ***successAction***: optional action to be dispatched if the XHR is successful: function(_normalized_payload_)
 * ***errorAction***: optional action to be dispatched if the XHR is not successful: function({id, actionId, response})
 
 ##### example
 ```javascript
 export function fetch (id) {
-  const action = actionCreator.createFetchAction({
+  return actionCreator.createFetchAction({
     // or return actionCreator.createGetAction({
     id: id,
     url: `/customer/endpoint/${id}`,
@@ -57,44 +88,13 @@ export function fetch (id) {
     successAction: ...,
     errorAction: ...
   });
-  // if you want to do something without action dispatching
-  const promise = action.promise;
-  return action;
 }
 ```
 
-##### dispatched actions
-Assuming example above using `CUSTOMER` as the `actionPrefix` value
-* ***CUSTOMER_FETCH_PENDING***: when the fetch has been initiated; ```{ payload: { id: _model id_ } }```
-* ***CUSTOMER_FETCH_ERROR***: if the XHR fetch failed; ```{ payload: { id: _model id_, response: _error response payload_ } }```
-* ***CUSTOMER_FETCH_SUCCESS***: if the XHR fetch succeeded; ```{ payload: { /see response shapes below/ } }```
+#### createGetAction
+Returns a redux action used to initiate a `GET` request.  See [XHR action details](#xhr-action) for more details.
 
-##### response shapes
-Either the API response, `formatter` or `normalizr schema` should return one of the following responses.
-
-Simple
-```
-{
-  id: _model id_
-  result: _model data_ (accessed using model.value() - see Model docs)
-  data: _meta data_ (accessed using model.data() - see Model docs; good for collections where the "model" is an array)
-}
-```
-Advanced
-```
-{
-  result: _model id_
-  entities: { // useful for multiple entities provided with a single response
-    _entityType_: { // must match the `entityType` attribute for the action creator options
-      _model id_: {
-        // the model data
-      }
-    },
-    data: _meta data_ (accessed using model.data() - see Model docs; good for collections where the "model" is an array)
-}
-```
 [API table of contents](#action-creator-api)
-
 
 #### createPostAction
 Returns a redux action used to initiate a `POST` request.  See [XHR action details](#xhr-action) for more details.
@@ -121,17 +121,20 @@ Returns a redux action used to initiate a `PATCH` request.  See [XHR action deta
 
 
 #### XHR Action
-Returns a dispatchable redux action used to perform an arbitrary XHR request associated with a model.  The last successful action (and response) will be saved in redux state and available using the Model API (see Model docs).
+Returns a dispatchable redux action used to perform an arbitrary XHR request associated with a model.  The last successful action (and response) will be saved in redux state and available using the Model API with `Model.wasActionPerformed(_optional_action_id_).success (or .error)` function ([see Model class docs](./model.md)).
+
 
 ##### options
 * ***id***: required model id
 * ***actionId***: required action identifier (for example `update`)
 * ***url***: required url
-* ***params***: optional effects-fetch params (https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch)
-* ***schema***: optional normalizr schema if response should be normalized
-* ***formatter***: optional function(payload, id) used to format the response before being evaluated by normalizr
+* ***params***: optional effects-fetch params `{ method, headers, mode, cache, body }` (see https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch)
+* ***schema***: optional [normalizr](https://github.com/paularmstrong/normalizr) schema if response should be normalized
+* ***formatter***: optional function(payload, id) used to format the response before being evaluated by [normalizr](https://github.com/paularmstrong/normalizr); [see return format](#response-format)
 * ***replaceModel***: `true` if the model contents should be replaced with this XHR response
 * ***clearAfter***: optional time in milis to clear out this recorded action in redux state
+
+*** note***: if `replaceModel` is `true`, use the `createFetchAction` response shape instead of the `response` attribute
 
 ##### example
 ```javascript
@@ -150,13 +153,6 @@ export function updateCustomer (id, customerData) {
 }
 ```
 
-##### dispatched actions
-Assuming example above using `CUSTOMER` as the `actionPrefix` value
-* ***CUSTOMER_ACTION_PENDING***: when the fetch has been initiated; ```{ payload: { id: _model id_, actionId: _action id_ } }```
-* ***CUSTOMER_ACTION_ERROR***: if the XHR fetch failed; ```{ payload: { id: _model id_, actionId: _action id_, response: { headers, status, statusText, url, value } } }```
-* ***CUSTOMER_ACTION_SUCCESS***: if the XHR fetch succeeded; ```{ payload: { id: _model id_, actionId: _action id_, response: _response payload_  } }```
-*** note***: if `replaceModel` is `true`, use the `createFetchAction` response shape instead of the `response` attribute
-
 [API table of contents](#action-creator-api)
 
 
@@ -172,8 +168,33 @@ export function setLocalCustomerPreference (id, preferenceInfo) {
 }
 ```
 
-##### dispatched actions
-Assuming example above using `CUSTOMER` as the `actionPrefix` value
-* ***CUSTOMER_DATA***: when the fetch has been initiated; ```{ payload: { id: _model id_, data: _data_ } }```
+##### response-format
+Either the XHR response, `formatter` or `normalizr schema` should contain some or all of these attributes.
 
+* ***result***: the content assumed to override the current model data
+* ***data***: any model meta data ([see [Model.data()](./model.md))
+* ***entities***: normalized format (what [normalizr](https://github.com/paularmstrong/normalizr) would produce).  In this case `result` should be the model id.
+
+
+Simple
+```
+{
+  result: _model data_, (accessed using model.value() - see Model docs)
+  data: _meta data_ (accessed using model.data() - see Model docs; good for collections where the "model" is an array)
+}
+```
+Advanced
+```
+{
+  result: _model id_
+  entities: { // useful for multiple entities provided with a single response (or to normalize the responses)
+    _entityType_: { // must match the `entityType` attribute for the action creator options
+      _model id_: {
+        // the model data
+      }
+    }
+  },
+  data: _meta data_ (accessed using model.data() - see Model docs; good for collections where the "model" is an array)
+}
+```
 [API table of contents](#action-creator-api)

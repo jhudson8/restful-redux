@@ -39,6 +39,10 @@ export default connect(mapStateToProps, mapDispatchToProps)(
     entityType: 'customer',
     // if this is not included, the model will not be auto-fetched
     fetchProp: 'fetch',
+    // optional value to indicate that the model should be fetched even if it already exists
+    forceFetch: true,
+    // used if the model represents a collection and you want the value() response to contain Model objects rather than data
+    arrayEntrySchema: _your_normalizr_schema_,
     // optional value to help log info to console if you are having trouble getting things working
     debug: true
   });

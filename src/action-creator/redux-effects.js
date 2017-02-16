@@ -29,9 +29,6 @@ var REST_METHODS = [{
   name: 'Patch',
   method: 'PATCH'
 }, {
-  name: 'Delete',
-  method: 'DELETE'
-}, {
   name: 'Post',
   method: 'POST'
 }];
