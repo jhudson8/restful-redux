@@ -60,7 +60,8 @@ export default function modelProvider (_Component, options) {
       if (options.fetchProp && !props[options.modelProp || 'model']) {
         const id = getModelId(props, options);
         if (id) {
-          const isDifferentId = !state.fetched[options.fetchProp] || state.fetched[options.fetchProp] !== id;
+          const prevId = state.fetched[options.fetchProp];
+          const isDifferentId = prevId !== id;
           const shouldForceFetch = options.forceFetch && allowForceFetch;
           if (isDifferentId) {
             const modelOptions = Object.assign({}, options, {
@@ -70,6 +71,7 @@ export default function modelProvider (_Component, options) {
             const modelCache = self.state.modelCache;
             const model = Model.fromCache(modelOptions, modelCache);
             if (model.canBeFetched() || shouldForceFetch) {
+              Model.clearCache(prevId, options.entityType, modelCache);
               fetchModel(id, props, options);
               state.fetched[options.fetchProp] = id;
             }

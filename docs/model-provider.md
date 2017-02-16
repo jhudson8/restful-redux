@@ -2,6 +2,8 @@ Model Provider
 ---------------
 A React class used to auto-fetch and inject Model objects (which wrap your model data) into the React properties.  This of this like a smart (as in smart vs. dumb) component for higher order model association.
 
+TODO: update example apps to use denormalizr from the normalizr package (rather than the separate denormalizr package).
+
 ### Example
 [../examples/01-github-profile-viewer/lib/profile-page/index.js](../examples/01-github-profile-viewer/lib/profile-page/index.js)
 
