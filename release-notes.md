@@ -1,3 +1,6 @@
+## v2.0.1
+- fix `bubbleUp` behavior
+
 ## v2.0.0
 - *only* support new 3.x denormalizr function provided by normalizr (import { denormalizrs } from 'normalizr' - not external `denormalizr` package)
 - add `arrayEntrySchema` modelProvider option to allow for collections models value() function to return an array of Models
