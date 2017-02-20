@@ -76,5 +76,5 @@ modelProvider(CustomerPage, {
 * ***idPropName***: the property name used for the model id (defaults to `id`)
 * ***fetchProp***: the property used to fetch the model if necessary (the model will not be auto-fetched if this is not set)
 * ***modelClass***: the model class to use (defaults to { Model } from 'restful-redux`;  see [Model docs]('./model.md))
-* ***forceFetch***: `true` to force a fetch even if a the model data exists.  Or a function (prevModel, props) which returns a boolean for finer grained control
+* ***forceFetch***: `true` to force a fetch even if a the model data exists.  Or a function `(newId, currentModel, newProps, currentProps)` which returns a boolean for finer grained control.  This function will execute during mount and any properties change.
 * ***fetchOptions***: optional function(props) used to provide a 2nd parameter to the fetch method if the `id` is not sufficient
