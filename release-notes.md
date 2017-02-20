@@ -1,3 +1,7 @@
+## v2.1.0
+- allow forceFetch to be a function for finer grained detail
+- provide completedAt/initiatedAt attributes for `wasFetched`, `isFetchPending`, `isActionPending`, `wasActionPerformed` Model functions
+
 ## v2.0.1
 - fix `bubbleUp` behavior
 
