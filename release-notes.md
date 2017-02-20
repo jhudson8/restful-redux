@@ -1,3 +1,6 @@
+## v2.1.1
+- allow forceFetch to trigger a fetch even if id does not change
+
 ## v2.1.0
 - allow forceFetch to be a function for finer grained detail
 - provide completedAt/initiatedAt attributes for `wasFetched`, `isFetchPending`, `isActionPending`, `wasActionPerformed` Model functions
