@@ -182,13 +182,6 @@ function reducer (options) {
       }
     }
 
-    // clear out any undefined fields
-    for (var key in meta) {
-      if (meta.hasOwnProperty(key) && typeof meta[key] === 'undefined') {
-        delete meta[key];
-      }
-    }
-
     if (clear) {
       // just delete the model if this action requires it
       stateEntities[entityType] = Object.assign({}, stateEntities[entityType]);
@@ -217,6 +210,13 @@ function reducer (options) {
       state.entities = context.execute();
     }
 
+    // clear out any undefined fields
+    for (var key in meta) {
+      if (meta.hasOwnProperty(key) && typeof meta[key] === 'undefined') {
+        delete meta[key];
+      }
+    }
+
     if (debug) {
       log(`${actionType} (${id}) handled\n\tprevious state:\n\t`, state, '\n\tpost state:\n\t', state, '\n\tresult:\n\t', result, '\n\tentities:\n\t', entities);
     }
@@ -231,7 +231,7 @@ function reducer (options) {
         fetched: true
       }
     }, ['fetchPending', 'fetchError', 'actionId', 'actionPending', 'actionSuccess',
-      'actionError', 'actionResponse']),
+      'actionError', 'actionResponse', 'actionInitiatedAt', 'actionCompletedAt']),
     createMeta({
       // same as FETCH_SUCCESS but if more semantically correct if we're setting manually
       type: 'SET',
@@ -239,45 +239,48 @@ function reducer (options) {
         fetched: true
       }
     }, ['fetchPending', 'fetchError', 'actionId', 'actionPending', 'actionSuccess',
-      'actionError', 'actionResponse']),
+      'actionError', 'actionResponse', 'fetchInitiatedAt', 'fetchCompletedAt']),
     createMeta({
       type: 'FETCH_PENDING',
       meta: {
-        fetchPending: true
+        fetchPending: true,
+        fetchInitiatedAt: '_timestamp'
       }
-    }, ['fetched']),
+    }, ['fetched', 'fetchCompletedAt']),
     createMeta({
       type: 'FETCH_ERROR',
       clear: true,
       meta: {
-        _responseProp: 'fetchError',
-        fetched: false,
+        _responseProp: 'fetchError'
       }
     }, ['fetchPending']),
     createMeta({
       type: 'ACTION_ERROR',
       meta: {
-        _responseProp: 'actionError'
+        _responseProp: 'actionError',
+        actionCompletedAt: '_timestamp'
       }
     }, ['actionPending']),
     createMeta({
       type: 'ACTION_PENDING',
       meta: {
         actionPending: true,
+        actionInitiatedAt: '_timestamp'
       }
-    }, ['actionTimestamp', 'actionError', 'actionResponse']),
+    }, ['actionCompletedTimestamp', 'actionError', 'actionResponse']),
     createMeta({
       type: 'ACTION_SUCCESS',
       meta: {
         _responseProp: 'actionResponse',
-        actionSuccess: true
+        actionSuccess: true,
+        actionCompletedAt: '_timestamp'
       }
     }, ['actionPending', 'actionError']),
     createMeta({
       type: 'ACTION_CLEAR',
       meta: {}
-    }, ['actionId', 'actionPending', 'actionTimestamp', 'actionError', 'actionResponse',
-      'actionSuccess', 'actionTimestamp']),
+    }, ['actionId', 'actionPending', 'actioninitiatedAt', 'actionCompletedAt', 'actionError', 'actionResponse',
+      'actionSuccess']),
     { type: 'DATA' }
   ].map(function (data) {
     return [`${actionPrefix}_${data.type}`, data];
@@ -291,6 +294,7 @@ function reducer (options) {
     for (var i = 0; i < handlers.length; i++) {
       if (handlers[i][0] === type) {
         // we've got a match
+        const now = new Date().getTime();
         const options = handlers[i][1];
         const payload = action.payload;
         const entities = payload.entities;
@@ -304,7 +308,7 @@ function reducer (options) {
         if (meta.fetched) {
           meta.fetched = {
             type: 'full',
-            timestamp: new Date().getTime(),
+            completedAt: now,
             entityType: entityType,
             id: id
           };
@@ -317,6 +321,12 @@ function reducer (options) {
         if (responseProp) {
           delete meta._responseProp;
           meta[responseProp] = response;
+        }
+
+        for (var key in meta) {
+          if (meta[key] === '_timestamp') {
+            meta[key] = now;
+          }
         }
 
         return update({

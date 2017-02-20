@@ -98,6 +98,111 @@ describe('model-provider', function () {
     expect(callArgs[0]).to.equal('1');
   });
 
+  describe('forceFetch', function () {
+    it('should trigger fetch even if id does not change (but only when mounted)', function () {
+      const fetch = sinon.spy();
+      const entities = {
+        foo: {
+          '1': 'foo'
+        }
+      };
+
+      const ComponentForceFetch = modelProvider(Stub, {
+        id: 'id',
+        entityType: 'foo',
+        fetchProp: 'fetch',
+        forceFetch: true
+      });
+      const component = shallow(React.createElement(ComponentForceFetch, {
+        id: '1',
+        entities: entities,
+        fetch: fetch
+      }));
+      expect(fetch.callCount).to.eql(1);
+
+      // JOE TODO find util method to change props
+      // but it shouldn't force fetch when props change even if id changes
+      /*
+      component.componentWillReceiveProps({
+        id: '1',
+        entities: entities,
+        fetch: fetch,
+        foo: 'bar'
+      });
+      expect(fetch.callCount).to.eql(1);
+      */
+    });
+
+    it('should trigger fetch even if id does not change (even only when mounted)', function () {
+      const fetch = sinon.spy();
+      const entities = {
+        foo: {
+          '1': 'foo'
+        }
+      };
+
+      const ComponentForceFetch = modelProvider(Stub, {
+        id: 'id',
+        entityType: 'foo',
+        fetchProp: 'fetch',
+        forceFetch: function () { return true; }
+      });
+      const component = shallow(React.createElement(ComponentForceFetch, {
+        id: '1',
+        entities: entities,
+        fetch: fetch
+      }));
+      expect(fetch.callCount).to.eql(1);
+
+      // JOE TODO find util method to change props
+      // but it shouldn't force fetch when props change even if id changes
+      /*
+      component.componentWillReceiveProps({
+        id: '1',
+        entities: entities,
+        fetch: fetch,
+        foo: 'bar'
+      });
+      expect(fetch.callCount).to.eql(2);
+      */
+    });
+
+    it('should never trigger fetch if `forceFetch` function returns false', function () {
+      const fetch = sinon.spy();
+      const entities = {
+        foo: {
+          '1': 'foo'
+        }
+      };
+
+      const ComponentForceFetch = modelProvider(Stub, {
+        id: 'id',
+        entityType: 'foo',
+        fetchProp: 'fetch',
+        forceFetch: function () { return false; }
+      });
+      const component = shallow(React.createElement(ComponentForceFetch, {
+        id: '1',
+        entities: entities,
+        fetch: fetch
+      }));
+      expect(fetch.callCount).to.eql(0);
+
+      // JOE TODO find util method to change props
+      // but it shouldn't force fetch when props change even if id changes
+      /*
+      component.componentWillReceiveProps({
+        id: '1',
+        entities: entities,
+        fetch: fetch,
+        foo: 'bar'
+      });
+      expect(fetch.callCount).to.eql(0);
+      */
+    });
+
+  });
+
   it('should trigger fetch when id changes', function () {
     const fetch = sinon.spy();
     shallow(React.createElement(Component, {

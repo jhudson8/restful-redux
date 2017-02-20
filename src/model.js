@@ -44,6 +44,10 @@ export default class Model {
     return this._metadata;
   }
 
+  meta () {
+    return this._meta;
+  }
+
   /**
    * Return the (optionally formatted) model data
    */
@@ -97,7 +101,9 @@ export default class Model {
    * Return a boolean indicating if a model fetch is currently in progress
    */
   isFetchPending () {
-    return !!this._meta.fetchPending;
+    return this._meta.fetchPending ? {
+      initiatedAt: this._meta.fetchInitiatedAt
+    } : false;
   }
 
   /**
@@ -114,7 +120,12 @@ export default class Model {
   isActionPending (actionId) {
     const meta = this._meta;
     if (meta.actionPending) {
-      return actionId ? meta.actionId === actionId : (meta.actionId || true);
+      if (actionId ? meta.actionId === actionId : true) {
+        return {
+          id: meta.actionId,
+          initiatedAt: meta.actionInitiatedAt
+        };
+      }
     }
     return false;
   }
@@ -137,7 +148,9 @@ export default class Model {
       return {
         id: meta.actionId,
         success: meta.actionResponse,
-        error: meta.actionError
+        error: meta.actionError,
+        initiatedAt: meta.actionInitiatedAt,
+        completedAt: meta.actionCompletedAt
       };
     }
   }

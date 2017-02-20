@@ -62,18 +62,23 @@ export default function modelProvider (_Component, options) {
         if (id) {
           const prevId = state.fetched[options.fetchProp];
           const isDifferentId = prevId !== id;
-          const shouldForceFetch = options.forceFetch && allowForceFetch;
           if (isDifferentId) {
+            const modelCache = self.state.modelCache;
+            const forceFetch = typeof options.forceFetch === 'function'
+              ? options.forceFetch(model, props) : options.forceFetch;
+            const shouldForceFetch = forceFetch && allowForceFetch;
             const modelOptions = Object.assign({}, options, {
               id: id,
               entities: props[entitiesProp]
             });
-            const modelCache = self.state.modelCache;
             const model = Model.fromCache(modelOptions, modelCache);
+
             if (model.canBeFetched() || shouldForceFetch) {
               Model.clearCache(prevId, options.entityType, modelCache);
               fetchModel(id, props, options);
               state.fetched[options.fetchProp] = id;
+            } else if (debug) {
+              log(`not fetching model ${id} - to override (even when non-id props change use "forceFetch" as a function)`);
             }
           } else if (verbose) {
             log(`model ${id} is not available but "canBeFetched" returned false`);

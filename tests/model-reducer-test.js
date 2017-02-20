@@ -259,8 +259,8 @@ describe('model-reducer', function () {
       });
       expect(emptyState).to.deep.equal(savedEmptyState);
       // don't deal with dymanic value
-      expect(!!state.entities._meta.foo['1'].fetched.timestamp).to.equal(true);
-      delete state.entities._meta.foo['1'].fetched.timestamp;
+      expect(!!state.entities._meta.foo['1'].fetched.completedAt).to.equal(true);
+      delete state.entities._meta.foo['1'].fetched.completedAt;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
@@ -298,7 +298,8 @@ describe('model-reducer', function () {
         }
       });
       expect(initialState1).to.deep.equal(savedInitialState1);
-      delete state.entities._meta.foo['1'].fetched.timestamp;
+      expect(!!state.entities._meta.foo['1'].fetched.completedAt).to.equal(true);
+      delete state.entities._meta.foo['1'].fetched.completedAt;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
@@ -344,7 +345,8 @@ describe('model-reducer', function () {
         }
       });
       expect(initialState1).to.deep.equal(savedInitialState1);
-      delete state.entities._meta.foo['1'].fetched.timestamp;
+      expect(!!state.entities._meta.foo['1'].fetched.completedAt).to.equal(true);
+      delete state.entities._meta.foo['1'].fetched.completedAt;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
@@ -405,7 +407,8 @@ describe('model-reducer', function () {
         }
       });
       // don't deal with dymanic value
-      delete state.entities._meta.foo['1'].fetched.timestamp;
+      expect(!!state.entities._meta.foo['1'].fetched.completedAt).to.equal(true);
+      delete state.entities._meta.foo['1'].fetched.completedAt;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
@@ -440,6 +443,8 @@ describe('model-reducer', function () {
         payload: { id: '1' }
       });
       expect(emptyState).to.deep.equal(savedEmptyState);
+      expect(!!state.entities._meta.foo['1'].fetchInitiatedAt).to.equal(true);
+      delete state.entities._meta.foo['1'].fetchInitiatedAt;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
@@ -458,6 +463,8 @@ describe('model-reducer', function () {
         payload: { id: '1' }
       });
       expect(initialState1).to.deep.equal(savedInitialState1);
+      expect(!!state.entities._meta.foo['1'].fetchInitiatedAt).to.equal(true);
+      delete state.entities._meta.foo['1'].fetchInitiatedAt;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
@@ -499,7 +506,6 @@ describe('model-reducer', function () {
           _meta: {
             foo: {
               '1': {
-                fetched: false,
                 fetchError: {
                   code: 'bad'
                 }
@@ -526,7 +532,6 @@ describe('model-reducer', function () {
           _meta: {
             foo: {
               '1': {
-                fetched: false,
                 fetchError: {
                   code: 'bad'
                 },
@@ -556,7 +561,8 @@ describe('model-reducer', function () {
         }
       });
       expect(emptyState).to.deep.equal(savedEmptyState);
-      delete state.entities._meta.foo['1'].actionTimestamp;
+      expect(!!state.entities._meta.foo['1'].actionCompletedAt).to.equal(true);
+      delete state.entities._meta.foo['1'].actionCompletedAt;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
@@ -589,7 +595,8 @@ describe('model-reducer', function () {
         }
       });
       expect(initialState1).to.deep.equal(savedInitialState1);
-      delete state.entities._meta.foo['1'].actionTimestamp;
+      expect(!!state.entities._meta.foo['1'].actionCompletedAt).to.equal(true);
+      delete state.entities._meta.foo['1'].actionCompletedAt;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
@@ -624,6 +631,8 @@ describe('model-reducer', function () {
         }
       });
       expect(emptyState).to.deep.equal(savedEmptyState);
+      expect(!!state.entities._meta.foo['1'].actionInitiatedAt).to.equal(true);
+      delete state.entities._meta.foo['1'].actionInitiatedAt;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
@@ -646,6 +655,8 @@ describe('model-reducer', function () {
         }
       });
       expect(initialState1).to.deep.equal(savedInitialState1);
+      expect(!!state.entities._meta.foo['1'].actionInitiatedAt).to.equal(true);
+      delete state.entities._meta.foo['1'].actionInitiatedAt;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
@@ -683,6 +694,8 @@ describe('model-reducer', function () {
         }
       });
       expect(emptyState).to.deep.equal(savedEmptyState);
+      expect(!!state.entities._meta.foo['1'].actionCompletedAt).to.equal(true);
+      delete state.entities._meta.foo['1'].actionCompletedAt;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
@@ -710,6 +723,8 @@ describe('model-reducer', function () {
         }
       });
       expect(initialState1).to.deep.equal(savedInitialState1);
+      expect(!!state.entities._meta.foo['1'].actionCompletedAt).to.equal(true);
+      delete state.entities._meta.foo['1'].actionCompletedAt;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
