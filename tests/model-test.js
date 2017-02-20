@@ -331,7 +331,3 @@ describe('model', function () {
   });
 
 });
-
-function _model(meta, model) {
-  return Object.assign({}, model || {}, { __meta: meta });
-}
