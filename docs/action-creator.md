@@ -21,17 +21,22 @@ Also, I find that this middleware makes JSON posts easier (auto-detection of obj
 const EFFECT_FETCH = 'EFFECT_FETCH';
 const enhanceFetchMiddleware = (store) => (next) => (action) {
   if (action.type === EFFECT_FETCH) {
-    const params = payload.params = Object.assign({
-      credentials: 'same-origin',
-      headers: {}
-    }, payload.params);
+    let params = action.payload.params || {};
+    action = Object.assign({
+      payload: Object.assign({
+        params: Object.assign({
+          credentials: params.credentials || 'same-origin'
+        }, params)
+      }, action.payload)
+    }, action);
+    params = action.params;
     const body = params.body;
     if (typeof body === 'object' || Array.isArray(body)) {
-      Object.assign({
+      params.headers = Object.assign({
         'Accept': 'application/json',
         'Content-Type': 'application/json;charset=UTF-8'
       }, params.headers);
-      params.body = JSON.stringify(params.body);
+      params.body = JSON.stringify(body);
     }
   }
   next(action);
