@@ -53,7 +53,7 @@ export default function modelProvider (_Component, options) {
     }
   }
 
-  function maybeFetchModels (props, allowForceFetch) {
+  function maybeFetchModels (props) {
     const self = this;
     const state = this.state;
     _models.forEach((options) => {
@@ -66,7 +66,7 @@ export default function modelProvider (_Component, options) {
             const modelCache = self.state.modelCache;
             const forceFetch = typeof options.forceFetch === 'function'
               ? options.forceFetch(model, props) : options.forceFetch;
-            const shouldForceFetch = forceFetch && allowForceFetch;
+            const shouldForceFetch = forceFetch;
             const modelOptions = Object.assign({}, options, {
               id: id,
               entities: props[entitiesProp]
@@ -111,7 +111,7 @@ export default function modelProvider (_Component, options) {
     },
 
     componentWillMount () {
-      maybeFetchModels.call(this, this.props, true);
+      maybeFetchModels.call(this, this.props);
     },
 
     componentWillReceiveProps (props) {

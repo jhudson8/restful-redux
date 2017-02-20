@@ -66,18 +66,18 @@ Return a `truthy` if the model has been sucessfully fetched.
   render: function () {
     const model = this.props.model;
     if (model.wasFetched()) {
-      // the actual return value contains fetch details { timestamp, type: 'full'|'normalized':'set' }
-      // 'full' if the model was fetched, 'normalized' if the model was set from a model fetch normalization, 'set' if the model was created using new Model(...)
+      // actual return value { type: 'full', completedAt: _timestamp_, entityType: _entity_type_, id: _model_id_ }
     }
   }
 ```
 
 #### isFetchPending
-Return `true` if the model has an outstanding XHR fetch request.
+Return a `truthy` if the model has an outstanding XHR fetch request.
 ```javascript
   render: function () {
     const model = this.props.model;
     if (model.isFetchPending()) {
+      // actual return value { initiatedAt: _timestamp_ }
       return <div>Loading...</div>;
     }
   }
@@ -96,11 +96,12 @@ If a model XHR fetch failed, return the error response.  Otherwise return `undef
 ```
 
 #### isActionPending
-Return the `action id` if an action XHR is pending (see `createXHRAction` in [./action-creator.md](./action-creator.md).  Optionally the `action id` can be passed as a parameter to only return true if the action being performed matches the provided `action id`.
+Return a `truthy` value if an action XHR is pending (see `createXHRAction` in [./action-creator.md](./action-creator.md).  Optionally the `action id` can be passed as a parameter to only return true if the action being performed matches the provided `action id`.
 ```javascript
   render: function () {
     const model = this.props.model;
     if (model.isActionPending('update')) {
+      // actual return value { id: _action_id_, initiatedAt: _timestamp_ }
       return <div>Updating the model</div>;
     }
   }
@@ -113,5 +114,17 @@ The last action performed, unless cleared, will always be returned.  The return 
   id: _action id_,
   success: _action response if successful_,
   error: _action response if non 200 status code_
+  initiatedAt: _timestamp_
+  completedAt: _timestamp_
 }
+```
+
+#### meta
+Return some lower level attributes that are used to keep state.  Not normally needed unless you want to know very specific
+details about fetch or action details.
+```javascript
+  render: function () {
+    const model = this.props.model;
+    const meta = model.meta();
+  }
 ```

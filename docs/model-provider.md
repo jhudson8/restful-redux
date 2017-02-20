@@ -42,6 +42,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(
     // if this is not included, the model will not be auto-fetched
     fetchProp: 'fetch',
     // optional value to indicate that the model should be fetched even if it already exists
+    // can be a function for finer grained details (see below for more details)
     forceFetch: true,
     // used if the model represents a collection and you want the value() response to contain Model objects rather than data
     arrayEntrySchema: _your_normalizr_schema_,
@@ -75,4 +76,5 @@ modelProvider(CustomerPage, {
 * ***idPropName***: the property name used for the model id (defaults to `id`)
 * ***fetchProp***: the property used to fetch the model if necessary (the model will not be auto-fetched if this is not set)
 * ***modelClass***: the model class to use (defaults to { Model } from 'restful-redux`;  see [Model docs]('./model.md))
+* ***forceFetch***: `true` to force a fetch even if a the model data exists.  Or a function (prevModel, props) which returns a boolean for finer grained control
 * ***fetchOptions***: optional function(props) used to provide a 2nd parameter to the fetch method if the `id` is not sufficient
