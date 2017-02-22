@@ -1,3 +1,6 @@
+## v2.2.1
+updated examples to use new normalizr schema (and denormalizr impl from normalizr)
+
 ## v2.2.0
 - add middleware to handle fetch actions with JSON post body content (will serialize content and update headers)
 ```javascript

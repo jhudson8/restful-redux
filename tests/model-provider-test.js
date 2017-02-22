@@ -98,6 +98,53 @@ describe('model-provider', function () {
     expect(callArgs[0]).to.equal('1');
   });
 
+  describe('onIdChange', function () {
+    function createComponent(spy) {
+      return modelProvider(Stub, {
+        id: 'id',
+        entityType: 'foo',
+        onIdChange: spy
+      });
+    }
+
+    it('should always call on mount', function () {
+      const spy = sinon.spy();
+      const Component = createComponent(spy);
+      shallow(React.createElement(Component), {
+        id: undefined,
+        entityType: 'foo'
+      });
+      expect(spy.callCount).to.equal(1);
+
+      shallow(React.createElement(Component), {
+        id: '1',
+        entityType: 'foo'
+      });
+      expect(spy.callCount).to.equal(2);
+    });
+
+    it('should also call only when id changes', function () {
+      const spy = sinon.spy();
+      const Component = createComponent(spy);
+      let component = shallow(React.createElement(Component), {
+        id: '1',
+        entityType: 'foo'
+      });
+      expect(spy.callCount).to.equal(1);
+      component = component.setProps({
+        id: '2',
+        entityType: 'foo'
+      });
+      expect(spy.callCount).to.equal(2);
+      component.setProps({
+        id: '2',
+        entityType: 'foo',
+        foo: 'bar'
+      });
+      expect(spy.callCount).to.equal(2);
+    });
+  });
+
   describe('forceFetch', function () {
     it('should trigger fetch even if id does not change (but only when mounted)', function () {
       const fetch = sinon.spy();

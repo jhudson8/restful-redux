@@ -12,6 +12,7 @@
     "redux-effects": "^0.4.3",
     "redux-effects-fetch": "^0.5.5",
     "redux-multi": "^0.1.12",
+    "redux-thunk": "^2.2.0",
     "restful-redux": "^2.1.1"
   },
   "devDependencies": {

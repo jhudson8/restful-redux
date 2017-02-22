@@ -3,14 +3,15 @@ Action Creators
 The action creator in this project is used to easily, and with very little code, create dispatchable actions that interact with this package's reducers.  This uses [redux-effects-fetch](https://github.com/redux-effects/redux-effects-fetch)) but you could create your own by following the [./redux-actions](./redux-actions) interface.
 
 ## Promises
-If you would like your `store.dispatch` function to return a promise for these actions, include the following code
+If you would like your `store.dispatch` function to return a promise for these actions, include the following code.  
+Or you can just include [the source code](../src/dispatch-promise.js).
 ```javascript
 import { dispatchPromise } from 'restful-redux';
 // "store" is the redux store
 dispatchPromise(store);
 ```
 
-Also, adding this middleware will include cookies and allow `params.body` object to be serialized a JSON object with appropriate headers
+Also, adding this middleware will include cookies and allow `params.body` object to be serialized a JSON object with appropriate headers.  Or you can just include [the source code](../src/fetch-json-middleware.js).
 ```javascript
 import { fetchJSONMiddleware } from 'restful-redux';
 ```

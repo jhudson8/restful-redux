@@ -110,6 +110,11 @@ export default function modelProvider (_Component, options) {
     if (debug) {
       log(`triggering fetch for model "${id}" using "${options.fetchProp}" prop"`);
     }
+    const fetchFunc = props[options.fetchProp];
+    if (typeof fetchFunc !== 'function') {
+      console.error(options.fetchProp); // eslint-disable-line no-console
+      throw new Error(`props.${options.fetchProp} is a ${typeof fetchFunc} but should be a function`);
+    }
     props[options.fetchProp](id, fetchOptions);
   }
 
@@ -123,33 +128,75 @@ export default function modelProvider (_Component, options) {
 
     componentWillMount () {
       maybeFetchModels.call(this, this.props);
+      triggerIdChanges(undefined, this.props, this.state);
     },
 
     componentWillReceiveProps (props) {
       maybeFetchModels.call(this, props, this.props);
+      triggerIdChanges(this.props, props, this.state);
     },
 
     render () {
-      const props = Object.assign({}, this.props);
-      const modelCache = this.state.modelCache;
-
-      _models.forEach((options) => {
-        const id = getModelId(props, options);
-        if (id) {
-          const modelOptions = Object.assign({}, options, {
-            id: id,
-            entities: props[entitiesProp]
-          });
-          // reuse the same model object if we can
-          let model = Model.fromCache(modelOptions, modelCache);
-          props[options.idPropName] = id;
-          props[options.propName] = model;
-        }
-      });
-
-      return React.createElement(_Component, props, props.children);
+      const props = this.props;
+      return React.createElement(_Component, generateProps(props, this.state), props.children);
     }
   });
+
+  function checkForMissingOrChangedIds (oldProps, newProps) {
+    return _models.map(function (options) {
+      if (!oldProps) {
+        return {
+          options: options,
+          oldId: undefined,
+          newId: getModelId(newProps, options)
+        };
+      }
+      const oldId = getModelId(oldProps, options);
+      const newId = getModelId(newProps, options);
+      if (oldId !== newId) {
+        return {
+          options: options,
+          oldId: undefined,
+          newId: getModelId(newProps, options)
+        };
+      }
+    }).filter(function (o) { return o; });
+  }
+
+  function triggerIdChanges (oldProps, newProps, state) {
+    const changelist = checkForMissingOrChangedIds(oldProps, newProps);
+    if (changelist.length > 0) {
+      const props = generateProps(newProps, state);
+      changelist.forEach(function (data) {
+        if (options.onIdChange) {
+          const options = data.options;
+          const oldId = data.oldId;
+          const newId = data.newId;
+          options.onIdChange(newId, oldId, props);
+        }
+      });
+    }
+  }
+
+  function generateProps (origProps, state) {
+    const props = Object.assign({}, origProps);
+    const modelCache = state.modelCache;
+
+    _models.forEach((options) => {
+      const id = getModelId(props, options);
+      if (id) {
+        const modelOptions = Object.assign({}, options, {
+          id: id,
+          entities: props[entitiesProp]
+        });
+        // reuse the same model object if we can
+        let model = Model.fromCache(modelOptions, modelCache);
+        props[options.idPropName] = id;
+        props[options.propName] = model;
+      }
+    });
+    return props;
+  }
 }
 
 function organizeProps (options) {
