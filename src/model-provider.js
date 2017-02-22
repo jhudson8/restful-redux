@@ -48,7 +48,7 @@ export default function modelProvider (_Component, options) {
     } else if (typeof id === 'function') {
       return id(props);
     } else if (id) {
-      return deepPropValue(id, props) || id;
+      return deepPropValue(id, props);
     }
   }
 

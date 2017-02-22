@@ -8,13 +8,13 @@ import schema from './schema';
 import { normalize } from 'normalizr';
 
 const profileActionCreator = reduxEffectsActionCreator({
-  debug: true,
   // prefix for all redux actions of this type
   actionPrefix: 'SEARCH',
   // root domain for model data; store data structure is { entities: { search: { _id_: {_model_data} } } }
   entityType: 'search',
   // action creator needs to have the "normalize" function provided
-  normalize: normalize
+  normalize: normalize,
+  debug: true
 });
 
 // fetch a github profile designed by the provided id

@@ -3,18 +3,18 @@
   "version": "1.0.0",
   "description": "",
   "dependencies": {
-    "denormalizr": "^0.4.1",
-    "normalizr": "^2.2.1",
+    "normalizr": "^3.2.1",
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
     "react-redux": "^4.4.5",
-    "restful-redux": "^1.0.0",
     "react-router": "^2.8.1",
     "react-router-redux": "^4.0.6",
     "redux": "^3.6.0",
     "redux-effects": "^0.4.3",
     "redux-effects-fetch": "^0.5.5",
-    "redux-multi": "^0.1.12"
+    "redux-multi": "^0.1.12",
+    "redux-thunk": "^2.2.0",
+    "restful-redux": "^2.1.1"
   },
   "devDependencies": {
     "babel-core": "^6.17.0",

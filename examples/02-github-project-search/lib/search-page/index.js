@@ -33,7 +33,8 @@ export default connect(mapStateToProps, mapDispatchToProps)(
       // should match the action creator `entityType` option
       entityType: 'search',
       // if this is not included, the model will not be auto-fetched
-      fetchProp: 'fetch'
+      fetchProp: 'fetch',
+      debug: true
     }]
   })
 );

@@ -5,9 +5,9 @@ import { connect } from 'react-redux';
 import Collection from './collection';
 import SearchPage from './search-page';
 import { fetch, showSearchPage } from './actions';
+import { denormalize } from 'normalizr';
 
 // imports to denormalize the normalized data
-import { denormalize } from 'denormalizr';
 import schema from './schema';
 
 // redux mapStateToProps smart component function
@@ -15,7 +15,7 @@ function mapStateToProps (state) {
   return {
     // the `app` attribute of state would match the combineReducers attribute in ../reducer
     entities: state.app
-  }
+  };
 }
 
 // redux mapDispatchToProps smart component function
@@ -46,8 +46,6 @@ export default connect(mapStateToProps, mapDispatchToProps)(
       entityType: 'search',
       // if this is not included, the model will not be auto-fetched
       fetchProp: 'fetch',
-
-      // provide denormalizr options
       denormalize: denormalize,
       schema: schema
     }]

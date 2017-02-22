@@ -7,7 +7,7 @@ import SearchPage from './search-page';
 import { fetch, showSearchPage } from './actions';
 
 // imports to denormalize the normalized data
-import { denormalize } from 'denormalizr';
+import { denormalize } from 'normalizr';
 import schema from '../project-details-page/schema';
 
 // redux mapStateToProps smart component function
@@ -15,7 +15,7 @@ function mapStateToProps (state) {
   return {
     // the `app` attribute of state would match the combineReducers attribute in ../reducer
     entities: state.app
-  }
+  };
 }
 
 // redux mapDispatchToProps smart component function

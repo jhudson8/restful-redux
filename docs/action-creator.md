@@ -5,42 +5,14 @@ The action creator in this project is used to easily, and with very little code,
 ## Promises
 If you would like your `store.dispatch` function to return a promise for these actions, include the following code
 ```javascript
+import { dispatchPromise } from 'restful-redux';
 // "store" is the redux store
-const _dispatch = store.dispatch;
-store.dispatch = function (action) {
-  const rtn = _dispatch.call(store, action);
-  if (action.promise) {
-    return action.promise;
-  }
-  return rtn;
-}
+dispatchPromise(store);
 ```
 
-Also, I find that this middleware makes JSON posts easier (auto-detection of object/array payload and allows cookies).
+Also, adding this middleware will include cookies and allow `params.body` object to be serialized a JSON object with appropriate headers
 ```javascript
-const EFFECT_FETCH = 'EFFECT_FETCH';
-const enhanceFetchMiddleware = (store) => (next) => (action) {
-  if (action.type === EFFECT_FETCH) {
-    let params = action.payload.params || {};
-    action = Object.assign({
-      payload: Object.assign({
-        params: Object.assign({
-          credentials: params.credentials || 'same-origin'
-        }, params)
-      }, action.payload)
-    }, action);
-    params = action.params;
-    const body = params.body;
-    if (typeof body === 'object' || Array.isArray(body)) {
-      params.headers = Object.assign({
-        'Accept': 'application/json',
-        'Content-Type': 'application/json;charset=UTF-8'
-      }, params.headers);
-      params.body = JSON.stringify(body);
-    }
-  }
-  next(action);
-}
+import { fetchJSONMiddleware } from 'restful-redux';
 ```
 
 ### Import and Create New Action Creator

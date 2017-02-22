@@ -1,3 +1,16 @@
+## v2.2.0
+- add middleware to handle fetch actions with JSON post body content (will serialize content and update headers)
+```javascript
+import { dispatchPromise } from 'restful-redux';
+// "store" is the redux store
+dispatchPromise(store);
+```
+- add helper function to allow dispatched actions to return a promise
+```javascript
+import { fetchJSONMiddleware } from 'restful-redux';
+// include this middleware when creating the redux store
+```
+
 ## v2.1.1
 - allow forceFetch to trigger a fetch even if id does not change
 
