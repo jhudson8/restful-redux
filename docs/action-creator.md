@@ -11,9 +11,9 @@ import { dispatchPromise } from 'restful-redux';
 dispatchPromise(store);
 ```
 
-Also, adding this middleware will include cookies and allow `params.body` object to be serialized a JSON object with appropriate headers.  Or you can just include [the source code](../src/fetch-json-middleware.js).
+Also, adding this middleware will include cookies and allow `params.body` object to be serialized a JSON object with appropriate headers.  Or you can just include [the source code](../src/fetch-config-middleware.js).
 ```javascript
-import { fetchJSONMiddleware } from 'restful-redux';
+import { fetchConfigMiddleware } from 'restful-redux';
 ```
 
 ### Import and Create New Action Creator
