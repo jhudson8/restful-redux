@@ -46,6 +46,8 @@ export default connect(mapStateToProps, mapDispatchToProps)(
     forceFetch: true,
     // used if the model represents a collection and you want the value() response to contain Model objects rather than data
     arrayEntrySchema: _your_normalizr_schema_,
+    // optional callback function when either the id value changes *or* the component is mounted
+    onIdChange: function(_new_id_, _old_id_, props)
     // optional value to help log info to console if you are having trouble getting things working
     debug: true
   });
