@@ -4,10 +4,10 @@ An automated reducer which understands dispatched actions created by the [action
 
 This can either be used as a standalone reducer
 ```
-import { reducer } from 'restful-redux';
+import { createReducer } from 'restful-redux';
 
 // simple example demonstrating a reducer dealing with "customer" data
-export default reducer({
+export default createReducer({
   // should match the action creator `actionPrefix` option
   actionPrefix: 'CUSTOMER',
   // should match the action creator `entityType` option
@@ -22,7 +22,7 @@ It's as simple as that!
 
 Or you can compose several of these reducers into a single one using the `join` function
 ```
-import { reducer } from 'restful-redux';
+import { createReducer, chainReducers } from 'restful-redux';
 
 // example reducer handling customer model data
 const customerReducer = reducer({
@@ -31,16 +31,16 @@ const customerReducer = reducer({
 });
 
 // example reducer handling customer search collections
-const customerSearchReducer = reducer({
+const customerSearchReducer = createReducer({
   actionPrefix: 'CUSTOMER_SEARCH',
   entityType: 'customerSearch'
 });
 
-const allReducers = reducer.join([
+// make sure to use your custom reducer first if you need specific state defaults
+const allReducers = chainReducers([
   function (state = {}, action {
     // you can add your own additional reducer logic as well
   }),
-  // add any restful-redux reducers *after* your custom reducer
   customerReducer,
   customerSearchReducer,
   _other_reducers_
@@ -53,37 +53,51 @@ const allReducers = reducer.join([
 * ***actionPrefix***: required identifier for all actions which must match the `actionPrefix` config option in the associated action creator
 * ***entityType***: required identifier (used for root state key of domain specific models) which must match the `entityType` config option in the associated action creator
 * ***debug***: optional value to help log info to console if you are having trouble getting things working.  Can be `true` or `verbose` for more detailed console logs.
-* ***beforeRenduce***: function (action, util, { id, entities, result }): executed before any reducing happens
+* ***beforeReduce***: Callback function used to return new state ***before*** reducing happens. (see belor for function details)
   * ***action***: the redux action
   * ***util***: see ***Util*** section below - utility object used to manipulate entities
   * ***id***: the entity id which was the focus of the dispatched action
   * ***entities***: all entities from redux state
   * ***value***: the model value that will be set to be associated with the provided id
-* ***afterRenduce***: same as ***beforeReduce*** but _after_ any state reduction
+* ***afterReduce***: Callback function used to return new state ***after*** reducing happens. (see belor for function details)
 
-## Util
-Utility functions which can be used to manipulate entities in state.  Executed from `reducer.util(state)`.  Utility events can be chained.
+#### beforeReduce / afterReduce
+This callback function must return the updated state if any changes are made.  Using the `reducerUtil` is handy for these situations.
+
+The function signature is (data, state) where `data` is { action, id, entities, result, data }
+* ***action***: the dispatched action
+* ***id***: the entity id specific to the action that initiated the reducer
+* ***entities***: the `entities` action payload value (if provided) in the action payload (not the current state entities)
+* ***result***: the `result` action payload value (if provided)
+* ***data***: the `data` action payload value (if provided)
+
+
+## Reducer Util
+Utility functions which can be used to manipulate entities in state.  Utility events can be chained.
 
 Note: The `execute` function must be called to return the new state ***unless used with beforeReduce/afterReduce***
 ```javascript
-import { reducer } from 'restful-redux';
+import { reducerUtil } from 'restful-redux';
 ...
-const newState = reducer.util(state)
+const newState = reducerUtil(state)
   .delete(...)
   .iterate(...)
   .execute();
 ```
 
-Or, if used with a ***beforeReduce/afterReduce*** reducer attrubute
+Or, if used with a ***beforeReduce/afterReduce*** reducer attribute
 ```javascript
+import { createReducer, reducerUtil } from 'restful-redux';
+
 // note, the reducer.util(state) is not necessary
-cosnt myReducer = reducer({
+const myReducer = createReducer({
   entityType: 'foo',
   actionPrefix: 'FOO',
-  beforeReduce: function (action, util, data) {
-    util
+  beforeReduce: function (data, state) {
+    // see details above for data
+    return reducerUtil(state)
       .delete(...)
-      // do whatever
+      // do whatever - operations can be chained
       .execute();
   }
 })
@@ -95,7 +109,7 @@ Delete an entity
 * ***id***: the entity id
 * ***entityType***: the entity type
 ```
-const newState = reducer.util(state).delete(_id_, _entityType_).execute();
+const newState = reducerUtil(state).delete(_id_, _entityType_).execute();
 ```
 
 ### replace function (id, entityType, value[, data])
@@ -105,14 +119,14 @@ Replace an entity with the provided value and optional data
 * ***value***: the model value (what would be returned from a fetch - and returned from model.value() )
 * ***data***: any metadata which would stick around even if the model was replaced ( return from model.data() )
 ```javascript
-const newState = reducer.util(state).replace(_id_, _entityType_, {foo: 'bar'}).execute();
+const newState = reducerUtil(state).replace(_id_, _entityType_, {foo: 'bar'}).execute();
 ```
 
 ### clear function (entityType)
 Clear out all entities associated with the provided entity type
 * ***entityType***: the entity type
 ```javascript
-const newState = reducer.util(state).clear(_entityType_).execute();
+const newState = reducerUtil(state).clear(_entityType_).execute();
 ```
 
 ### iterate function (entityType, callback ({ id, value, meta }, ))
@@ -134,7 +148,7 @@ Note: _this_ can be used in your callback function to execute utility methods
 ```javascript
 // delete all entities fetched more than 10 min ago
 var checkTs = new Date().getTime() - (1000 * 60 * 10);
-const newState = reducer.util(state).iterate(_entityType_, function (id, value, meta) {
+const newState = reducerUtil(state).iterate(_entityType_, function (id, value, meta) {
   var fetchTime = meta.fetchedBy ? meta.fetchedBy.timestamp : meta.fetched && meta.fetched.timestamp;
   if (fetchTime && fetchTime < checkTs) {
     this.delete(id, _entityType_);
@@ -145,7 +159,7 @@ const newState = reducer.util(state).iterate(_entityType_, function (id, value, 
 ## Redux State
 This reducer uses a normalized data structure (see [normalizr](https://github.com/paularmstrong/normalizr)).  Assuming the following reducer
 ```javascript
-export default reducer({
+export default createReducer({
   actionPrefix: 'CUSTOMER',
   entityType: 'customer'
 });

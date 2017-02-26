@@ -1,6 +1,6 @@
 /* global it, describe */
 import sinon from 'sinon';
-import actionCreator from '../../src/action-creator/redux-effects';
+import { createActionCreator } from '../../src';
 import { normalize, schema } from 'normalizr';
 var expect = require('chai').expect;
 
@@ -10,12 +10,12 @@ fooSchema.define({
   author: personSchema
 });
 
-var fooActionCreator = actionCreator({
+var fooActionCreator = createActionCreator({
   actionPrefix: 'FOO',
   entityType: 'foo',
   normalize: normalize
 });
-var normalizedFooActionCreator = actionCreator({
+var normalizedFooActionCreator = createActionCreator({
   actionPrefix: 'FOO',
   entityType: 'foo',
   normalize: normalize

@@ -34,7 +34,7 @@ function mapDispatchToProps (dispatch) {
 
 export default connect(mapStateToProps, mapDispatchToProps)(
 
-  modelProvider(CustomerPage, {
+  modelProvider({
     // react-router will give us route token values in `props.params`
     id: 'params.id',
     // should match the action creator `entityType` option
@@ -50,7 +50,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(
     onIdChange: function(_new_id_, _old_id_, props)
     // optional value to help log info to console if you are having trouble getting things working
     debug: true
-  });
+  })(CustomerPage);
 
 );
 ```
@@ -58,7 +58,7 @@ or if you have multiple models to work with
 ```javascript
 ...
 
-modelProvider(CustomerPage, {
+modelProvider({
   debug: true,
   models: [{
     id: 'params.id',
@@ -67,7 +67,7 @@ modelProvider(CustomerPage, {
   }, {
     ...
   }]
-});
+})(CustomerPage);
 ```
 
 ### options
@@ -78,5 +78,5 @@ modelProvider(CustomerPage, {
 * ***idPropName***: the property name used for the model id (defaults to `id`)
 * ***fetchProp***: the property used to fetch the model if necessary (the model will not be auto-fetched if this is not set)
 * ***modelClass***: the model class to use (defaults to { Model } from 'restful-redux`;  see [Model docs]('./model.md))
-* ***forceFetch***: `true` to force a fetch even if a the model data exists.  Or a function `(newId, currentModel, newProps, currentProps)` which returns a boolean for finer grained control.  This function will execute during mount and any properties change.
+* ***forceFetch***: `true` to force a fetch even if a the model data exists.  Or a function `(newId, currentModel, newProps, currentProps)` which returns a boolean for finer grained control (return `true` to fetch).  This function will execute during mount and any properties change.
 * ***fetchOptions***: optional function(props) used to provide a 2nd parameter to the fetch method if the `id` is not sufficient

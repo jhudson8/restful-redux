@@ -2,115 +2,6 @@ import { checkRequiredOptions, logger } from './common-util';
 
 const NO_ID = '_noid_';
 
-function util (origState) {
-  var state = origState;
-  var entities = Object.assign({}, state);
-  if (entities.entities) {
-    state = entities;
-    entities = state.entities = Object.assign({}, state.entities);
-  } else {
-    state = entities;
-  }
-  entities._meta = Object.assign({}, entities._meta);
-  var operations = {};
-
-  function operation (entityType, callback) {
-    var ops = operations[entityType];
-    if (!ops) {
-      ops = operations[entityType] = [];
-    }
-    callback(ops);
-  }
-
-  var rtn = {
-    delete: function (id, entityType) {
-      operation(entityType, function (ops) {
-        ops.push({
-          action: 'delete',
-          id: id
-        });
-      });
-      return rtn;
-    },
-    replace: function (id, entityType, value, data) {
-      operation(entityType, function (ops) {
-        ops.push({ action: 'replace', id: 'id', value: value, data: data });
-      });
-      return rtn;
-    },
-    // clear out all entities
-    clear: function (entityType) {
-      operation('_global', function (ops) {
-        ops.push({
-          action: 'delete',
-          entityType: entityType
-        });
-      });
-      return rtn;
-    },
-    // iterate through each entityType
-    iterate: function (entityType, callback) {
-      var modelEntities = entities[entityType];
-      var modelMeta = entities._meta && entities._meta[entityType] || {};
-      if (modelEntities) {
-        for (var id in modelEntities) {
-          callback.call(rtn, id, modelEntities[id], modelMeta && modelMeta[id]);
-        }
-      }
-      return rtn;
-    },
-    execute: function () {
-      var changeMade = false;
-      // entity specific operations
-      for (var entityType in operations) {
-        var entityOperations = operations[entityType];
-        if (entityType === '_global') {
-          // global operations
-          entityOperations.forEach(function (operation) {
-            var action = operation.action;
-            var entityType = operation.entityType;
-            if (action === 'delete') {
-              changeMade = true;
-              delete entities[entityType];
-              delete entities._meta[entityType];
-            }
-          });
-        } else {
-          // entity specific operaiont
-          var _entities = entities[entityType] = Object.assign({}, entities[entityType]);
-          var _meta = entities._meta[entityType] = Object.assign({}, entities._meta[entityType]);
-          entityOperations.forEach(function (operation) {
-            var id = operation.id;
-            var action = operation.action;
-            var value = operation.value;
-            var data = operation.data;
-
-            if (action === 'delete') {
-              delete _entities[id];
-              delete _meta[id];
-              changeMade = true;
-            } else if (action === 'replace') {
-              if (value) {
-                _entities[id] = value;
-              }
-              if (data) {
-                _meta[id] = Object.assign({}, _meta[id], { data: data });
-              }
-              changeMade = true;
-            }
-          });
-        }
-      }
-      if (changeMade) {
-        return state;
-      } else {
-        return origState;
-      }
-    }
-  };
-  return rtn;
-}
-
 /**
  * Utility method for a consistent fetch pattern.  Return the state if applicable and false otherwise.
  * Options
@@ -148,9 +39,8 @@ function reducer (options) {
     stateEntities._meta = Object.assign({}, stateEntities._meta);
 
     if (beforeReduce) {
-      var context = util(state.entities);
-      beforeReduce(action, util, { action, id, entities, value: result });
-      state.entities = context.execute();
+      state = beforeReduce({ action, id, entities: stateEntities, result, data: meta.data }, state) || state;
+      stateEntities = state.entities;
     }
 
     if (result) {
@@ -162,7 +52,7 @@ function reducer (options) {
     }
 
     if (entities) {
-      state.entities = stateEntities = updateEntityModels(entities, stateEntities, id, entityType, meta.fetched);
+      stateEntities = state.entities = updateEntityModels(entities, stateEntities, id, entityType, meta.fetched);
     }
 
     // update the metadata
@@ -205,9 +95,7 @@ function reducer (options) {
     }
 
     if (afterReduce) {
-      context = util(state.entities);
-      afterReduce(action, context, action, util, { action, id, entities, value: result });
-      state.entities = context.execute();
+      state = afterReduce({ action, id, entities: stateEntities, result, data: meta.data }, state) || state;
     }
 
     // clear out any undefined fields
@@ -349,7 +237,6 @@ function reducer (options) {
     return state;
   };
 }
-reducer.util = util;
 
 function createMeta (props, clearProps) {
   clearProps.forEach(function (propType) {
@@ -378,15 +265,5 @@ function updateEntityModels (values, entities, primaryId, primaryEntityType, fet
   }
   return rtn;
 }
-
-// allow multiple reducers to be joined together
-reducer.join = function(reducers) {
-  return function (state, action) {
-    for (var i = 0; i < reducers.length; i ++) {
-      state = reducers[i](state, action);
-    }
-    return state;
-  };
-};
 
 export default reducer;

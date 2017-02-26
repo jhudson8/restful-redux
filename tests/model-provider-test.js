@@ -3,18 +3,18 @@
 import React from 'react';
 import sinon from 'sinon';
 import { shallow } from 'enzyme';
-import modelProvider from '../src/model-provider';
+import { modelProvider } from '../src';
 var expect = require('chai').expect;
 
 function Stub () {}
 
 describe('model-provider', function () {
-  const Component = modelProvider(Stub, {
+  const Component = modelProvider({
     id: 'id',
     entityType: 'foo',
     fetchProp: 'fetch'
-  });
-  const ComponentMultipleModels = modelProvider(Stub, {
+  })(Stub);
+  const ComponentMultipleModels = modelProvider({
     models: [{
       id: 'id1',
       entityType: 'foo',
@@ -24,12 +24,12 @@ describe('model-provider', function () {
       entityType: 'foo',
       fetchProp: 'fetch2'
     }]
-  });
-  const ComponentNestedId = modelProvider(Stub, {
+  })(Stub);
+  const ComponentNestedId = modelProvider({
     id: 'params.id',
     entityType: 'foo',
     fetchProp: 'fetch'
-  });
+  })(Stub);
 
   describe('models and collections', function () {
     it('should trigger fetch when mounted', function () {
@@ -100,11 +100,11 @@ describe('model-provider', function () {
 
   describe('onIdChange', function () {
     function createComponent(spy) {
-      return modelProvider(Stub, {
+      return modelProvider({
         id: 'id',
         entityType: 'foo',
         onIdChange: spy
-      });
+      })(Stub);
     }
 
     it('should always call on mount', function () {
@@ -154,12 +154,12 @@ describe('model-provider', function () {
         }
       };
 
-      const ComponentForceFetch = modelProvider(Stub, {
+      const ComponentForceFetch = modelProvider({
         id: 'id',
         entityType: 'foo',
         fetchProp: 'fetch',
         forceFetch: true
-      });
+      })(Stub);
       let component = shallow(React.createElement(ComponentForceFetch, {
         id: '1',
         entities: entities,
@@ -184,12 +184,12 @@ describe('model-provider', function () {
         }
       };
 
-      const ComponentForceFetch = modelProvider(Stub, {
+      const ComponentForceFetch = modelProvider({
         id: 'id',
         entityType: 'foo',
         fetchProp: 'fetch',
         forceFetch: function () { return true; }
-      });
+      })(Stub);
       let component = shallow(React.createElement(ComponentForceFetch, {
         id: '1',
         entities: entities,
@@ -214,12 +214,12 @@ describe('model-provider', function () {
         }
       };
 
-      const ComponentForceFetch = modelProvider(Stub, {
+      const ComponentForceFetch = modelProvider({
         id: 'id',
         entityType: 'foo',
         fetchProp: 'fetch',
         forceFetch: function () { return false; }
-      });
+      })(Stub);
       let component = shallow(React.createElement(ComponentForceFetch, {
         id: '1',
         entities: entities,
@@ -298,12 +298,12 @@ describe('model-provider', function () {
   });
 
   describe('should obey "modelProp"', function () {
-    const Component = modelProvider(Stub, {
+    const Component = modelProvider({
       id: 'id',
       entityType: 'foo',
       modelProp: 'bar',
       fetchProp: 'fetch'
-    });
+    })(Stub);
 
     it('should not fetch if model is provided', function () {
       const fetch = sinon.spy();
@@ -335,12 +335,12 @@ describe('model-provider', function () {
   });
 
   describe ('should obey "idProp"', function () {
-    const Component = modelProvider(Stub, {
+    const Component = modelProvider({
       id: 'id',
       entityType: 'foo',
       idProp: 'bar',
       fetchProp: 'fetch'
-    });
+    })(Stub);
 
     it ('should set id value on child component', function () {
       const fetch = sinon.spy();
@@ -358,11 +358,11 @@ describe('model-provider', function () {
   });
 
   describe ('should obey "fetchProp"', function () {
-    const Component = modelProvider(Stub, {
+    const Component = modelProvider({
       id: 'id',
       entityType: 'foo',
       fetchProp: 'bar'
-    });
+    })(Stub);
 
     it ('should set id value on child component', function () {
       const fetch = sinon.spy();
@@ -405,7 +405,7 @@ describe('model-provider', function () {
   });
 
   describe('should obey "fetchOptions"', function () {
-    const Component = modelProvider(Stub, {
+    const Component = modelProvider({
       id: 'id',
       entityType: 'foo',
       fetchProp: 'fetch',
@@ -413,7 +413,7 @@ describe('model-provider', function () {
         abc: 'params.def',
         ghi: 'params.jkl'
       }
-    });
+    })(Stub);
 
     it ('should pass values as 2nd fetch parameter', function () {
       const fetch = sinon.spy();

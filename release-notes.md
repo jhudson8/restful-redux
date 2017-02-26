@@ -1,3 +1,22 @@
+## v3.0.0
+- renamed `reducer` to `createReducer`
+```import { createReducer } from 'restful-redux';```
+- renamed `reduxEffectsActionCreator` to `createActionCreator`
+```import { createActionCreator } from 'restful-redux';```
+- changed `beforeReduce`/`afterReduce` reducer lifecycle method signature
+The function signature is (data, state) where `data` is { action, id, entities, result, data } (`reducerUtil` is handy for operations here)
+  * ***action***: the dispatched action
+  * ***id***: the entity id specific to the action that initiated the reducer
+  * ***entities***: the `entities` action payload value (if provided) in the action payload (not the current state entities)
+  * ***result***: the `result` action payload value (if provided)
+  * ***data***: the `data` action payload value (if provided)
+- moved the reducer utility functions from `reducer.util` to `import { reducerUtil } from 'restful-redux'`
+- modelProvider has been refactored to match the callback style of redux smart componentWillReceiveProps
+```javascript
+modelProvider(options)(Component);  see `modelProvider` docs for more details
+```
+And, I suck at social media promotion... if you find this project useful, please star this repo :)
+
 ## v2.2.1
 updated examples to use new normalizr schema (and denormalizr impl from normalizr)
 

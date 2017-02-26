@@ -4,23 +4,23 @@ The action creator in this project is used to easily, and with very little code,
 
 ## Promises
 If you would like your `store.dispatch` function to return a promise for these actions, include the following code.  
-Or you can just include [the source code](../src/dispatch-promise.js).
+Or you can include [the source code](../src/dispatch-promise.js).
 ```javascript
 import { dispatchPromise } from 'restful-redux';
 // "store" is the redux store
 dispatchPromise(store);
 ```
 
-Also, adding this middleware will include cookies and allow `params.body` object to be serialized a JSON object with appropriate headers.  Or you can just include [the source code](../src/fetch-config-middleware.js).
+Adding this middleware will include cookies and allow `params.body` object to be serialized a JSON object with appropriate headers.  Or you can include [the source code](../src/fetch-config-middleware.js).
 ```javascript
 import { fetchConfigMiddleware } from 'restful-redux';
 ```
 
 ### Import and Create New Action Creator
 ```javascript
-import { reduxEffectsActionCreator } from 'restful-redux';
+import { createActionCreator } from 'restful-redux';
 
-const actionCreator = reduxEffectsActionCreator({
+const actionCreator = createActionCreator({
   // prefix for all redux actions of this type
   actionPrefix: 'CUSTOMER',
   // root domain for model data; redux store data structure would be { entities: { customer: { _id_: {_model_data} } } }

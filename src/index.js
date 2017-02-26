@@ -1,15 +1,19 @@
 import Model from './model';
-import reducer from './model-reducer';
+import createReducer from './model-reducer';
 import modelProvider from './model-provider';
-import reduxEffectsActionCreator from './action-creator/redux-effects';
+import createActionCreator from './action-creator/redux-effects';
 import fetchConfigMiddleware from './fetch-config-middleware';
 import dispatchPromise from './dispatch-promise';
+import chainReducers from './chain-reducers';
+import reducerUtil from './reducer-util';
 
 export {
   Model,
-  reducer,
+  createReducer,
+  createActionCreator,
   modelProvider,
-  reduxEffectsActionCreator,
   fetchConfigMiddleware,
-  dispatchPromise
+  dispatchPromise,
+  chainReducers,
+  reducerUtil
 };

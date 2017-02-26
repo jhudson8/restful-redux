@@ -9,11 +9,7 @@ const NO_ID = '_noid_';
  * exist in the store.  A `fetch` prop value is expected to be provided with `mapDispatchToProps`
  * - Component: the "dumb" component
  */
-export default function modelProvider (_Component, options) {
-  if (!_Component) {
-    throw new Error('Undefined modelProvider component');
-  }
-
+export default function modelProvider (options) {
   const debug = options.debug;
   const log = logger('model-provider');
 
@@ -118,85 +114,91 @@ export default function modelProvider (_Component, options) {
     props[options.fetchProp](id, fetchOptions);
   }
 
-  return React.createClass({
-    getInitialState: function () {
-      return {
-        modelCache: {},
-        fetched: {}
-      };
-    },
-
-    componentWillMount () {
-      maybeFetchModels.call(this, this.props);
-      triggerIdChanges(undefined, this.props, this.state);
-    },
-
-    componentWillReceiveProps (props) {
-      maybeFetchModels.call(this, props, this.props);
-      triggerIdChanges(this.props, props, this.state);
-    },
-
-    render () {
-      const props = this.props;
-      return React.createElement(_Component, generateProps(props, this.state), props.children);
+  return function (_Component) {
+    if (!_Component) {
+      throw new Error('Undefined modelProvider component');
     }
-  });
 
-  function checkForMissingOrChangedIds (oldProps, newProps) {
-    return _models.map(function (options) {
-      if (!oldProps) {
+    return React.createClass({
+      getInitialState: function () {
         return {
-          options: options,
-          oldId: undefined,
-          newId: getModelId(newProps, options)
+          modelCache: {},
+          fetched: {}
         };
-      }
-      const oldId = getModelId(oldProps, options);
-      const newId = getModelId(newProps, options);
-      if (oldId !== newId) {
-        return {
-          options: options,
-          oldId: undefined,
-          newId: getModelId(newProps, options)
-        };
-      }
-    }).filter(function (o) { return o; });
-  }
+      },
 
-  function triggerIdChanges (oldProps, newProps, state) {
-    const changelist = checkForMissingOrChangedIds(oldProps, newProps);
-    if (changelist.length > 0) {
-      const props = generateProps(newProps, state);
-      changelist.forEach(function (data) {
-        if (options.onIdChange) {
-          const options = data.options;
-          const oldId = data.oldId;
-          const newId = data.newId;
-          options.onIdChange(newId, oldId, props);
-        }
-      });
-    }
-  }
+      componentWillMount () {
+        maybeFetchModels.call(this, this.props);
+        triggerIdChanges(undefined, this.props, this.state);
+      },
 
-  function generateProps (origProps, state) {
-    const props = Object.assign({}, origProps);
-    const modelCache = state.modelCache;
+      componentWillReceiveProps (props) {
+        maybeFetchModels.call(this, props, this.props);
+        triggerIdChanges(this.props, props, this.state);
+      },
 
-    _models.forEach((options) => {
-      const id = getModelId(props, options);
-      if (id) {
-        const modelOptions = Object.assign({}, options, {
-          id: id,
-          entities: props[entitiesProp]
-        });
-        // reuse the same model object if we can
-        let model = Model.fromCache(modelOptions, modelCache);
-        props[options.idPropName] = id;
-        props[options.propName] = model;
+      render () {
+        const props = this.props;
+        return React.createElement(_Component, generateProps(props, this.state), props.children);
       }
     });
-    return props;
-  }
+
+    function checkForMissingOrChangedIds (oldProps, newProps) {
+      return _models.map(function (options) {
+        if (!oldProps) {
+          return {
+            options: options,
+            oldId: undefined,
+            newId: getModelId(newProps, options)
+          };
+        }
+        const oldId = getModelId(oldProps, options);
+        const newId = getModelId(newProps, options);
+        if (oldId !== newId) {
+          return {
+            options: options,
+            oldId: undefined,
+            newId: getModelId(newProps, options)
+          };
+        }
+      }).filter(function (o) { return o; });
+    }
+
+    function triggerIdChanges (oldProps, newProps, state) {
+      const changelist = checkForMissingOrChangedIds(oldProps, newProps);
+      if (changelist.length > 0) {
+        const props = generateProps(newProps, state);
+        changelist.forEach(function (data) {
+          if (options.onIdChange) {
+            const options = data.options;
+            const oldId = data.oldId;
+            const newId = data.newId;
+            options.onIdChange(newId, oldId, props);
+          }
+        });
+      }
+    }
+
+    function generateProps (origProps, state) {
+      const props = Object.assign({}, origProps);
+      const modelCache = state.modelCache;
+
+      _models.forEach((options) => {
+        const id = getModelId(props, options);
+        if (id) {
+          const modelOptions = Object.assign({}, options, {
+            id: id,
+            entities: props[entitiesProp]
+          });
+          // reuse the same model object if we can
+          let model = Model.fromCache(modelOptions, modelCache);
+          props[options.idPropName] = id;
+          props[options.propName] = model;
+        }
+      });
+      return props;
+    }
+  };
 }
 
 function organizeProps (options) {
