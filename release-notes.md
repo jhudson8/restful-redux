@@ -13,8 +13,14 @@ The function signature is (data, state) where `data` is { action, id, entities, 
 - moved the reducer utility functions from `reducer.util` to `import { reducerUtil } from 'restful-redux'`
 - modelProvider has been refactored to match the callback style of redux smart componentWillReceiveProps
 ```javascript
-modelProvider(options)(Component);  see `modelProvider` docs for more details
+modelProvider(options)(Component); //  see `modelProvider` docs for more details
 ```
+- extracted reducer utility functions to `reducerUtil`
+```javascript
+import  { reducerUtil } from `restful-redux`;
+```
+See model-reducer docs for more details
+
 And, I suck at social media promotion... if you find this project useful, please star this repo :)
 
 ## v2.2.1
