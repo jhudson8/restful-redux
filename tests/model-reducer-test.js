@@ -57,6 +57,31 @@ const initialState2 = {
 };
 Object.freeze(savedInitialState2);
 const savedInitialState2 = JSON.parse(JSON.stringify(initialState2));
+var bubbleUpTestState = {
+  entities: {
+    _meta: {
+      fooList: {
+        'l1': {
+          fetched: { type: 'full' }
+        }
+      },
+      foo: {
+        '1': {
+          fetched: { type: 'normalized' },
+          fetchedBy: { entityType: 'fooList', id: 'l1' }
+        }
+      }
+    },
+    fooList: {
+      'l1': ['1']
+    },
+    foo: {
+      '1': { foo: 'bar' }
+    }
+  }
+};
+Object.freeze(bubbleUpTestState);
+const savedbubbleUpTestState = JSON.parse(JSON.stringify(bubbleUpTestState));
 
 describe('model-reducer', function () {
   const fooReducer = createReducer({
@@ -105,6 +130,44 @@ describe('model-reducer', function () {
       }
     });
     expect(state).to.equal(emptyState);
+  });
+
+  describe('bubbleUp', function () {
+    it('should shallow copy the state by default', function () {
+      const state = fooReducer(bubbleUpTestState, {
+        type: 'FOO_FETCH_SUCCESS',
+        payload: {
+          id: '1',
+          result: { beep: 'boop' }
+        }
+      });
+      expect(savedbubbleUpTestState).to.deep.equal(bubbleUpTestState);
+      expect(state.entities.fooList.l1).to.not.equal(bubbleUpTestState.entities.fooList.l1);
+    });
+    it('should not shallow bubbleUp=false in action payload', function () {
+      const state = fooReducer(bubbleUpTestState, {
+        type: 'FOO_FETCH_SUCCESS',
+        payload: {
+          id: '1',
+          result: { beep: 'boop' },
+          bubbleUp: false
+        }
+      });
+      expect(savedbubbleUpTestState).to.deep.equal(bubbleUpTestState);
+      expect(state.entities.fooList.l1).to.equal(bubbleUpTestState.entities.fooList.l1);
+    });
+    it('should not shallow copy if reducer option is false', function () {
+      const reducer = createReducer({ actionPrefix: 'FOO', entityType: 'foo', bubbleUp: false });
+      const state = reducer(bubbleUpTestState, {
+        type: 'FOO_FETCH_SUCCESS',
+        payload: {
+          id: '1',
+          result: { beep: 'boop' }
+        }
+      });
+      expect(savedbubbleUpTestState).to.deep.equal(bubbleUpTestState);
+      expect(state.entities.fooList.l1).to.equal(bubbleUpTestState.entities.fooList.l1);
+    });
   });
 
   describe('DATA', function () {
@@ -232,8 +295,6 @@ describe('model-reducer', function () {
             foo: {
               '1': {
                 fetched: {
-                  entityType: 'foo',
-                  id: '1',
                   type: 'full'
                 }
               }
@@ -276,8 +337,6 @@ describe('model-reducer', function () {
             foo: {
               '1': {
                 fetched: {
-                  entityType: 'foo',
-                  id: '1',
                   type: 'full'
                 }
               }
@@ -318,8 +377,6 @@ describe('model-reducer', function () {
             foo: {
               '1': {
                 fetched: {
-                  entityType: 'foo',
-                  id: '1',
                   type: 'full'
                 }
               }
@@ -357,8 +414,6 @@ describe('model-reducer', function () {
             foo: {
               '1': {
                 fetched: {
-                  entityType: 'foo',
-                  id: '1',
                   type: 'full'
                 },
                 data: {
@@ -398,14 +453,14 @@ describe('model-reducer', function () {
       expect(initialState1).to.deep.equal(savedInitialState1);
       expect(!!state.entities._meta.foo['1'].fetched.completedAt).to.equal(true);
       delete state.entities._meta.foo['1'].fetched.completedAt;
+      expect(!!state.entities._meta.bar['1'].fetchedBy.completedAt).to.equal(true);
+      delete state.entities._meta.bar['1'].fetchedBy.completedAt;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
             foo: {
               '1': {
                 fetched: {
-                  entityType: 'foo',
-                  id: '1',
                   type: 'full'
                 },
                 data: {
@@ -466,8 +521,6 @@ describe('model-reducer', function () {
             foo: {
               '1': {
                 fetched: {
-                  entityType: 'foo',
-                  id: '1',
                   type: 'full'
                 },
                 data: {

@@ -52,6 +52,7 @@ export default function (options) {
     id,
     actionId,
     replaceModel,
+    actionBubbleUp,
     isDelete,
     schema,
     resolver,
@@ -91,7 +92,7 @@ export default function (options) {
       if (isDelete) {
         payload.delete = true;
       }
-      if (bubbleUp === false) {
+      if (bubbleUp === false || actionBubbleUp === false) {
         payload.bubbleUp = false;
       }
 
@@ -162,6 +163,7 @@ export default function (options) {
     rtn[`create${options.name}Action`] = function ({
       id,
       actionId,
+      bubbleUp,
       url,
       params,
       schema,
@@ -200,6 +202,7 @@ export default function (options) {
           actionId,
           replaceModel,
           isDelete: options.isDelete,
+          actionBubbleUp: bubbleUp,
           schema,
           formatter,
           resolver: resolve,
@@ -212,6 +215,7 @@ export default function (options) {
           type: ERROR,
           id,
           actionId,
+          actionBubbleUp: bubbleUp,
           formatter,
           resolver: reject,
           reduxAction: errorAction,

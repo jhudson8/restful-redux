@@ -22,6 +22,56 @@ var normalizedFooActionCreator = createActionCreator({
 });
 
 describe('redux-effects-action-creator', function () {
+  describe('bubbleUp', function () {
+    var actionCreator = createActionCreator({
+      actionPrefix: 'FOO',
+      entityType: 'foo',
+      bubbleUp: false
+    });
+    it('should include bubbleUp:false in payload if bubbleUp=false in action creator options', function () {
+      var action = actionCreator.createFetchAction({
+        id: '1',
+        url: 'http://foo.com/thing/1'
+      });
+      var steps = action[0].meta.steps[0];
+      var successAction = steps[0]({ value: { foo: 'bar' } });
+      expect(successAction[0]).to.deep.equal({
+        type: 'FETCH_SUCCESS',
+        payload: {
+          id: '1',
+          result: {
+            foo: 'bar'
+          },
+          bubbleUp: false
+        }
+      });
+    });
+    it ('should include bubbleUp:false in payload if formatter result bubbleUp:false', function () {
+      var action = fooActionCreator.createFetchAction({
+        id: '1',
+        url: 'http://foo.com/thing/1',
+        formatter: function (data) {
+          return {
+            result: data,
+            bubbleUp: false
+          };
+        }
+      });
+      var steps = action[0].meta.steps[0];
+      var successAction = steps[0]({ value: { foo: 'bar' } });
+      expect(successAction[0]).to.deep.equal({
+        type: 'FETCH_SUCCESS',
+        payload: {
+          id: '1',
+          result: {
+            foo: 'bar'
+          },
+          bubbleUp: false
+        }
+      });
+    });
+  });
+
   describe('createFetchAction', function() {
     it('should handle simple fetch action', function () {
       var action = fooActionCreator.createFetchAction({

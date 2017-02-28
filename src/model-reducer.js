@@ -199,9 +199,7 @@ function reducer (options) {
         if (meta.fetched) {
           meta.fetched = {
             type: 'full',
-            completedAt: now,
-            entityType: entityType,
-            id: id
+            completedAt: now
           };
         }
 
@@ -250,6 +248,7 @@ function createMeta (props, clearProps) {
 }
 
 function updateEntityModels (values, entities, primaryId, primaryEntityType, fetchData) {
+  const fetchedBy = Object.assign({}, fetchData, { entityType: primaryEntityType, id: primaryId } );
   const rtn = Object.assign({}, entities);
   const _meta = rtn._meta = Object.assign({}, entities._meta);
   for (let entityType in values) {
@@ -261,7 +260,7 @@ function updateEntityModels (values, entities, primaryId, primaryEntityType, fet
           if (id === primaryId && entityType === primaryEntityType) {
             entitiesMeta[id] = Object.assign({ fetched: fetchData }, entitiesMeta[id]);
           } else {
-            entitiesMeta[id] = Object.assign({ fetched: { type: 'normalized' } }, entitiesMeta[id], { fetchedBy: fetchData });
+            entitiesMeta[id] = Object.assign({ fetched: { type: 'normalized' } }, entitiesMeta[id], { fetchedBy: fetchedBy });
           }
         }
       }

@@ -1,5 +1,8 @@
+## v3.0.2
+- added `bubbleUp` option support to individual action creator functions (as opposed to the createActionCreator function where it was already supported)
+
 ## v3.0.1
-- added `bubbleUp` support to reducer
+- added `bubbleUp` option support to reducer
 
 ## v3.0.0
 - renamed `reducer` to `createReducer`
