@@ -39,7 +39,7 @@ export default function modelProvider (options) {
 
   function getModelId (props, options) {
     const id = options.id;
-    if (id === false) {
+    if (id === false || id === NO_ID) {
       return NO_ID;
     } else if (typeof id === 'function') {
       return id(props);

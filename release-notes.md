@@ -1,3 +1,6 @@
+## v3.0.3
+- fix bug with modelProvider when using the `id: false` option
+
 ## v3.0.2
 - added `bubbleUp` option support to individual action creator functions (as opposed to the createActionCreator function where it was already supported)
 
