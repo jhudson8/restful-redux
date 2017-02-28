@@ -17,9 +17,9 @@ function reducer (options) {
     actionPrefix,
     beforeReduce,
     afterReduce,
+    bubbleUp,
     debug
   } = options;
-  const bubbleUp = typeof options.bubbleUp === 'undefined' ? true : options.bubbleUp;
   const verbose = debug === 'verbose';
   const log = logger(`model-reducer "${entityType}"`);
 
@@ -29,6 +29,7 @@ function reducer (options) {
     id,
     result,
     entities,
+    actionBubbleUp,
     meta,
     clear,
     actionType
@@ -79,8 +80,9 @@ function reducer (options) {
     }
 
     // dirty parent entity if applicable
+    const cancelBubbleUp = bubbleUp === false || actionBubbleUp === false;
     const fetchedBy = meta.fetchedBy;
-    if (fetchedBy && (action.payload.bubbleUp !== false || !bubbleUp)) {
+    if (fetchedBy && !cancelBubbleUp) {
       const fetchedByEntityType = fetchedBy.entityType;
       if (stateEntities[fetchedByEntityType]) {
         const fetchedById = fetchedBy.id;
@@ -188,6 +190,7 @@ function reducer (options) {
         const entities = payload.entities;
         const response = payload.response;
         const result = payload.result;
+        const bubbleUp = payload.bubbleUp;
         const id = (payload.id === false ? NO_ID : payload.id) || result;
         const actionId = payload.actionId;
         const meta = Object.assign({}, options.meta);
@@ -223,6 +226,7 @@ function reducer (options) {
           id,
           result,
           entities,
+          actionBubbleUp: bubbleUp,
           meta,
           clear: options.clear,
           type: options.type,

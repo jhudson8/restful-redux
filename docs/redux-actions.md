@@ -7,6 +7,9 @@ Assuming the following action creator
 const actionCreator = reduxEffectsActionCreator({
   actionPrefix: 'CUSTOMER',
   entityType: 'customer',
+  // if you have a normalized data structure, the source entity will be shallow copied if
+  // the sub-entity action has this attribute
+  bubbleUp: false
 });
 ```
 

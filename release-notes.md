@@ -1,3 +1,6 @@
+## v3.0.1
+- added `bubbleUp` support to reducer
+
 ## v3.0.0
 - renamed `reducer` to `createReducer`
 ```import { createReducer } from 'restful-redux';```
@@ -20,8 +23,6 @@ modelProvider(options)(Component); //  see `modelProvider` docs for more details
 import  { reducerUtil } from `restful-redux`;
 ```
 See model-reducer docs for more details
-
-And, I suck at social media promotion... if you find this project useful, please star this repo :)
 
 ## v2.2.1
 updated examples to use new normalizr schema (and denormalizr impl from normalizr)
