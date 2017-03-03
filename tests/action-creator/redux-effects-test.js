@@ -45,6 +45,13 @@ describe('redux-effects-action-creator', function () {
           bubbleUp: false
         }
       });
+      expect(action[1]).to.deep.equal({
+        payload: {
+          bubbleUp: false,
+          id: '1'
+        },
+        type: 'FOO_FETCH_PENDING'
+      });
     });
     it ('should include bubbleUp:false in payload if formatter result bubbleUp:false', function () {
       var action = fooActionCreator.createFetchAction({

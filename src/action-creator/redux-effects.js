@@ -21,16 +21,20 @@ var REST_METHODS = [{
 }, {
   name: 'Delete',
   method: 'DELETE',
-  isDelete: true
+  isDelete: true,
+  fetchOrAction: ACTION
 }, {
   name: 'Put',
-  method: 'PUT'
+  method: 'PUT',
+  fetchOrAction: ACTION
 }, {
   name: 'Patch',
-  method: 'PATCH'
+  method: 'PATCH',
+  fetchOrAction: ACTION
 }, {
   name: 'Post',
-  method: 'POST'
+  method: 'POST',
+  fetchOrAction: ACTION
 }];
 
 export default function (options) {
@@ -52,7 +56,7 @@ export default function (options) {
     id,
     actionId,
     replaceModel,
-    actionBubbleUp,
+    bubbleUp,
     isDelete,
     schema,
     resolver,
@@ -92,8 +96,8 @@ export default function (options) {
       if (isDelete) {
         payload.delete = true;
       }
-      if (bubbleUp === false || actionBubbleUp === false) {
-        payload.bubbleUp = false;
+      if (typeof bubbleUp !== 'undefined') {
+        payload.bubbleUp = bubbleUp;
       }
 
       const actionType = `${actionPrefix}_${fetchOrAction}_${type}`;
@@ -123,6 +127,7 @@ export default function (options) {
             dispatch(asyncResponseAction ({
               entityType,
               fetchOrAction,
+              bubbleUp,
               type: 'CLEAR',
               id
             }));
@@ -148,6 +153,10 @@ export default function (options) {
   };
 
   REST_METHODS.forEach(function (options) {
+    const {
+      fetchOrAction,
+      method
+    } = options;
     /**
      * return the action to be dispatched when an XHR-based action should be taken on a model/REST document
      * - ACTION_SUCCESS_{entityType}: the data was retrieved successfully
@@ -160,25 +169,25 @@ export default function (options) {
      * - payload: [effects-fetch payload](https://github.com/redux-effects/redux-effects-fetch#creating-a-user)
      * - clearAfter: clear the action results after N milliseconds (optional)
      */
-    rtn[`create${options.name}Action`] = function ({
-      id,
-      actionId,
-      bubbleUp,
-      url,
-      params,
-      schema,
-      formatter,
-      replaceModel,
-      successAction,
-      errorAction,
-      clearAfter
-    }) {
+    rtn[`create${options.name}Action`] = function (options) {
+      let {
+        id,
+        actionId,
+        url,
+        params,
+        schema,
+        formatter,
+        replaceModel,
+        successAction,
+        errorAction,
+        clearAfter
+      } = options;
+      const _bubbleUp = typeof options.bubbleUp === 'undefined' ? bubbleUp : options.bubbleUp;
       if (id === false) {
         id = NO_ID;
       }
-      const fetchOrAction = options.fetchOrAction || ACTION;
       params = Object.assign({}, params, {
-        method: options.method
+        method: method
       });
 
       let resolve, reject, promise;
@@ -191,7 +200,7 @@ export default function (options) {
         });
       }
 
-      const pendingAction = createPendingAction(actionPrefix, id, actionId);
+      const pendingAction = createPendingAction(actionPrefix, id, actionId, _bubbleUp);
       const fetchAction = fetch(url, params);
       const composedAction = bind(fetchAction,
         asyncResponseAction({
@@ -202,7 +211,7 @@ export default function (options) {
           actionId,
           replaceModel,
           isDelete: options.isDelete,
-          actionBubbleUp: bubbleUp,
+          bubbleUp: _bubbleUp,
           schema,
           formatter,
           resolver: resolve,
@@ -215,7 +224,7 @@ export default function (options) {
           type: ERROR,
           id,
           actionId,
-          actionBubbleUp: bubbleUp,
+          bubbleUp: _bubbleUp,
           formatter,
           resolver: reject,
           reduxAction: errorAction,
@@ -238,9 +247,12 @@ export default function (options) {
 
 
 // create a dispatchable action that represents a pending model/REST document action
-function createPendingAction (actionPrefix, id, actionId) {
+function createPendingAction (actionPrefix, id, actionId, bubbleUp) {
   const type = actionId ? ACTION : FETCH;
   const payload = { id };
+  if (typeof bubbleUp !== 'undefined') {
+    payload.bubbleUp = bubbleUp;
+  }
   if (actionId) {
     payload.actionId = actionId;
   }

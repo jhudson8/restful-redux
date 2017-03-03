@@ -1,3 +1,6 @@
+## v3.0.4
+- bug fix: keep "pending" action from shallow cloning the normalized source model data if bubbleUp=false
+
 ## v3.0.3
 - fix bug with modelProvider when using the `id: false` option
 
