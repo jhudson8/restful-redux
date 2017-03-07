@@ -5,3 +5,6 @@ tests
 examples
 docs
 README.md
+.babelrc
+.eslinrc.json
+release-nodes.md

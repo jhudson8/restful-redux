@@ -1,3 +1,6 @@
+## v3.0.5
+- no code change.  added unnecessary files to .npmignore
+
 ## v3.0.4
 - bug fix: keep "pending" action from shallow cloning the normalized source model data if bubbleUp=false
 
