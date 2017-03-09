@@ -16,39 +16,44 @@ export default function (options) {
   // default to same origin credentials which allow cookie passing
   options.credentials = options.hasOwnProperty('credentials') ? options.credentials : 'same-origin';
 
-  return (store) => (next) => (action) => { // eslint-disable-line no-unused-vars
-    if (action.type === EFFECT_FETCH) {
-      // we've got an XHR request - clone the action so we can tweak it
-      let params = action.payload.params || {};
-      action = Object.assign({
-        payload: Object.assign({
-          params: Object.assign({
-            // use default credentials
-            credentials: params.credentials || options.credentials,
-            headers: {}
-          }, params)
-        }, action.payload)
-      }, action);
+  return () => (next) => {
+    if (next.type) {
+      throw new Error('restful-redux fetchConfigMiffleware is not used correctly (options are not provided).  Should be `fetchConfigMiddleware()`');
+    }
+    return function (action) {
+      if (action.type === EFFECT_FETCH) {
+        // we've got an XHR request - clone the action so we can tweak it
+        let params = action.payload.params || {};
+        action = Object.assign({}, action, {
+          payload: Object.assign({}, action.payload, {
+            params: Object.assign({
+              // use default credentials
+              credentials: options.credentials,
+              headers: {}
+            }, params)
+          })
+        });
 
-      // auto add any headers
-      const headers = setting('headers', options, action);
-      if (headers) {
-        Object.assign(params.headers, headers);
-      }
+        // auto add any headers
+        const headers = setting('headers', options, action);
+        if (headers) {
+          Object.assign(params.headers, headers);
+        }
 
-      const autoJSON = setting('autoJSON', options, action);
-      if (!autoJSON === false) {
-        const body = params.body;
-        if (typeof body === 'object' || Array.isArray(body)) {
-          params.headers = Object.assign({
-            'Accept': 'application/json',
-            'Content-Type': 'application/json;charset=UTF-8'
-          }, params.headers);
-          params.body = JSON.stringify(body);
+        const autoJSON = setting('autoJSON', options, action);
+        if (autoJSON !== false) {
+          const body = params.body;
+          if (typeof body === 'object' || Array.isArray(body)) {
+            params.headers = Object.assign({
+              'Accept': 'application/json',
+              'Content-Type': 'application/json;charset=UTF-8'
+            }, params.headers);
+            params.body = JSON.stringify(body);
+          }
         }
       }
-    }
-    return next(action);
+      return next(action);
+    };
   };
 }
 

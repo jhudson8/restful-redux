@@ -1,3 +1,6 @@
+## v3.0.6
+- added a warning in fetchConfigMiddleware to make sure it's applied to middleware chain as `fetchConfigMiddleware({ ...options })` rather than just `fetchConfigMiddleware`
+
 ## v3.0.5
 - no code change.  added unnecessary files to .npmignore
 
