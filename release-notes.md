@@ -1,3 +1,6 @@
+## v3.0.7
+- add 1 additional warning to prevent config mistakes
+
 ## v3.0.6
 - added a warning in fetchConfigMiddleware to make sure it's applied to middleware chain as `fetchConfigMiddleware({ ...options })` rather than just `fetchConfigMiddleware`
 

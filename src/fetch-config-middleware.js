@@ -33,6 +33,7 @@ export default function (options) {
             }, params)
           })
         });
+        params = action.payload.params;
 
         // auto add any headers
         const headers = setting('headers', options, action);
