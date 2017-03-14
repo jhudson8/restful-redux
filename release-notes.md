@@ -1,3 +1,12 @@
+##v3.1.0
+- added support for nexted modelProp and idProp properties in the component provider (nesting using `.`)
+```
+modelProvider({
+  entityType: 'abc',
+  modelProp: 'foo.bar'
+})(Component)
+```
+
 ## v3.0.7
 - add 1 additional warning to prevent config mistakes
 

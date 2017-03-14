@@ -192,13 +192,27 @@ export default function modelProvider (options) {
           });
           // reuse the same model object if we can
           let model = Model.fromCache(modelOptions, modelCache);
-          props[options.idPropName] = id;
-          props[options.propName] = model;
+          setPropValue(props, options.idPropName, id);
+          setPropValue(props, options.propName, model);
         }
       });
       return props;
     }
   };
+}
+
+function setPropValue (parent, keyParts, value) {
+  for (var i = 0; i < keyParts.length; i++) {
+    var key = keyParts[i];
+    if (i === keyParts.length - 1) {
+      parent[key] = value;
+    } else {
+      if (!parent[key]) {
+        parent[key] = {};
+      }
+      parent = parent[key];
+    }
+  }
 }
 
 function organizeProps (options) {
@@ -207,8 +221,8 @@ function organizeProps (options) {
   return Object.assign({}, options, {
     id: id === false ? NO_ID : ((typeof id === 'string') ? id.split('.') : id),
     entityType: options.entityType,
-    propName: options.modelProp || 'model',
-    idPropName: options.idProp || 'id',
+    propName: (options.modelProp || 'model').split('.'),
+    idPropName: (options.idProp || 'id').split('.'),
     fetchProp: options.fetchProp,
     modelClass: options.modelClass || Model,
     fetchOptions: Object.assign({}, options.fetchOptions)

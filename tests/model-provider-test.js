@@ -305,6 +305,23 @@ describe('model-provider', function () {
       fetchProp: 'fetch'
     })(Stub);
 
+    it('should handle nested model properties', function () {
+      const Component = modelProvider({
+        id: 'id',
+        modelProp: 'foo.bar',
+        entityType: 'foo'
+      })(Stub);
+
+      const impl = shallow(React.createElement(Component, {
+        id: '1',
+        entities: {
+          foo: {}
+        }
+      }));
+      const props = impl.props();
+      expect(!!props.foo.bar.canBeFetched()).to.equal(true);
+    });
+
     it('should not fetch if model is provided', function () {
       const fetch = sinon.spy();
       const impl = shallow(React.createElement(Component, {
