@@ -128,7 +128,7 @@ export function updateCustomer (id, customerData) {
   return actionCreator.createPostAction({
     id: id,
     url: `/customer/endpoint/${id}`,
-    payload: { // see https://github.com/redux-effects/redux-effects-fetch#actions
+    params: { // see https://github.com/redux-effects/redux-effects-fetch#actions
       body: customerData
     },
     replaceModel: true,

@@ -391,6 +391,65 @@ describe('model-reducer', function () {
       });
     });
 
+    it('should not clear out pre-existing values', function () {
+      let state = fooReducer(emptyState, {
+        type: 'FOO_FETCH_SUCCESS',
+        payload: {
+          result: '1',
+          entities: {
+            foo: {
+              '1': {
+                beep: 'boop'
+              }
+            }
+          }
+        }
+      });
+      state = fooReducer(state, {
+        type: 'FOO_FETCH_SUCCESS',
+        payload: {
+          result: '2',
+          entities: {
+            foo: {
+              '2': {
+                abc: 'def'
+              }
+            }
+          }
+        }
+      });
+
+      delete state.entities._meta.foo['1'].fetched.completedAt;
+      delete state.entities._meta.foo['2'].fetched.completedAt;
+
+      expect(state).to.deep.equal({
+        entities: {
+          _meta: {
+            foo: {
+              '1': {
+                fetched: {
+                  type: 'full'
+                }
+              },
+              '2': {
+                fetched: {
+                  type: 'full'
+                }
+              }
+            }
+          },
+          foo: {
+            '1': {
+              beep: 'boop'
+            },
+            '2': {
+              abc: 'def'
+            }
+          }
+        }
+      });
+    });
+
     it('should update an existing model but keep existing custom meta properties', function () {
       const state = fooReducer(initialState1, {
         type: 'FOO_FETCH_SUCCESS',

@@ -36,6 +36,7 @@ function reducer (options) {
   }) {
     // make sure our necessary data structure is initialized
     let stateEntities = Object.assign({}, state.entities);
+    const prevState = state;
     state = Object.assign({}, state, { entities: stateEntities});
     stateEntities._meta = Object.assign({}, stateEntities._meta);
 
@@ -44,16 +45,13 @@ function reducer (options) {
       stateEntities = state.entities;
     }
 
-    if (result) {
+    if (result && !entities) {
       // our collection entity value is the results
-      stateEntities[entityType] = entities ? Object.assign({}, entities[entityType]) : {};
+      stateEntities[entityType] = Object.assign({}, stateEntities && [entityType]);
       stateEntities[entityType][id] = result;
     } else if (entities) {
-      result = entities[entityType][id];
-    }
-
-    if (entities) {
       stateEntities = state.entities = updateEntityModels(entities, stateEntities, id, entityType, meta.fetched);
+      // in this case `result` and `id` will match because this is a normalized result
     }
 
     // update the metadata
@@ -108,7 +106,7 @@ function reducer (options) {
     }
 
     if (debug) {
-      log(`${actionType} (${id}) handled\n\tprevious state:\n\t`, state, '\n\tpost state:\n\t', state, '\n\tresult:\n\t', result, '\n\tentities:\n\t', entities);
+      log(`${actionType} (${id}) handled\n\tprevious state:\n\t`, prevState, '\n\tpost state:\n\t', state, '\n\tresult:\n\t', result, '\n\tentities:\n\t', entities);
     }
     return state;
   }

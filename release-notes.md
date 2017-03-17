@@ -1,3 +1,6 @@
+##v3.1.1
+- fixed `previous state` logging when reducer is in `debug` mode
+
 ##v3.1.0
 - added support for nexted modelProp and idProp properties in the component provider (nesting using `.`)
 ```
