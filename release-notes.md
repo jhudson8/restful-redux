@@ -1,3 +1,6 @@
+##v3.1.2
+- add more unit tests and fixed normalized entity type reducer overwriting bug
+
 ##v3.1.1
 - fixed `previous state` logging when reducer is in `debug` mode
 

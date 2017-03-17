@@ -47,11 +47,12 @@ function reducer (options) {
 
     if (result && !entities) {
       // our collection entity value is the results
-      stateEntities[entityType] = Object.assign({}, stateEntities && [entityType]);
+      stateEntities[entityType] = Object.assign({}, stateEntities && stateEntities[entityType]);
       stateEntities[entityType][id] = result;
     } else if (entities) {
-      stateEntities = state.entities = updateEntityModels(entities, stateEntities, id, entityType, meta.fetched);
       // in this case `result` and `id` will match because this is a normalized result
+      stateEntities = state.entities = updateEntityModels(entities, stateEntities, id, entityType, meta.fetched);
+      result = stateEntities[entityType][id];
     }
 
     // update the metadata
