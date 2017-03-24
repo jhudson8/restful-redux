@@ -1,3 +1,6 @@
+## v3.2.1
+- fixed model reducer handling with normalized results
+
 ## v3.2
 - change reducer `afterReduce` and `beforeReduce` signature to include `state` as an attribute of the first parameter... `function ({action, id, entities, result, data, state}, meta)`
     `meta` is now the 2nd parameter which is where model state is stored (is a fetch pending, was there an action error... stuff like that).  You can mutate this object directly in `afterReduce` as it has already been cloned
