@@ -716,7 +716,8 @@ describe('model-reducer', function () {
                 fetchPending: true
               }
             }
-          }
+          },
+          foo: {}
         }
       });
     });
@@ -838,7 +839,8 @@ describe('model-reducer', function () {
                 }
               }
             }
-          }
+          },
+          foo: {}
         }
       });
     });
@@ -905,7 +907,8 @@ describe('model-reducer', function () {
                 actionPending: true
               }
             }
-          }
+          },
+          foo: {}
         }
       });
     });
@@ -970,7 +973,8 @@ describe('model-reducer', function () {
                 }
               }
             }
-          }
+          },
+          foo: {}
         }
       });
     });
@@ -1028,7 +1032,8 @@ describe('model-reducer', function () {
             foo: {
               '1': {}
             }
-          }
+          },
+          foo: {}
         }
       });
     });
