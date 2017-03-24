@@ -1,3 +1,6 @@
+## v3.2.2
+- 1 more bug fix with normalization
+
 ## v3.2.1
 - fixed model reducer handling with normalized results
 

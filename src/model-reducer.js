@@ -45,16 +45,20 @@ function reducer (options) {
       stateEntities = state.entities;
     }
 
-    stateEntities[entityType] = Object.assign({}, stateEntities && stateEntities[entityType]);
+    let _entities = stateEntities[entityType] = Object.assign({}, stateEntities && stateEntities[entityType]);
     if (result && !entities) {
       // our collection entity value is the results
-      stateEntities[entityType][id] = result;
+      _entities[id] = result;
     } else if (entities) {
       // in this case `result` and `id` will match because this is a normalized result
       stateEntities = state.entities = updateEntityModels(entities, stateEntities, id, entityType, meta.fetched);
-      if (result && entities[entityType] && entities[entityType][result]) {
+      _entities = stateEntities[entityType];
+      if (_entities[result]) {
         // result is the id
-        result = stateEntities[entityType][id];
+        result = _entities[id];
+      } else if (result) {
+        // result is the value
+        _entities[id] = result;
       }
     }
 
