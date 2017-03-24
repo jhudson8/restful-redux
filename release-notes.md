@@ -1,4 +1,9 @@
-##v3.1.2
+## v3.2
+- change reducer `afterReduce` and `beforeReduce` signature to include `state` as an attribute of the first parameter... `function ({action, id, entities, result, data, state}, meta)`
+    `meta` is now the 2nd parameter which is where model state is stored (is a fetch pending, was there an action error... stuff like that).  You can mutate this object directly in `afterReduce` as it has already been cloned
+- allow `successAction` and `errorAction` action creator attributes to be functions which will be given the response payload as the 1st parameter (they can still be plain objects like before)
+
+## v3.1.2
 - add more unit tests and fixed normalized entity type reducer overwriting bug
 
 ##v3.1.1

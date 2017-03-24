@@ -23,6 +23,16 @@ export default function (origState) {
       });
       return rtn;
     },
+    replaceAttributes: function (id, entityType, data) {
+      operation(entityType, function (ops) {
+        ops.push({
+          action: 'replaceAttributes',
+          id: id,
+          data: data
+        });
+      });
+      return rtn;
+    },
     replace: function (id, entityType, value, data) {
       operation(entityType, function (ops) {
         ops.push({ action: 'replace', id: 'id', value: value, data: data });
@@ -88,6 +98,19 @@ export default function (origState) {
               delete _entities[id];
               delete _meta[id];
               changeMade = true;
+            } else if (action === 'replaceAttributes') {
+              if (data.value) {
+                _entities[id] = replaceAttributes(_entities[id], data.value);
+                changeMade = true;
+              }
+              if (data.data) {
+                _meta[id] = Object.assign({}, _meta[id], { data: replaceAttributes(_meta[id] && _meta[id].data, data.data) });
+                changeMade = true;
+              }
+              if (data.meta) {
+                _meta[id] = Object.assign({}, replaceAttributes(_meta[id], data.meta));
+                changeMade = true;
+              }
             } else if (action === 'replace') {
               if (value) {
                 _entities[id] = value;
@@ -108,4 +131,22 @@ export default function (origState) {
     }
   };
   return rtn;
+}
+
+function replaceAttributes (source, replaceWith) {
+  if (!replaceWith) {
+    return source;
+  }
+  source = Object.assign({}, source);
+  for (var key in replaceWith) {
+    if (replaceWith.hasOwnProperty(key)) {
+      var value = replaceWith[key];
+      if (typeof value === 'undefined' || value === null) {
+        delete source[key];
+      } else {
+        source[key] = value;
+      }
+    }
+  }
+  return source;
 }

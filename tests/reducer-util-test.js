@@ -10,7 +10,9 @@ var initialState2 = {
         '1': {
           data: {
             customMetaProp: 'foo'
-          }
+          },
+          metaProp1: '1',
+          metaProp2: '2'
         },
         '2': {
           data: {
@@ -22,7 +24,8 @@ var initialState2 = {
     foo: {
       '1': {
         foo: 'abc',
-        beep: 'boop'
+        beep: 'boop',
+        aaa: 'bbb'
       },
       '2': {
         abc: 'def',
@@ -49,9 +52,26 @@ describe('reducer-util', function () {
         .replace('3', 'foo', { test3: 'test3' })
         .execute();
       expect(state).to.deep.equal({entities:{_meta:{foo:{
-        '1':{data:{customMetaProp:'foo'}},
+        '1':{data:{customMetaProp:'foo'},metaProp1:'1',metaProp2:'2'},
         '2':{data:{customMetaProp:'bar'}},
-        id:{'data':{'meta2':'test2'}}}},'foo':{'1':{'foo':'abc','beep':'boop'},'2':{'abc':'def','ghi':'jkl'},'id':{'test3':'test3'}}}});
+        id:{'data':{'meta2':'test2'}}}},'foo':{'1':{aaa:'bbb','foo':'abc','beep':'boop'},'2':{'abc':'def','ghi':'jkl'},'id':{'test3':'test3'}}}});
+    });
+    it('replaceAttributes', function () {
+      var state = reducerUtil(initialState2)
+        .replaceAttributes('1', 'foo', {
+          value: {
+            foo: null,
+            aaa: 'ccc'
+          },
+          data: {
+            abc: 'def'
+          },
+          meta: {
+            metaProp1: null
+          }
+        })
+        .execute();
+      expect(state).to.deep.equal({'entities':{'_meta':{'foo':{'1':{'data':{'customMetaProp':'foo','abc':'def'},'metaProp2':'2'},'2':{'data':{'customMetaProp':'bar'}}}},'foo':{'1':{'beep':'boop','aaa':'ccc'},'2':{'abc':'def','ghi':'jkl'}}}});
     });
     it('delete', function () {
       var spy = sinon.spy();
@@ -66,8 +86,8 @@ describe('reducer-util', function () {
       expect(spy.callCount).to.equal(2);
       expect(spy.firstCall.args).to.deep.equal([
         '1',
-        { foo: 'abc', beep: 'boop' },
-        { data: { customMetaProp: 'foo' } }
+        { aaa: 'bbb', foo: 'abc', beep: 'boop' },
+        { data: { customMetaProp: 'foo' }, metaProp1: '1', metaProp2: '2' }
       ]);
       expect(state).to.deep.equal({entities:{_meta:{foo:{'2':{data:{customMetaProp:'bar'}}}},foo:{'2':{abc:'def',ghi:'jkl'}}}});
       expect(initialState2).to.deep.equal(savedInitialState2);

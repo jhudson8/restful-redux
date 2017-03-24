@@ -41,7 +41,7 @@ function reducer (options) {
     stateEntities._meta = Object.assign({}, stateEntities._meta);
 
     if (beforeReduce) {
-      state = beforeReduce({ action, id, entities: stateEntities, result, data: meta.data }, state) || state;
+      state = beforeReduce({ action, id, entities: stateEntities, result, data: meta.data, state: state }, meta) || state;
       stateEntities = state.entities;
     }
 
@@ -96,7 +96,7 @@ function reducer (options) {
     }
 
     if (afterReduce) {
-      state = afterReduce({ action, id, entities: stateEntities, result, data: meta.data }, state) || state;
+      state = afterReduce({ action, id, entities: stateEntities, result, data: meta.data, state: state }, meta) || state;
     }
 
     // clear out any undefined fields

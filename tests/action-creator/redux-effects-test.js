@@ -132,6 +132,22 @@ describe('redux-effects-action-creator', function () {
       expect(dispatch.firstCall.args).to.deep.equal([{foo: 'success'}]);
     });
 
+    it('should handle success event as a function', function () {
+      var handler = function (payload) {
+        return Object.assign(payload, {test: 'foo'});
+      };
+      var action = fooActionCreator.createFetchAction({
+        id: '1',
+        url: 'http://foo.com/thing/1',
+        successAction: handler
+      });
+      var steps = action[0].meta.steps[0];
+      var successAction = steps[0]({ value: { foo: 'bar' } });
+      var dispatch = sinon.spy();
+      successAction[2](dispatch);
+      expect(dispatch.firstCall.args[0]).to.deep.equal({result: {foo: 'bar'}, id: '1', test: 'foo'});
+    });
+
     it('should normalize on success event', function () {
       var action = normalizedFooActionCreator.createFetchAction({
         id: '1',

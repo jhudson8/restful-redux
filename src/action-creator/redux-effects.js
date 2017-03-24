@@ -107,13 +107,17 @@ export default function (options) {
       if (debug) {
         log(`triggering ${actionType} with `, action);
       }
-
       const rtn = [genericAction, action, function (dispatch) {
         if (resolver) {
           resolver(payload);
         }
         if (reduxAction) {
-          dispatch(reduxAction);
+          if (typeof reduxAction === 'function') {
+            reduxAction = reduxAction(payload);
+          }
+          if (reduxAction) {
+            dispatch(reduxAction);
+          }
         }
       }];
 

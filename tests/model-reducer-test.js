@@ -270,8 +270,8 @@ describe('model-reducer', function () {
       const reducer = createReducer({
         entityType: 'foo',
         actionPrefix: 'FOO',
-        beforeReduce: function (data, state) {
-          return Object.assign({ foo: 'bar' }, state);
+        beforeReduce: function (data) {
+          return Object.assign({ foo: 'bar' }, data.state);
         }
       });
       const state = reducer(emptyState, {
@@ -312,8 +312,8 @@ describe('model-reducer', function () {
       const reducer = createReducer({
         entityType: 'foo',
         actionPrefix: 'FOO',
-        afterReduce: function (data, state) {
-          return Object.assign({ foo: 'bar' }, state);
+        afterReduce: function (data) {
+          return Object.assign({ foo: 'bar' }, data.state);
         }
       });
       const state = reducer(emptyState, {
