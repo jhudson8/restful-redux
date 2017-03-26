@@ -55,7 +55,7 @@ var normalizedEntities = {
   }
 };
 
-function options(entitiesOrMeta, isEntities, options) {
+function options (entitiesOrMeta, isEntities, options) {
   var entities = isEntities ? entitiesOrMeta : copyMetaEntities(entitiesOrMeta);
   return Object.assign({
     id: '1',
@@ -223,10 +223,19 @@ describe('model', function () {
 
 
   describe('alternative constructors', function () {
-    it('(id, value)', function () {
-      var model = new Model('1', {_meta: {data: {abc: 'def'}}, foo: 'bar'});
-      expect(model.value()).to.deep.eql({_meta: {data: {abc: 'def'}}, foo: 'bar'});
-      expect(model.data()).to.deep.eql({abc: 'def'});
+    it('(id, value, meta)', function () {
+      var model = new Model('1', { foo: 'bar' }, { data: { abc: 'def' }, fetch: { success: true }, action: { id: 'test', error: { ghi: 'jkl' } } });
+      expect(model.value()).to.deep.eql({ foo: 'bar' });
+      expect(model.data()).to.deep.eql({ abc: 'def' });
+      expect(model.wasFetched()).to.equal(true);
+      expect(model.wasActionPerformed('test')).to.deep.equal({ id: 'test', error: { ghi: 'jkl' } });
+    });
+    it('(ivalue, meta)', function () {
+      var model = new Model({ id: '1', foo: 'bar' }, { data: { abc: 'def' }, fetch: { success: true }, action: { id: 'test', error: { ghi: 'jkl' } } });
+      expect(model.value()).to.deep.eql({ id: '1', foo: 'bar' });
+      expect(model.data()).to.deep.eql({ abc: 'def' });
+      expect(model.wasFetched()).to.equal(true);
+      expect(model.wasActionPerformed('test')).to.deep.equal({ id: 'test', error: { ghi: 'jkl' } });
     });
   });
 
@@ -234,20 +243,20 @@ describe('model', function () {
   describe('wasFetched', function () {
     it('should return "exists" if the model exists with no meta value', function () {
       var model = new Model(options(noMetaEntities, true));
-      expect(model.wasFetched()).to.deep.equal({ type: 'set' });
+      expect(model.wasFetched()).to.deep.equal('exists');
     });
 
     it('should return the meta "fetched" if exists', function () {
-      var model = new Model(options({ fetched: 'full' }));
-      expect(model.wasFetched()).to.equal('full');
+      var model = new Model(options({ fetch: { success: 'fetched' } }));
+      expect(model.wasFetched()).to.equal('fetched');
     });
   });
 
 
   describe('isFetchPending', function () {
-    it('should return true if a fetch is pending', function () {
-      var model = new Model(options({ fetchInitiatedAt: 'foo', fetchPending: true }));
-      expect(model.isFetchPending()).to.deep.equal({ initiatedAt: 'foo' });
+    it('should return "initiatedAt" timestamp (or true) if a fetch is pending', function () {
+      var model = new Model(options({ fetch: { pending: true, initiatedAt: 12345 } }));
+      expect(model.isFetchPending()).to.equal(12345);
     });
 
     it('should return false if a fetch is not pending', function () {
@@ -264,7 +273,7 @@ describe('model', function () {
 
   describe('fetchError', function () {
     it('should return the fetch error', function () {
-      var model = new Model(options({ fetchError: {foo: 'bar'} }));
+      var model = new Model(options({ fetch: { error: {foo: 'bar'} } }));
       expect(model.fetchError()).to.deep.equal({foo: 'bar'});
     });
 
@@ -277,17 +286,17 @@ describe('model', function () {
 
   describe('isActionPending', function () {
     it('should return the action id if any action is pending', function () {
-      var model = new Model(options({ actionPending: true, actionId: 'foo', actionInitiatedAt: 'bar' }));
-      expect(model.isActionPending()).to.deep.equal({ id: 'foo', initiatedAt: 'bar' });
+      var model = new Model(options({ action: { id: 'foo', pending: true, initiatedAt: 12345 } }));
+      expect(model.isActionPending()).to.deep.equal({ id: 'foo', pending: true, initiatedAt: 12345 });
     });
 
     it('should return true if a specific action is pending', function () {
-      var model = new Model(options({ actionPending: true, actionId: 'foo', actionInitiatedAt: 'bar' }));
-      expect(model.isActionPending()).to.deep.equal({ id: 'foo', initiatedAt: 'bar' });
+      var model = new Model(options({ action: { id: 'foo', pending: true, initiatedAt: 12345 } }));
+      expect(model.isActionPending()).to.deep.equal({ id: 'foo', pending: true, initiatedAt: 12345 });
     });
 
     it('should return false if a different action is pending', function () {
-      var model = new Model(options({ actionPending: true, actionId: 'foo' }));
+      var model = new Model(options({ action: { id: 'foo', pending: true, initiatedAt: 12345 } }));
       expect(model.isActionPending('bar')).to.equal(false);
     });
 
@@ -305,28 +314,28 @@ describe('model', function () {
 
   describe('wasActionPerformed', function () {
     it('should return the action details if any action was performed', function () {
-      var model = new Model(options({ actionId: 'foo', actionResponse: { foo: 'bar' }, actionCompletedAt: 'abc', actionInitiatedAt: 'def' }));
-      expect(model.wasActionPerformed()).to.deep.equal({ id: 'foo', success: { foo: 'bar' }, error: undefined, completedAt: 'abc', initiatedAt: 'def' });
+      var model = new Model(options({ action: { id: 'foo', success: { foo: 'bar'}, completedAt: 12345 } }));
+      expect(model.wasActionPerformed()).to.deep.equal({ id: 'foo', success: { foo: 'bar'}, completedAt: 12345 });
     });
 
     it('should return action details if a specific action was performed', function () {
-      var model = new Model(options({ actionId: 'foo', actionResponse: { foo: 'bar' }, actionCompletedAt: 'abc', actionInitiatedAt: 'def' }));
-      expect(model.wasActionPerformed('foo')).to.deep.equal({ id: 'foo', success: { foo: 'bar' }, error: undefined, completedAt: 'abc', initiatedAt: 'def' });
+      var model = new Model(options({ action: { id: 'foo', success: { foo: 'bar'}, completedAt: 12345 } }));
+      expect(model.wasActionPerformed('foo')).to.deep.equal({ id: 'foo', success: { foo: 'bar'}, completedAt: 12345 });
     });
 
     it('should return action error details if an action failed', function () {
-      var model = new Model(options({ actionId: 'foo', actionError: { foo: 'bar' }, actionCompletedAt: 'abc', actionInitiatedAt: 'def' }));
-      expect(model.wasActionPerformed('foo')).to.deep.equal({ id: 'foo', error: { foo: 'bar' }, success: undefined, completedAt: 'abc', initiatedAt: 'def' });
+      var model = new Model(options({ action: { id: 'foo', error: { foo: 'bar'}, completedAt: 12345 } }));
+      expect(model.wasActionPerformed('foo')).to.deep.equal({ id: 'foo', error: { foo: 'bar'}, completedAt: 12345 });
     });
 
-    it('should return undefined if a different action was performed', function () {
-      var model = new Model(options({ actionId: 'foo', actionError: { foo: 'bar' } }));
-      expect(model.wasActionPerformed('bar')).to.equal(undefined);
+    it('should return false if a different action was performed', function () {
+      var model = new Model(options({ id: 'foo', error: { foo: 'bar'}, completedAt: 12345 }));
+      expect(model.wasActionPerformed('bar')).to.equal(false);
     });
 
-    it('should return undefined if an action was not performed', function () {
+    it('should return false if an action was not performed', function () {
       var model = new Model(options({ }));
-      expect(model.wasActionPerformed()).to.equal(undefined);
+      expect(model.wasActionPerformed()).to.equal(false);
     });
   });
 

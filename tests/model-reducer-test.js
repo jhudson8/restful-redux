@@ -62,13 +62,15 @@ var bubbleUpTestState = {
     _meta: {
       fooList: {
         'l1': {
-          fetched: { type: 'full' }
+          fetch: { success: 'fetched' }
         }
       },
       foo: {
         '1': {
-          fetched: { type: 'normalized' },
-          fetchedBy: { entityType: 'fooList', id: 'l1' }
+          fetch: {
+            success: 'normalized',
+            source: { entityType: 'fooList', id: 'l1' }
+          }
         }
       }
     },
@@ -265,7 +267,7 @@ describe('model-reducer', function () {
     });
   });
 
-  describe('lifeycle callbacks', function () {
+  describe('lifecycle callbacks', function () {
     it('beforeReduce', function () {
       const reducer = createReducer({
         entityType: 'foo',
@@ -287,15 +289,15 @@ describe('model-reducer', function () {
           }
         }
       });
-      delete state.entities._meta.foo['1'].fetched.completedAt;
+      delete state.entities._meta.foo['1'].fetch.completedAt;
       expect(state).to.deep.equal({
         foo: 'bar',
         entities: {
           _meta: {
             foo: {
               '1': {
-                fetched: {
-                  type: 'full'
+                fetch: {
+                  success: 'fetched'
                 }
               }
             }
@@ -329,15 +331,15 @@ describe('model-reducer', function () {
           }
         }
       });
-      delete state.entities._meta.foo['1'].fetched.completedAt;
+      delete state.entities._meta.foo['1'].fetch.completedAt;
       expect(state).to.deep.equal({
         foo: 'bar',
         entities: {
           _meta: {
             foo: {
               '1': {
-                fetched: {
-                  type: 'full'
+                fetch: {
+                  success: 'fetched'
                 }
               }
             }
@@ -369,15 +371,15 @@ describe('model-reducer', function () {
       });
       expect(emptyState).to.deep.equal(savedEmptyState);
       // don't deal with dymanic value
-      expect(!!state.entities._meta.foo['1'].fetched.completedAt).to.equal(true);
-      delete state.entities._meta.foo['1'].fetched.completedAt;
+      expect(!!state.entities._meta.foo['1'].fetch.completedAt).to.equal(true);
+      delete state.entities._meta.foo['1'].fetch.completedAt;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
             foo: {
               '1': {
-                fetched: {
-                  type: 'full'
+                fetch: {
+                  success: 'fetched'
                 }
               }
             }
@@ -419,21 +421,21 @@ describe('model-reducer', function () {
         }
       });
 
-      delete state.entities._meta.foo['1'].fetched.completedAt;
-      delete state.entities._meta.foo['2'].fetched.completedAt;
+      delete state.entities._meta.foo['1'].fetch.completedAt;
+      delete state.entities._meta.foo['2'].fetch.completedAt;
 
       expect(state).to.deep.equal({
         entities: {
           _meta: {
             foo: {
               '1': {
-                fetched: {
-                  type: 'full'
+                fetch: {
+                  success: 'fetched'
                 }
               },
               '2': {
-                fetched: {
-                  type: 'full'
+                fetch: {
+                  success: 'fetched'
                 }
               }
             }
@@ -466,21 +468,21 @@ describe('model-reducer', function () {
         }
       });
 
-      delete state.entities._meta.foo['1'].fetched.completedAt;
-      delete state.entities._meta.foo['2'].fetched.completedAt;
+      delete state.entities._meta.foo['1'].fetch.completedAt;
+      delete state.entities._meta.foo['2'].fetch.completedAt;
 
       expect(state).to.deep.equal({
         entities: {
           _meta: {
             foo: {
               '1': {
-                fetched: {
-                  type: 'full'
+                fetch: {
+                  success: 'fetched'
                 }
               },
               '2': {
-                fetched: {
-                  type: 'full'
+                fetch: {
+                  success: 'fetched'
                 }
               }
             }
@@ -519,21 +521,21 @@ describe('model-reducer', function () {
         }
       });
 
-      delete state.entities._meta.foo['1'].fetched.completedAt;
-      delete state.entities._meta.foo['2'].fetched.completedAt;
+      delete state.entities._meta.foo['1'].fetch.completedAt;
+      delete state.entities._meta.foo['2'].fetch.completedAt;
 
       expect(state).to.deep.equal({
         entities: {
           _meta: {
             foo: {
               '1': {
-                fetched: {
-                  type: 'full'
+                fetch: {
+                  success: 'fetched'
                 }
               },
               '2': {
-                fetched: {
-                  type: 'full'
+                fetch: {
+                  success: 'fetched'
                 }
               }
             }
@@ -565,15 +567,15 @@ describe('model-reducer', function () {
         }
       });
       expect(initialState1).to.deep.equal(savedInitialState1);
-      expect(!!state.entities._meta.foo['1'].fetched.completedAt).to.equal(true);
-      delete state.entities._meta.foo['1'].fetched.completedAt;
+      expect(!!state.entities._meta.foo['1'].fetch.completedAt).to.equal(true);
+      delete state.entities._meta.foo['1'].fetch.completedAt;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
             foo: {
               '1': {
-                fetched: {
-                  type: 'full'
+                fetch: {
+                  success: 'fetched'
                 },
                 data: {
                   customMetaProp: 'foo'
@@ -610,17 +612,17 @@ describe('model-reducer', function () {
         }
       });
       expect(initialState1).to.deep.equal(savedInitialState1);
-      expect(!!state.entities._meta.foo['1'].fetched.completedAt).to.equal(true);
-      delete state.entities._meta.foo['1'].fetched.completedAt;
-      expect(!!state.entities._meta.bar['1'].fetchedBy.completedAt).to.equal(true);
-      delete state.entities._meta.bar['1'].fetchedBy.completedAt;
+      expect(typeof state.entities._meta.foo['1'].fetch.completedAt).to.equal('number');
+      delete state.entities._meta.foo['1'].fetch.completedAt;
+      expect(typeof state.entities._meta.bar['1'].fetch.completedAt).to.equal('number');
+      delete state.entities._meta.bar['1'].fetch.completedAt;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
             foo: {
               '1': {
-                fetched: {
-                  type: 'full'
+                fetch: {
+                  success: 'fetched'
                 },
                 data: {
                   customMetaProp: 'foo'
@@ -629,13 +631,12 @@ describe('model-reducer', function () {
             },
             bar: {
               '1': {
-                fetched: {
-                  type: 'normalized'
-                },
-                fetchedBy: {
-                  entityType: 'foo',
-                  id: '1',
-                  type: 'full'
+                fetch: {
+                  success: 'normalized',
+                  source: {
+                    entityType: 'foo',
+                    id: '1'
+                  }
                 }
               }
             }
@@ -672,15 +673,15 @@ describe('model-reducer', function () {
         }
       });
       // don't deal with dymanic value
-      expect(!!state.entities._meta.foo['1'].fetched.completedAt).to.equal(true);
-      delete state.entities._meta.foo['1'].fetched.completedAt;
+      expect(!!state.entities._meta.foo['1'].fetch.completedAt).to.equal(true);
+      delete state.entities._meta.foo['1'].fetch.completedAt;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
             foo: {
               '1': {
-                fetched: {
-                  type: 'full'
+                fetch: {
+                  success: 'fetched'
                 },
                 data: {
                   abc: 'def'
@@ -706,14 +707,16 @@ describe('model-reducer', function () {
         payload: { id: '1' }
       });
       expect(emptyState).to.deep.equal(savedEmptyState);
-      expect(!!state.entities._meta.foo['1'].fetchInitiatedAt).to.equal(true);
-      delete state.entities._meta.foo['1'].fetchInitiatedAt;
+      expect(typeof state.entities._meta.foo['1'].fetch.initiatedAt).to.equal('number');
+      delete state.entities._meta.foo['1'].fetch.initiatedAt;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
             foo: {
               '1': {
-                fetchPending: true
+                fetch: {
+                  pending: true
+                }
               }
             }
           },
@@ -727,14 +730,16 @@ describe('model-reducer', function () {
         payload: { id: '1' }
       });
       expect(initialState1).to.deep.equal(savedInitialState1);
-      expect(!!state.entities._meta.foo['1'].fetchInitiatedAt).to.equal(true);
-      delete state.entities._meta.foo['1'].fetchInitiatedAt;
+      expect(typeof state.entities._meta.foo['1'].fetch.initiatedAt).to.equal('number');
+      delete state.entities._meta.foo['1'].fetch.initiatedAt;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
             foo: {
               '1': {
-                fetchPending: true,
+                fetch: {
+                  pending: true
+                },
                 data: {
                   customMetaProp: 'foo'
                 }
@@ -765,13 +770,17 @@ describe('model-reducer', function () {
         }
       });
       expect(emptyState).to.deep.equal(savedEmptyState);
+      expect(typeof state.entities._meta.foo['1'].fetch.completedAt).to.equal('number');
+      delete state.entities._meta.foo['1'].fetch.completedAt;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
             foo: {
               '1': {
-                fetchError: {
-                  code: 'bad'
+                fetch: {
+                  error: {
+                    code: 'bad'
+                  }
                 }
               }
             }
@@ -791,13 +800,17 @@ describe('model-reducer', function () {
         }
       });
       expect(initialState1).to.deep.equal(savedInitialState1);
+      expect(typeof state.entities._meta.foo['1'].fetch.completedAt).to.equal('number');
+      delete state.entities._meta.foo['1'].fetch.completedAt;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
             foo: {
               '1': {
-                fetchError: {
-                  code: 'bad'
+                fetch: {
+                  error: {
+                    code: 'bad'
+                  },
                 },
                 data: {
                   customMetaProp: 'foo'
@@ -825,17 +838,18 @@ describe('model-reducer', function () {
         }
       });
       expect(emptyState).to.deep.equal(savedEmptyState);
-      expect(!!state.entities._meta.foo['1'].actionCompletedAt).to.equal(true);
-      delete state.entities._meta.foo['1'].actionCompletedAt;
+      expect(typeof state.entities._meta.foo['1'].action.completedAt).to.equal('number');
+      delete state.entities._meta.foo['1'].action.completedAt;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
             foo: {
               '1': {
-                actionId: 'test',
-                actionSuccess: true,
-                actionResponse: {
-                  foo: 'bar'
+                action: {
+                  id: 'test',
+                  success: {
+                    foo: 'bar'
+                  }
                 }
               }
             }
@@ -860,15 +874,17 @@ describe('model-reducer', function () {
         }
       });
       expect(initialState1).to.deep.equal(savedInitialState1);
-      expect(!!state.entities._meta.foo['1'].actionCompletedAt).to.equal(true);
-      delete state.entities._meta.foo['1'].actionCompletedAt;
+      expect(typeof state.entities._meta.foo['1'].action.completedAt).to.equal('number');
+      delete state.entities._meta.foo['1'].action.completedAt;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
             foo: {
               '1': {
-                actionId: 'test',
-                actionSuccess: true,
+                action: {
+                  id: 'test',
+                  success: true
+                },
                 data: {
                   customMetaProp: 'foo'
                 }
@@ -896,15 +912,17 @@ describe('model-reducer', function () {
         }
       });
       expect(emptyState).to.deep.equal(savedEmptyState);
-      expect(!!state.entities._meta.foo['1'].actionInitiatedAt).to.equal(true);
-      delete state.entities._meta.foo['1'].actionInitiatedAt;
+      expect(typeof state.entities._meta.foo['1'].action.initiatedAt).to.equal('number');
+      delete state.entities._meta.foo['1'].action.initiatedAt;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
             foo: {
               '1': {
-                actionId: 'bar',
-                actionPending: true
+                action: {
+                  id: 'bar',
+                  pending: true
+                }
               }
             }
           },
@@ -921,15 +939,17 @@ describe('model-reducer', function () {
         }
       });
       expect(initialState1).to.deep.equal(savedInitialState1);
-      expect(!!state.entities._meta.foo['1'].actionInitiatedAt).to.equal(true);
-      delete state.entities._meta.foo['1'].actionInitiatedAt;
+      expect(typeof state.entities._meta.foo['1'].action.initiatedAt).to.equal('number');
+      delete state.entities._meta.foo['1'].action.initiatedAt;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
             foo: {
               '1': {
-                actionId: 'bar',
-                actionPending: true,
+                action: {
+                  id: 'bar',
+                  pending: true
+                },
                 data: {
                   customMetaProp: 'foo'
                 }
@@ -960,16 +980,18 @@ describe('model-reducer', function () {
         }
       });
       expect(emptyState).to.deep.equal(savedEmptyState);
-      expect(!!state.entities._meta.foo['1'].actionCompletedAt).to.equal(true);
-      delete state.entities._meta.foo['1'].actionCompletedAt;
+      expect(typeof state.entities._meta.foo['1'].action.completedAt).to.equal('number');
+      delete state.entities._meta.foo['1'].action.completedAt;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
             foo: {
               '1': {
-                actionId: 'bar',
-                actionError: {
-                  abc: 'def'
+                action: {
+                  id: 'bar',
+                  error: {
+                    abc: 'def'
+                  }
                 }
               }
             }
@@ -990,16 +1012,18 @@ describe('model-reducer', function () {
         }
       });
       expect(initialState1).to.deep.equal(savedInitialState1);
-      expect(!!state.entities._meta.foo['1'].actionCompletedAt).to.equal(true);
-      delete state.entities._meta.foo['1'].actionCompletedAt;
+      expect(typeof state.entities._meta.foo['1'].action.completedAt).to.equal('number');
+      delete state.entities._meta.foo['1'].action.completedAt;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
             foo: {
               '1': {
-                actionId: 'bar',
-                actionError: {
-                  abc: 'def'
+                action: {
+                  id: 'bar',
+                  error: {
+                    abc: 'def'
+                  }
                 },
                 data: {
                   customMetaProp: 'foo'
@@ -1067,10 +1091,10 @@ describe('model-reducer', function () {
     it('should actually clear out an action', function () {
       let state = JSON.parse(JSON.stringify(initialState1));
       const meta = state.entities._meta.foo['1'];
-      meta.actionId = 'actionId';
-      meta.actionResponse = 'foo';
-      meta.actionError = 'bar';
-      meta.actionSuccess = true;
+      meta.action = {
+        id: 'actionId',
+        success: 'foo'
+      };
       state = fooReducer(state, {
         type: 'FOO_ACTION_CLEAR',
         payload: { id: '1' }

@@ -271,6 +271,27 @@ describe('redux-effects-action-creator', function () {
       });
     });
 
+    it('should obey `replaceModel`', function () {
+      var action = fooActionCreator.createPostAction({
+        id: '1',
+        actionId: 'beep',
+        url: 'http://foo.com/thing/1',
+        replaceModel: true
+      });
+      var steps = action[0].meta.steps[0];
+      var successAction = steps[0]({ value: { foo: 'bar' } });
+      expect(successAction[1]).to.deep.equal({
+        type: 'FOO_ACTION_SUCCESS',
+        payload: {
+          id: '1',
+          actionId: 'beep',
+          result: {
+            foo: 'bar'
+          }
+        }
+      });
+    });
+
     it('should handle error event', function () {
       var action = fooActionCreator.createPostAction({
         id: '1',

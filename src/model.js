@@ -7,17 +7,22 @@
 const NO_ID = '_noid_';
 
 export default class Model {
-  constructor (options, value) {
+  constructor (options, value, meta) {
     let entities;
     let id;
     let entityType;
-    let meta;
-    if (value) {
-      // (id, value)
-      id = determineId(options);
-      options = undefined;
-      meta = value._meta;
-      options = {};
+    if (typeof meta !== 'undefined' || typeof value !== 'undefined') {
+      if (meta) {
+        // (id, value, meta)
+        id = options;
+        options = {};
+      } else {
+        // (value, meta)
+        meta = value;
+        value = options;
+        options = {};
+        id = determineId(value.id);
+      }
     } else {
       // (options)
       id = determineId(options.id);
@@ -90,27 +95,41 @@ export default class Model {
    * Return true if the model has been fetched
    */
   wasFetched () {
-    return this._fetchedInfo;
+    let rtn = this._meta.fetch && this._meta.fetch.success;
+    if (!rtn && this.value()) {
+      rtn = 'exists';
+    }
+    return rtn;
   }
 
   canBeFetched () {
-    return !(this._meta.fetchPending || this._meta.fetchError || this._meta.fetched || this.value());
+    const meta = this._meta;
+    const fetchData = meta.fetch;
+    if (fetchData) {
+      if (fetchData.pending) {
+        return false;
+      } else {
+        return !(fetchData.success || this.value());
+      }
+    } else {
+      return this.value() ? false : true;
+    }
   }
 
   /**
    * Return a boolean indicating if a model fetch is currently in progress
    */
   isFetchPending () {
-    return this._meta.fetchPending ? {
-      initiatedAt: this._meta.fetchInitiatedAt
-    } : false;
+    const fetchData = this._meta.fetch;
+    return fetchData && fetchData.pending && (fetchData.initiatedAt || true) || false;
   }
 
   /**
    * Return a fetch error if one was encountered
    */
   fetchError () {
-    return this._meta.fetchError;
+    const fetchData = this._meta.fetch;
+    return fetchData && fetchData.error;
   }
 
   /**
@@ -118,13 +137,10 @@ export default class Model {
    * @param {string} id: optinal identifier to see if a specific action is currently in progress
    */
   isActionPending (actionId) {
-    const meta = this._meta;
-    if (meta.actionPending) {
-      if (actionId ? meta.actionId === actionId : true) {
-        return {
-          id: meta.actionId,
-          initiatedAt: meta.actionInitiatedAt
-        };
+    const actionData = this._meta.action;
+    if (actionData) {
+      if (actionId ? actionData.id === actionId : true && actionData.pending) {
+        return actionData;
       }
     }
     return false;
@@ -134,25 +150,22 @@ export default class Model {
    * Return true if either a fetch or action is pending
    */
   isPending (id) {
-    return this.isFetchPending() || this.isActionPending(id);
+    return !!(this.isFetchPending() || this.isActionPending(id));
   }
 
   /**
    * If an action was performed and successful, return { id, success, error }.  `success` and `error` will be mutually exclusive and will
    * represent the XHR response payload
-   * @paramm {string} id: optional action id to only return true if a specific action was performed
+   * @paramm {string} actionId: optional action id to only return true if a specific action was performed
    */
-  wasActionPerformed (id) {
-    const meta = this._meta;
-    if (!meta.actionPending && meta.actionId && (!id || id === meta.actionId)) {
-      return {
-        id: meta.actionId,
-        success: meta.actionResponse,
-        error: meta.actionError,
-        initiatedAt: meta.actionInitiatedAt,
-        completedAt: meta.actionCompletedAt
-      };
+  wasActionPerformed (actionId) {
+    const actionData = this._meta.action;
+    if (actionData) {
+      if (actionId ? actionData.id === actionId : true && !actionData.pending) {
+        return actionData;
+      }
     }
+    return false;
   }
 }
 
