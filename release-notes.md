@@ -1,3 +1,6 @@
+## v3.3.1
+fix bug to ensure that the `pending` attribute is removed once the XHR request comes back
+
 ## v3.3.0
 Unless you were working with metadata directly these changes are all under the covers.  The data shape of the fetch/action loading state has been change to be similar.  See the new doc (unit testing) for more details on the shape.
 

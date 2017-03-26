@@ -159,6 +159,7 @@ function reducer (options) {
       fetch: {
         success: 'fetched',
         error: undefined,
+        pending: undefined,
         _timestamp: 'completedAt'
       },
       action: undefined
@@ -171,6 +172,7 @@ function reducer (options) {
         success: 'set',
         initiatedAt: undefined,
         error: undefined,
+        pending: undefined,
         _timestamp: 'completedAt',
       },
       fetchPending: undefined,
@@ -194,7 +196,7 @@ function reducer (options) {
       fetch: {
         _timestamp: 'completedAt',
         success: undefined,
-        pending: undefined,
+        pending: undefined
       },
       _responseProp: ['fetch', 'error']
     }
