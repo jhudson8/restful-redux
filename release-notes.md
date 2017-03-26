@@ -1,3 +1,8 @@
+## v3.3.0
+Unless you were working with metadata directly these changes are all under the covers.  The data shape of the fetch/action loading state has been change to be similar.  See the new doc (unit testing) for more details on the shape.
+
+Note: with your action creators, if a defined `errorAction` or `successAction` are functions, they will have the XHR response as the first parameter so, if using thunk you should return a function; e.g. `successAction: function (response) { return function (dispatch) {...}; }`
+
 ## v3.2.2
 - 1 more bug fix with normalization
 
