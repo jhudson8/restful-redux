@@ -61,6 +61,8 @@ See [./redux-actions.md](./redux-actions.md) if you want to know the action shap
 * ***successAction***: optional action to be dispatched if the XHR is successful: function(_normalized_payload_)
 * ***errorAction***: optional action to be dispatched if the XHR is not successful: function({id, actionId, response})
 
+note: if the errorAction or successAction are functions, they will have the XHR response as the first parameter so, if using thunk you should return a function `successAction: function (response) { return function (dispatch) {...}; }`
+
 ##### example
 ```javascript
 export function fetch (id) {

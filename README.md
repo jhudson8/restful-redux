@@ -102,6 +102,7 @@ That's it!  The `modelProvider` is expected to be wrapped in a `smart component`
 * [Model Provider React component](./docs/model-provider.md)
 * [Model Class](./docs/model.md)
 * [Model Reducer](./docs/model-reducer.md)
+* [Unit Testing](./docs/unit-testing.md) (creating models which simulate different states)
 
 
 ## Examples
