@@ -1,3 +1,6 @@
+## v3.1.2
+fix action pending state
+
 ## v3.3.1
 fix bug to ensure that the `pending` attribute is removed once the XHR request comes back
 
