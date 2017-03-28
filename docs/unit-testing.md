@@ -31,6 +31,7 @@ new Model(_model_value_, { fetch: { success: true } });
 
 ### Fetched With Error
 ```
+// technically the error response shape would be { headers, status, statusText, url, value } but the Model class doesn't care
 new Model(_model_value_, { fetch: { error: {...error response payload} } });
 ```
 
@@ -46,6 +47,7 @@ new Model(_model_value_, { action: { id: _action_id_, success: true } });
 
 ### Action With Error
 ```
+// technically the error response shape would be { headers, status, statusText, url, value } but the Model class doesn't care
 new Model(_model_value_, { action: { id: _action_id_, error: {...error response payload} } });
 ```
 

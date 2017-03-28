@@ -1,0 +1,157 @@
+Collections
+-----------
+Collections don't have to be any different than models (in other words an array can be returned from `model.getValue()`).  See the main [README](../README.md) page to do this without advanced functionality.
+
+If you [normalize](https://github.com/paularmstrong/normalizr) your collection you can track action/fetch XHR state for each item in the collection individually.
+
+This is an example using an API to fetch and display users that belong to a group.  See sibling docs for more details on the code listed below.
+
+## Tracking XHR status for individual collection items
+This simple example shows a list of products and shows a loading indicator when a product is being added to cart.
+
+Assume our product search response returns a shape of `{ totalCount: _number_, products: [...] }`
+### Normalizr Schema
+This is how the magic happens.  We normalize the results and extract the array of product values to an array of ids
+with the product data stored separately
+```
+import { schema } from 'normalizr';
+
+// the schema.Entity parameter will match our `entityType` value
+export productSchema = new schema.Entity('product');
+export productCollectionSchema = new schema.Array(productSchema);
+```
+
+### Action Creators
+This is similar to the basic example except we
+
+* apply the `productCollectionSchema` to the response
+* use a formatter to move the `totalCount` value to `data` (model.data()) because now the `model.value()` must return an array
+```javascript
+import { createActionCreator } from 'restful-redux';
+import { productCollectionSchema } from './schemas';
+
+// this will handle our product search action
+const productCollectionActionCreator = createActionCreator({
+  entityType: 'products',
+  actionPrefix: 'PRODUCTS',
+  schema: productCollectionSchema,
+  formatter: function (response) {
+    return {
+      value: response.products,
+      data: {
+        totalCount: response.totalCount
+      }
+    };
+  }
+});
+
+// this will handle our add to cart action
+const productActionCreator = createActionCreator({
+  entityType: 'products',
+  actionPrefix: 'PRODUCTS'
+});
+
+// action creator to initiate a product search fetch
+export function searchProducts (searchTerm) {
+  return productCollectionActionCreator.fetch({
+    id: searchTerm,
+    url: `/api/products/search/${searchTerm}`
+  });
+}
+
+// action creator to initiate a product related add to cart
+export function addToCart (productId) {
+  return productCollectionActionCreator.post({
+    id: productId,
+    // actionId allows us to track the XHR state of this specific action for this specific product
+    actionId: 'addToCart',
+    url: `/api/products/search/${searchTerm}`,
+    // we'll assume the response will return the new product details (with a count of the quantity in cart)
+    replaceModel: true
+  });
+}
+```
+
+### Reducer
+```javascript
+import { createReducer, chainReducers } from 'restful-redux';
+
+// nothing functionally different here from the basic example
+export default chainReducers(
+  createReducer({
+    entityType: 'products',
+    actionPrefix: 'PRODUCTS'
+  }),
+  createReducer({
+    entityType: 'product',
+    actionPrefix: 'PRODUCT'
+  })
+);
+```
+
+### React Component Model Provider
+```javascript
+import { modelProvider } from 'restful-redux';
+import { searchProducts, addToCart } from './actions';
+
+function ProductListComponent ({ model, addToCart, params }) {
+  const products = model.value();
+  if (model.fetchError()) {
+    // model.fetchError() returns the error payload: { headers, status, statusText, url, value }
+    return <div>Sorry, we couldn't load your products</div>
+  } else if (model.isFetchPending()) {
+    return <div>Loading your products</div>;
+  } else {
+    // normally you would decompose product details to a separate component but we're keeping it simple here
+    return (
+      <ul>
+        {products.map(product) => (
+          <li>
+            {product.name} {product.quantityInCart} in cart
+            {/* notice how we can refer to restful-redux model functions in our collection items */}
+            {product.isActionPending('addToCart')
+              ? <span>adding to cart...</span>
+              : <button onClick={(ev) => addToCart(product.id)}>Add to cart</button>
+            }
+          </li>
+        )}
+      </ul>
+    );
+  }
+}
+
+function mapPropsToState (state) {
+  // simple example assumes we aren't using `combineReducers` so we're just using global state to hold our entities
+  return {
+    entities: state
+  };
+}
+
+function mapDispatchToProps (dispatch) {
+  return {
+    fetch: (searchTerm) => dispatch()
+  }
+}
+
+// assuming we're using react-router with a route of /products/{searchTerm} (`props.params.searchTerm` will be our search term)
+export modelProvider({
+  id: 'params.searchTerm',
+  entityType: 'products',
+  fetchProp: 'fetchProducts'
+})(UserProfileComponent);
+```
+
+## Collection with normalization (and item specific actions / loading state)
+All we need to do is create a normalizr schema so that our collection get stored in a way that item values are stored separately from their collection.
+
+### Normalizr schema
+```
+import { schema } from 'normalizr';
+
+// the schema.Entity parameter will match our `entityType` value
+const userSchema = new schema.Entity('user');
+const userCollectionSchema = new schema.Array(userSchema);
+```
+
+### reducer
+Now were going to include an `refresh` function for an individual

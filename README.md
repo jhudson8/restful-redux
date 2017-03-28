@@ -74,7 +74,7 @@ function UserProfileComponent ({ model }) {
   if (model.isFetchPending()) {
     return <div>Loading...</div>;
   } else if (model.fetchError()) {
-    // you can also get more details from the fetchError response
+    // model.fetchError() actually returns the error payload: { headers, status, statusText, url, value }
     return <div>Fetch error...</div>
   } else {
     const user = model.value();

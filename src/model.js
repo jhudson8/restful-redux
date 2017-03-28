@@ -21,7 +21,7 @@ export default class Model {
         meta = value;
         value = options;
         options = {};
-        id = determineId(value.id);
+        id = value ? determineId(value.id) : NO_ID;
       }
     } else {
       // (options)
@@ -139,7 +139,7 @@ export default class Model {
   isActionPending (actionId) {
     const actionData = this._meta.action;
     if (actionData) {
-      if (actionId ? actionData.id === actionId : true && actionData.pending) {
+      if ((actionId ? actionData.id === actionId : true) && actionData.pending) {
         return actionData;
       }
     }
