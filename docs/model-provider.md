@@ -2,8 +2,6 @@ Model Provider
 ---------------
 A React class used to auto-fetch and inject Model objects (which wrap your model data) into the React properties.  This of this like a smart (as in smart vs. dumb) component for higher order model association.
 
-TODO: update example apps to use denormalizr from the normalizr package (rather than the separate denormalizr package).
-
 ### Example
 [../examples/01-github-profile-viewer/lib/profile-page/index.js](../examples/01-github-profile-viewer/lib/profile-page/index.js)
 
@@ -79,4 +77,7 @@ modelProvider({
 * ***fetchProp***: the property used to fetch the model if necessary (the model will not be auto-fetched if this is not set)
 * ***modelClass***: the model class to use (defaults to { Model } from 'restful-redux`;  see [Model docs]('./model.md))
 * ***forceFetch***: `true` to force a fetch even if a the model data exists.  Or a function `(newId, currentModel, newProps, currentProps)` which returns a boolean for finer grained control (return `true` to fetch).  This function will execute during mount and any properties change.
+* ***denormalize***: normalizr denormalize function if you want the model value to be denormalized (`schema` is required)
+* ***schema***: normalizr schema to denormalize the value
+* ***arrayEntrySchema***: normalizr schema if the model value is an array and you want
 * ***fetchOptions***: optional function(props) used to provide a 2nd parameter to the fetch method if the `id` is not sufficient

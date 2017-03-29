@@ -103,6 +103,7 @@ That's it!  The `modelProvider` is expected to be wrapped in a `smart component`
 * [Model Class](./docs/model.md)
 * [Model Reducer](./docs/model-reducer.md)
 * [Unit Testing](./docs/unit-testing.md) (creating models which simulate different states)
+* [Advanced Collection Handling](./docs/collections.md) (Keeping track of item level XHR status for individual collection items)
 
 
 ## Examples

@@ -36,6 +36,8 @@ const productCollectionActionCreator = createActionCreator({
   actionPrefix: 'PRODUCTS',
   schema: productCollectionSchema,
   formatter: function (response) {
+    // to normalize a collection we need the model `value` to be an array so we'll save
+    // the additional attributes as `data`
     return {
       value: response.products,
       data: {
@@ -61,11 +63,18 @@ export function searchProducts (searchTerm) {
 
 // action creator to initiate a product related add to cart
 export function addToCart (productId) {
-  return productCollectionActionCreator.post({
+  return productCollectionActionCreator.createPostAction({
     id: productId,
     // actionId allows us to track the XHR state of this specific action for this specific product
     actionId: 'addToCart',
-    url: `/api/products/search/${searchTerm}`,
+    url: `/api/product/${productId}`,
+    // by including `fetchConfigMiddleware` (see ./action-creator.md) the body will be serialized
+    // and  appropriate JSON headers will be set for you
+    params: {
+      body: {
+        quantity: 1
+      }
+    },
     // we'll assume the response will return the new product details (with a count of the quantity in cart)
     replaceModel: true
   });
@@ -94,7 +103,7 @@ export default chainReducers(
 import { modelProvider } from 'restful-redux';
 import { searchProducts, addToCart } from './actions';
 
-function ProductListComponent ({ model, addToCart, params }) {
+function ProductListComponent ({ model, addToCart }) {
   const products = model.value();
   if (model.fetchError()) {
     // model.fetchError() returns the error payload: { headers, status, statusText, url, value }
@@ -129,16 +138,19 @@ function mapPropsToState (state) {
 
 function mapDispatchToProps (dispatch) {
   return {
-    fetch: (searchTerm) => dispatch()
-  }
+    fetch: (searchTerm) => dispatch(fetch(searchTerm)),
+    addToCart: (productId) => dispatch(addToCart(productId))
+  };
 }
 
 // assuming we're using react-router with a route of /products/{searchTerm} (`props.params.searchTerm` will be our search term)
-export modelProvider({
-  id: 'params.searchTerm',
-  entityType: 'products',
-  fetchProp: 'fetchProducts'
-})(UserProfileComponent);
+export connect(mapStateToProps, mapDispatchToProps)(
+  modelProvider({
+    id: 'params.searchTerm',
+    entityType: 'products',
+    fetchProp: 'fetchProducts'
+  })(UserProfileComponent);
+)
 ```
 
 ## Collection with normalization (and item specific actions / loading state)

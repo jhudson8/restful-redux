@@ -42,6 +42,7 @@ new Model(_model_value_, { action: { id: _action_id_, pending: true } });
 
 ### Action Without Error
 ```
+// `success` value actually represents the XHR response but the Model class doesn't care
 new Model(_model_value_, { action: { id: _action_id_, success: true } });
 ```
 
