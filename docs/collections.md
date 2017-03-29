@@ -140,7 +140,7 @@ function mapPropsToState (state) {
 
 function mapDispatchToProps (dispatch) {
   return {
-    fetch: (searchTerm) => dispatch(fetch(searchTerm)),
+    fetchProducts: (searchTerm) => dispatch(fetch(searchTerm)),
     addToCart: (productId) => dispatch(addToCart(productId))
   };
 }
