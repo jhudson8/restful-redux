@@ -55,5 +55,6 @@ new Model(_model_value_, { action: { id: _action_id_, error: {...error response 
 ### Model Data
 (what is returned when using Model.data() - as opposed to Model.value());  this data is kept around even if the model is re-fetched
 ```
+// if you just want to provide a model value use `new Model(_model_value_, false)`
 new Model(_model_value_, { data: {...} });
 ```
