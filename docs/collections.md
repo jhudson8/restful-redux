@@ -100,6 +100,8 @@ export default chainReducers(
 
 ### React Component Model Provider
 ```javascript
+import { productCollectionSchema, productSchema } from './schemas';
+import { denormalize } from 'normalizr';
 import { modelProvider } from 'restful-redux';
 import { searchProducts, addToCart } from './actions';
 
@@ -107,7 +109,7 @@ function ProductListComponent ({ model, addToCart }) {
   const products = model.value();
   if (model.fetchError()) {
     // model.fetchError() returns the error payload: { headers, status, statusText, url, value }
-    return <div>Sorry, we couldn't load your products</div>
+    return <div>Sorry, we could not load your products</div>
   } else if (model.isFetchPending()) {
     return <div>Loading your products</div>;
   } else {
@@ -148,22 +150,12 @@ export connect(mapStateToProps, mapDispatchToProps)(
   modelProvider({
     id: 'params.searchTerm',
     entityType: 'products',
-    fetchProp: 'fetchProducts'
+    fetchProp: 'fetchProducts',
+    // below is what will replace the normalized collection id values to the product values
+    denormalize: denormalize,
+    schema: productCollectionSchema
+    // below is what will replace the product values with Model objects that give you access to product level XHR status
+    arrayEntrySchema: productSchema
   })(UserProfileComponent);
 )
 ```
-
-## Collection with normalization (and item specific actions / loading state)
-All we need to do is create a normalizr schema so that our collection get stored in a way that item values are stored separately from their collection.
-
-### Normalizr schema
-```
-import { schema } from 'normalizr';
-
-// the schema.Entity parameter will match our `entityType` value
-const userSchema = new schema.Entity('user');
-const userCollectionSchema = new schema.Array(userSchema);
-```
-
-### reducer
-Now were going to include an `refresh` function for an individual
