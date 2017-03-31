@@ -72,8 +72,8 @@ modelProvider({
 * ***models***: (if more than 1 model should be referenced, array of objects with following options)
 * ***id***: function(props) or string (nesting using `.`) to identify the model id from React component properties.  This can also be `false` for entities that have an unknown id - like the authenticated user of an application.
 * ***entityType***: arbitrary string value (but should be meaningful to the model type) which should match the `entityType` value in your reducer and action creator
-* ***propName***: property name used for the model object (defaults to `model`)
-* ***idPropName***: the property name used for the model id (defaults to `id`)
+* ***modelProp***: property name used for the model object (defaults to `model`)
+* ***idProp***: the property name used for the model id (defaults to `id`)
 * ***fetchProp***: the property used to fetch the model if necessary (the model will not be auto-fetched if this is not set)
 * ***modelClass***: the model class to use (defaults to { Model } from 'restful-redux`;  see [Model docs]('./model.md))
 * ***forceFetch***: `true` to force a fetch even if a the model data exists.  Or a function `(newId, currentModel, newProps, currentProps)` which returns a boolean for finer grained control (return `true` to fetch).  This function will execute during mount and any properties change.
