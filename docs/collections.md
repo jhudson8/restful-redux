@@ -4,10 +4,8 @@ Collections don't have to be any different than models (in other words an array 
 
 If you [normalize](https://github.com/paularmstrong/normalizr) your collection you can track action/fetch XHR state for each item in the collection individually.
 
-This is an example using an API to fetch and display users that belong to a group.  See sibling docs for more details on the code listed below.
-
 ## Tracking XHR status for individual collection items
-This simple example shows a list of products and shows a loading indicator when a product is being added to cart.
+This contrived example shows a list of products and a product-level loading indicator when a product is being added to cart.
 
 Assume our product search response returns a shape of `{ totalCount: _number_, products: [...] }`
 ### Normalizr Schema
@@ -30,24 +28,13 @@ This is similar to the basic example except we
 import { createActionCreator } from 'restful-redux';
 import { productCollectionSchema } from './schemas';
 
-// this will handle our product search action
+// high level restful-redux action creator for our product collections (search results)
 const productCollectionActionCreator = createActionCreator({
   entityType: 'products',
-  actionPrefix: 'PRODUCTS',
-  schema: productCollectionSchema,
-  formatter: function (response) {
-    // to normalize a collection we need the model `value` to be an array so we'll save
-    // the additional attributes as `data`
-    return {
-      value: response.products,
-      data: {
-        totalCount: response.totalCount
-      }
-    };
-  }
+  actionPrefix: 'PRODUCTS'
 });
 
-// this will handle our add to cart action
+// high level restful-redux action creator for an individual product
 const productActionCreator = createActionCreator({
   entityType: 'products',
   actionPrefix: 'PRODUCTS'
@@ -57,7 +44,20 @@ const productActionCreator = createActionCreator({
 export function searchProducts (searchTerm) {
   return productCollectionActionCreator.fetch({
     id: searchTerm,
-    url: `/api/products/search/${searchTerm}`
+    url: `/api/products/search/${searchTerm}`,
+    // this will separate the list of products into an array with a separate entry for each product
+    schema: productCollectionSchema,
+    formatter: function (response) {
+      // to normalize a collection we need the model `value` to be an array so we'll save
+      // the additional attributes as `data`
+      return {
+        result: response.products,
+        data: {
+          // so we can still get the total count with props.model.data().totalCount
+          totalCount: response.totalCount
+        }
+      };
+    }
   });
 }
 
@@ -105,8 +105,10 @@ import { denormalize } from 'normalizr';
 import { modelProvider } from 'restful-redux';
 import { searchProducts, addToCart } from './actions';
 
+// `model` is automatically injected into this component props by the modelProvider
 function ProductListComponent ({ model, addToCart }) {
   const products = model.value();
+  const numProducts = products && model.data().totalCount;
   if (model.fetchError()) {
     // model.fetchError() returns the error payload: { headers, status, statusText, url, value }
     return <div>Sorry, we could not load your products</div>
@@ -115,18 +117,21 @@ function ProductListComponent ({ model, addToCart }) {
   } else {
     // normally you would decompose product details to a separate component but we're keeping it simple here
     return (
-      <ul>
-        {products.map(product) => (
-          <li>
-            {product.name} {product.quantityInCart} in cart
-            {/* notice how we can refer to restful-redux model functions in our collection items */}
-            {product.isActionPending('addToCart')
-              ? <span>adding to cart...</span>
-              : <button onClick={(ev) => addToCart(product.id)}>Add to cart</button>
-            }
-          </li>
-        )}
-      </ul>
+      <div>
+        <ul>
+          {products.map(product) => (
+            <li>
+              {product.name} {product.quantityInCart} in cart
+              {/* notice how we can refer to restful-redux model functions in our collection items */}
+              {product.isActionPending('addToCart')
+                ? <span>adding to cart...</span>
+                : <button onClick={(ev) => addToCart(product.id)}>Add to cart</button>
+              }
+            </li>
+          )}
+        </ul>
+        {numProducts && <span>{numProducts} total products</span>}
+      </div>
     );
   }
 }

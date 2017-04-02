@@ -11,7 +11,7 @@ import { dispatchPromise } from 'restful-redux';
 dispatchPromise(store);
 ```
 
-Adding this middleware will include cookies and allow `params.body` object to be serialized a JSON object with appropriate headers.  Or you can include [the source code](../src/fetch-config-middleware.js).
+Adding this middleware will include cookies and allow `params.body` object to be serialized as a JSON object with appropriate headers.  Or you can include [the source code](../src/fetch-config-middleware.js).
 ```javascript
 import { fetchConfigMiddleware } from 'restful-redux';
 ```
@@ -57,7 +57,7 @@ See [./redux-actions.md](./redux-actions.md) if you want to know the action shap
 * ***url***: required fetch url
 * ***params***: optional effects-fetch parameters (https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch)
 * ***schema***: optional [normalizr](https://github.com/paularmstrong/normalizr) schema if response should be normalized
-* ***formatter***: optional function(payload, id) used to format the response before being evaluated by [normalizr](https://github.com/paularmstrong/normalizr); [see return format](#response-format)
+* ***formatter***: optional function(payload, { id, actionType, entityType }) used to format the response before being evaluated by [normalizr](https://github.com/paularmstrong/normalizr); [see formatter response format](#formatter-return-format)
 * ***successAction***: optional action to be dispatched if the XHR is successful: function(_normalized_payload_)
 * ***errorAction***: optional action to be dispatched if the XHR is not successful: function({id, actionId, response})
 
@@ -69,10 +69,7 @@ export function fetch (id) {
   return actionCreator.createFetchAction({
     // or return actionCreator.createGetAction({
     id: id,
-    url: `/customer/endpoint/${id}`,
-    // if you want to do something with action dispatching
-    successAction: ...,
-    errorAction: ...
+    url: `/customer/endpoint/${id}`
   });
 }
 ```
@@ -89,7 +86,7 @@ Returns a redux action used to initiate a `POST` request.  See [XHR action detai
 
 
 #### createDeleteAction
-Returns a redux action used to initiate an DELETE request.  See [XHR action details](#xhr-action) for more details.
+Returns a redux action used to initiate a `DELETE` request.  See [XHR action details](#xhr-action) for more details.
 
 [API table of contents](#action-creator-api)
 
@@ -116,7 +113,7 @@ Returns a dispatchable redux action used to perform an arbitrary XHR request ass
 * ***url***: required url
 * ***params***: optional effects-fetch params `{ method, headers, mode, cache, body }` (see https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch)
 * ***schema***: optional [normalizr](https://github.com/paularmstrong/normalizr) schema if response should be normalized
-* ***formatter***: optional function(payload, id) used to format the response before being evaluated by [normalizr](https://github.com/paularmstrong/normalizr); [see return format](#response-format)
+* ***formatter***: optional function(payload, id) used to format the response before being evaluated by [normalizr](https://github.com/paularmstrong/normalizr); [see formatter return format](#formatter-return-format)
 * ***replaceModel***: `true` if the model contents should be replaced with this XHR response
 * ***clearAfter***: optional time in milis to clear out this recorded action in redux state
 
@@ -152,14 +149,22 @@ export function setLocalCustomerPreference (id, preferenceInfo) {
   // using model.data().customerPreference
   return actionCreator.createModelDataAction(id, { customerPreference: preferenceInfo });
 }
+
+// and in your React component...
+const preferenceInfo = props.model.data().preferenceInfo; // data() can return undefined if not set
 ```
 
-##### response-format
-Either the XHR response, `formatter` or `normalizr schema` should contain some or all of these attributes.
+##### Formatter Return Format
+If a `formatter` function is provided it should return an object some or all of these attributes
 
-* ***result***: the content assumed to override the current model data
+Fetch (or action with `replaceModel = true`)
+* ***result***: formatted model value (accessable using `model.getValue()`)
 * ***data***: any model meta data ([see [Model.data()](./model.md))
 * ***entities***: normalized format (what [normalizr](https://github.com/paularmstrong/normalizr) would produce).  In this case `result` should be the model id.
+
+Any other action
+* ***response***: The formatted XHR response payload (accessable using `model.getAction().success` or `model.getAction().error`)
+* ***data***: any model meta data ([see [Model.data()](./model.md))
 
 
 Simple
@@ -179,6 +184,7 @@ Advanced
         // the model data
       }
     }
+    // other entities values for different ids and/or entity types can be included as well
   },
   data: _meta data_ (accessed using model.data() - see Model docs; good for collections where the "model" is an array)
 }

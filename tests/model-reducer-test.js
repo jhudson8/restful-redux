@@ -91,6 +91,37 @@ describe('model-reducer', function () {
     entityType: 'foo'
   });
 
+  it('lifecycle', function () {
+    let pendingState = fooReducer(emptyState, {
+      type: 'FOO_FETCH_PENDING',
+      payload: {
+        id: '1'
+      }
+    });
+    delete pendingState.entities._meta.foo['1'].fetch.initiatedAt;
+    expect(pendingState).to.deep.equal({entities:{_meta:{foo:{'1':{fetch:{pending:true}}}},foo:{}}});
+
+    const successState = fooReducer(pendingState, {
+      type: 'FOO_FETCH_SUCCESS',
+      payload: {
+        id: '1',
+        result: { abc: 'def' }
+      }
+    });
+    delete successState.entities._meta.foo['1'].fetch.completedAt;
+    expect(successState).to.deep.equal({entities:{_meta:{foo:{'1':{fetch:{success:'fetched'}}}},foo:{'1':{abc:'def'}}}});
+
+    const errorState = fooReducer(pendingState, {
+      type: 'FOO_FETCH_ERROR',
+      payload: {
+        id: '1',
+        response: { abc: 'def' }
+      }
+    });
+    delete errorState.entities._meta.foo['1'].fetch.completedAt;
+    expect(errorState).to.deep.equal({entities:{_meta:{foo:{'1':{fetch:{error:{abc:'def'}}}}},foo:{}}});
+  });
+
   describe('chainReducers', function () {
     const origState = {};
     const reducer1 = function (state, action) {
@@ -590,6 +621,26 @@ describe('model-reducer', function () {
           }
         }
       });
+    });
+
+    it('should update/add unrelated normalized entities', function () {
+      const state = fooReducer(initialState1, {
+        type: 'FOO_FETCH_SUCCESS',
+        payload: {
+          id: '2',
+          result: { aaa: 'bbb' },
+          entities: {
+            foo: {
+              '1': {
+                flip: 'flop'
+              }
+            }
+          }
+        }
+      });
+      delete state.entities._meta.foo['1'].fetch.completedAt;
+      delete state.entities._meta.foo['2'].fetch.completedAt;
+      expect(state).to.deep.equal({"entities":{"_meta":{"foo":{"1":{"data":{"customMetaProp":"foo"},"fetch":{"success":"normalized","source":{"id":"2","entityType":"foo"}}},"2":{"fetch":{"success":"fetched"}}}},"foo":{"1":{"flip":"flop"},"2":{"aaa":"bbb"}}}});
     });
 
     it('should update/add normalized entities', function () {
