@@ -98,7 +98,7 @@ That's it!  The `modelProvider` is expected to be wrapped in a `smart component`
 
 
 ## Docs
-* [FAQ / Troubleshooting][./docs/faq.md]
+* [FAQ / Troubleshooting](./docs/faq.md)
 * [Action Creator](./docs/action-creator.md)
 * [Model Provider React component](./docs/model-provider.md)
 * [Model Class](./docs/model.md)
