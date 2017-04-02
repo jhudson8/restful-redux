@@ -12,16 +12,16 @@ Troubleshooting / FAQ
 ### Model exist in your React component but Model.value() is always undefined
 
 * Make sure your `id` model provider value matches your `id` value in your action creator
-* Make sure you included the reducer with the same `entityType` as the action creator
+* Make sure you included the reducer with the same `entityType` value as the action creator and model provider
 * Add the `debug: true` to the action creator and reducer
 
 ### Model.wasActionPerformed(_action_id_) always returns false
 
-* Call the method with 0 parameters to see if you get what you are looking for (this means your ids don't match up)
+* Call the method with 0 parameters to see if you get what you are looking for (this means your action ids don't match up)
 * Make sure that the ***action id*** parameter referenced in your React component matches the `actionId` value in your action creator
 * Remember that if an `actionId` value is not provided, your model value will be replaced (unless this is a `delete` action)
 
-### I have more complex model id needs
+### More complex model id needs
 
 Here are the different ***modeProvider*** `id` values
 
@@ -44,7 +44,7 @@ modelProvider({
   id: false
 ```
 
-### I'm using an action creator formatter and `Model.value()` (`Model.wasActionPerformed()`) is `undefined`/`false`
+### Getting undefined/false values when using a formatter
 
 If you are using `createFetchAction` make sure the formatter returns an object with one or more of the the following attributes
 ```javascript
@@ -88,7 +88,7 @@ export function fetch (modelId) {
 }
 ```
 
-### I'm trying to post JSON data and it isn't working and/or cookies aren't being sent
+### No cookies or post body sent when making XHR requests
 The `fetch` API will not send cookies by default.  The easy way is to include the provided middleware
 ```javascript
 import { fetchConfigMiddleware } from 'restful-redux';
@@ -104,7 +104,7 @@ Alternatively, make sure you do the following
 ### What are the `params` options for `create{Post|Patch|Put|Delete}Action`?
 [see the Fetch API parameters](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch#Parameters)
 
-### I want more control over when a model is fetched
+### More control over when a model is fetched
 As long as a `fetchProp` attribute is set on your model provider (and `props[fetchProp]` is a function) your model will be fetched if it has not been previously.  It will never be fetched again without manual intervention.
 
 To override this behavior, use the `forceFetch` attrubute
