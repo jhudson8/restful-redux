@@ -32,7 +32,7 @@ Here are the different ***modeProvider*** `id` values
 ```javascript
 modelProvider({
   ...
-  id: ...
+  id: ... // see below
 })(Component)
 
   // always use the value `foo` for the model id
