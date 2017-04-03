@@ -107,6 +107,13 @@ Alternatively, make sure you do the following
 
 ### What are the `params` options for `create{Post|Patch|Put|Delete}Action`?
 [see the Fetch API parameters](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch#Parameters)
+```javascript
+myActionCreator.createPostAction({
+  id: ...,
+  url: ...,
+  params: {...}
+});
+```
 
 ### More control over when a model is fetched
 As long as a `fetchProp` attribute is set on your model provider (and `props[fetchProp]` is a function) your model will be fetched if it has not been previously.  It will never be fetched again without manual intervention.
@@ -131,6 +138,7 @@ For non-dynamic behavior, use an action creator with `delete: true`;
 myActionCreator.createPostAction({
   id: ...,
   url: ...,
-  formatter: (payload) => { return payload.foo ? { delete: true } : payload }
+  // will delete the existing model if `payload.foo` is a truthy;  otherwise model value will be replaced with payload
+  formatter: (payload) => { return delete: payload.foo }
 });
 ```
