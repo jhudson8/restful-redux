@@ -11,12 +11,16 @@ Troubleshooting / FAQ
 
 ### Model exist in your React component but Model.value() is always undefined
 
+* Look at the network tab in your developer's console, do you see the XHR going through and coming back as a 200 - is the expected payload there?
+* Did you include the necessary middleware (`redux-effects`, `redux-effects-fetch`, `redux-multi`, `redux-thunk`)
 * Make sure your `id` model provider value matches your `id` value in your action creator
 * Make sure you included the reducer with the same `entityType` value as the action creator and model provider
 * Add the `debug: true` to the action creator and reducer
 
 ### Model.wasActionPerformed(_action_id_) always returns false
 
+* Look at the network tab in your developer's console, do you see the XHR going through and coming back as a 200 - is the expected payload there?
+* Did you include the necessary middleware (`redux-effects`, `redux-effects-fetch`, `redux-multi`, `redux-thunk`)
 * Call the method with 0 parameters to see if you get what you are looking for (this means your action ids don't match up)
 * Make sure that the ***action id*** parameter referenced in your React component matches the `actionId` value in your action creator
 * Remember that if an `actionId` value is not provided, your model value will be replaced (unless this is a `delete` action)
