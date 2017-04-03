@@ -99,6 +99,82 @@ describe('redux-effects-action-creator', function () {
       var steps = action[0].meta.steps;
       expect(steps.length).to.equal(1);
     });
+    describe('formatter', function () {
+      it('should work with formatter that returns undefined', function () {
+        var _actionCreator = createActionCreator({
+          actionPrefix: 'FOO',
+          entityType: 'foo'
+        });
+        var action = _actionCreator.createFetchAction({
+          id: '1',
+          url: 'http://foo.com/thing/1',
+          formatter: function (payload) {}
+        });
+        var steps = action[0].meta.steps[0];
+        var successAction = steps[0]({ value: { foo: 'bar' } });
+        expect(successAction[0]).to.deep.equal({
+          type: 'FETCH_SUCCESS',
+          payload: {
+            id: '1',
+            result: {
+              foo: 'bar'
+            }
+          }
+        });
+      });
+      it('should work with formatter that returns the same payload', function () {
+        var _actionCreator = createActionCreator({
+          actionPrefix: 'FOO',
+          entityType: 'foo'
+        });
+        var action = _actionCreator.createFetchAction({
+          id: '1',
+          url: 'http://foo.com/thing/1',
+          formatter: function (payload) {
+            return payload;
+          }
+        });
+        var steps = action[0].meta.steps[0];
+        var successAction = steps[0]({ value: { foo: 'bar' } });
+        expect(successAction[0]).to.deep.equal({
+          type: 'FETCH_SUCCESS',
+          payload: {
+            id: '1',
+            result: {
+              foo: 'bar'
+            }
+          }
+        });
+      });
+      it('should work with formatter that returns new data', function () {
+        var _actionCreator = createActionCreator({
+          actionPrefix: 'FOO',
+          entityType: 'foo'
+        });
+        var action = _actionCreator.createFetchAction({
+          id: '1',
+          url: 'http://foo.com/thing/1',
+          formatter: function () {
+            return {
+              result: { abc: 'def' },
+              data: { ghi: 'jkl' }
+            };
+          }
+        });
+        var steps = action[0].meta.steps[0];
+        var successAction = steps[0]({ value: { foo: 'bar' } });
+        expect(successAction[0]).to.deep.equal({
+          type: 'FETCH_SUCCESS',
+          payload: {
+            id: '1',
+            result: {
+              abc: 'def'
+            },
+            data: { ghi: 'jkl' }
+          }
+        });
+      });
+    });
 
     it('should handle success event', function () {
       var action = fooActionCreator.createFetchAction({
@@ -268,6 +344,83 @@ describe('redux-effects-action-creator', function () {
             foo: 'bar'
           }
         }
+      });
+    });
+    describe('formatter', function () {
+      it('should work when undefined is returned', function () {
+        var _actionCreator = createActionCreator({
+          actionPrefix: 'FOO',
+          entityType: 'foo'
+        });
+        var action = _actionCreator.createPostAction({
+          id: '1',
+          actionId: 'beep',
+          url: 'http://foo.com/thing/1',
+          formatter: function () {}
+        });
+        var steps = action[0].meta.steps[0];
+        var successAction = steps[0]({ value: { foo: 'bar' } });
+        expect(successAction[1]).to.deep.equal({
+          type: 'FOO_ACTION_SUCCESS',
+          payload: {
+            id: '1',
+            actionId: 'beep',
+            response: {
+              foo: 'bar'
+            }
+          }
+        });
+      });
+      it('should work when the same payload is returned', function () {
+        var _actionCreator = createActionCreator({
+          actionPrefix: 'FOO',
+          entityType: 'foo'
+        });
+        var action = _actionCreator.createPostAction({
+          id: '1',
+          actionId: 'beep',
+          url: 'http://foo.com/thing/1',
+          formatter: function (payload) { return payload; }
+        });
+        var steps = action[0].meta.steps[0];
+        var successAction = steps[0]({ value: { foo: 'bar' } });
+        expect(successAction[1]).to.deep.equal({
+          type: 'FOO_ACTION_SUCCESS',
+          payload: {
+            id: '1',
+            actionId: 'beep',
+            response: {
+              foo: 'bar'
+            }
+          }
+        });
+      });
+      it('should override the response', function () {
+        var _actionCreator = createActionCreator({
+          actionPrefix: 'FOO',
+          entityType: 'foo'
+        });
+        var action = _actionCreator.createPostAction({
+          id: '1',
+          actionId: 'beep',
+          url: 'http://foo.com/thing/1',
+          formatter: function () { return { response: { abc: 'def' }, data: { ghi: 'jkl' } }; }
+        });
+        var steps = action[0].meta.steps[0];
+        var successAction = steps[0]({ value: { foo: 'bar' } });
+        expect(successAction[1]).to.deep.equal({
+          type: 'FOO_ACTION_SUCCESS',
+          payload: {
+            id: '1',
+            actionId: 'beep',
+            response: {
+              abc: 'def'
+            },
+            data: {
+              ghi: 'jkl'
+            }
+          }
+        });
       });
     });
 

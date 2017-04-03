@@ -76,12 +76,22 @@ export default function (options) {
       };
       if (type === SUCCESS) {
         if (!actionId || replaceModel) {
-          payload = _formatter(payload, formatterOptions);
+          const _payload = _formatter(payload, formatterOptions);
+          if (!_payload || _payload === payload) {
+            payload = defaultFormat('result')(payload);
+          } else {
+            payload = _payload;
+          }
           if (schema && normalize && payload) {
             payload = Object.assign(payload, normalize(payload.result, schema));
           }
         } else {
-          payload = _formatter(response.value, formatterOptions);
+          const _payload = _formatter(response.value, formatterOptions);
+          if (!_payload || _payload === payload) {
+            payload = defaultFormat('response')(payload);
+          } else {
+            payload = _payload;
+          }
         }
       } else {
         payload = { response: response };
@@ -159,7 +169,8 @@ export default function (options) {
   REST_METHODS.forEach(function (options) {
     const {
       fetchOrAction,
-      method
+      method,
+      isDelete
     } = options;
     /**
      * return the action to be dispatched when an XHR-based action should be taken on a model/REST document
@@ -187,6 +198,7 @@ export default function (options) {
         clearAfter
       } = options;
       const _bubbleUp = typeof options.bubbleUp === 'undefined' ? bubbleUp : options.bubbleUp;
+      const _delete = typeof options.delete !== 'undefined' ? options.delete : isDelete;
       if (id === false) {
         id = NO_ID;
       }
@@ -214,7 +226,7 @@ export default function (options) {
           id,
           actionId,
           replaceModel,
-          isDelete: options.isDelete,
+          isDelete: _delete,
           bubbleUp: _bubbleUp,
           schema,
           formatter,
