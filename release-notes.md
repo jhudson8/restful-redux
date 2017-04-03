@@ -1,3 +1,6 @@
+## v3.2.0
+add `createLocalDelete` and `createLocalPut` action creator functions to modify redux state through actions without XHR requests
+
 ## v3.1.3
 enhancement: allow formatter to return undefined and/or the same payload to be treated as if no formatter was used
 

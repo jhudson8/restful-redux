@@ -74,6 +74,39 @@ export function fetch (id) {
 }
 ```
 
+#### createLocalPutAction
+Returns a redux action used to set (or replace) a model value
+```
+return actionCreator.createLocalPutAction(id, _model_value_);
+```
+
+[API table of contents](#action-creator-api)
+
+#### createLocalDeleteAction
+Returns a redux action used to remove a model value from redux state (as if it had never been fetched)
+```
+return actionCreator.createLocalDeleteAction(id);
+```
+
+[API table of contents](#action-creator-api)
+
+#### createModelDataAction
+Returns a dispatchable redux action used to apply model specific meta data.  This data will persist even if the model is updated and can be retrieved using the `data()` function on a model.
+
+##### example
+```javascript
+export function setLocalCustomerPreference (id, preferenceInfo) {
+  // this will be able to retrieved in your React class (assuming the use of the model provider)
+  // using model.data().customerPreference
+  return actionCreator.createModelDataAction(id, { customerPreference: preferenceInfo });
+}
+
+// and in your React component...
+const preferenceInfo = props.model.data().preferenceInfo; // data() can return undefined if not set
+```
+
+[API table of contents](#action-creator-api)
+
 #### createGetAction
 Returns a redux action used to initiate a `GET` request.  See [XHR action details](#xhr-action) for more details.
 
@@ -139,21 +172,6 @@ export function updateCustomer (id, customerData) {
 
 [API table of contents](#action-creator-api)
 
-
-#### createModelDataAction
-Returns a dispatchable redux action used to apply model specific meta data.  This data will persist even if the model is updated and can be retrieved using the `data()` function on a model.
-
-##### example
-```javascript
-export function setLocalCustomerPreference (id, preferenceInfo) {
-  // this will be able to retrieved in your React class (assuming the use of the model provider)
-  // using model.data().customerPreference
-  return actionCreator.createModelDataAction(id, { customerPreference: preferenceInfo });
-}
-
-// and in your React component...
-const preferenceInfo = props.model.data().preferenceInfo; // data() can return undefined if not set
-```
 
 ##### Formatter Return Format
 If a `formatter` function is provided it should return an object some or all of these attributes
