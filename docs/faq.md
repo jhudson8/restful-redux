@@ -126,7 +126,7 @@ modelProvider({
 ### Dynamically delete the model value after an XHR action
 Note: `createDeleteAction` will do this automatically.
 
-Otherwise, you can use a formatter with `isDelete: true`;
+For non-dynamic behavior, use an action creator with `delete: true`;
 ```javascript
 myActionCreator.createPostAction({
   id: ...,

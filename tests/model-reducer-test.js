@@ -6,6 +6,29 @@ const expect = require('chai').expect;
 const emptyState = {};
 Object.freeze(emptyState);
 const savedEmptyState = JSON.parse(JSON.stringify(emptyState));
+const fetchedState = {
+  entities: {
+    _meta: {
+      foo: {
+        '1': {
+          data: {
+            customMetaProp: 'foo'
+          },
+          fetch: {
+            success: 'fetched',
+            completedAt: 12345
+          }
+        }
+      }
+    },
+    foo: {
+      '1': {
+        foo: 'abc',
+        beep: 'boop'
+      }
+    }
+  }
+};
 const initialState1 = {
   entities: {
     _meta: {
@@ -152,7 +175,7 @@ describe('model-reducer', function () {
     });
   });
 
-  it ('should return provided state for N/A action type', function () {
+  it('should return provided state for N/A action type', function () {
     const state = fooReducer(emptyState, {
       type: 'BAR_FETCH_SUCCESS',
       payload: {
@@ -164,6 +187,43 @@ describe('model-reducer', function () {
     });
     expect(state).to.equal(emptyState);
   });
+
+  describe('local actions', function () {
+    it('SET_DATA', function () {
+      const state = fooReducer(emptyState, {
+        type: 'FOO_SET_DATA',
+        payload: {
+          id: '2',
+          data: {
+            abc: 'def'
+          }
+        }
+      });
+      expect(state).to.deep.equal({entities:{_meta:{foo:{'2':{data:{abc:'def'}}}},foo:{}}});
+    });
+    it('SET', function () {
+      const state = fooReducer(emptyState, {
+        type: 'FOO_SET',
+        payload: {
+          id: '2',
+          result: {
+            abc: 'def'
+          }
+        }
+      });
+      delete state.entities._meta.foo['2'].fetch.completedAt;
+      expect(state).to.deep.equal({entities:{_meta:{foo:{'2':{fetch:{success:'set'},fetched:true}}},foo:{'2':{abc:'def'}}}});
+    });
+    it('DELETE', function () {
+      const state = fooReducer(fetchedState, {
+        type: 'FOO_DELETE',
+        payload: {
+          id: '1'
+        }
+      });
+      expect(state).to.deep.equal({entities:{_meta:{foo:{'1':{data:{customMetaProp:'foo'}}}},foo:{}}});
+    });
+  })
 
   describe('bubbleUp', function () {
     it('should shallow copy the state by default', function () {

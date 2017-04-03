@@ -179,6 +179,17 @@ function reducer (options) {
       fetched: true
     }
   }, {
+    type: 'SET_DATA',
+    meta: {}
+  }, {
+    type: 'DELETE',
+    meta: {
+      fetch: undefined,
+      fetchPending: undefined,
+      fetched: undefined,
+      _clearValue: true
+    }
+  }, {
     type: 'FETCH_PENDING',
     meta: {
       fetch: {

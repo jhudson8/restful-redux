@@ -295,7 +295,42 @@ describe('redux-effects-action-creator', function () {
         }
       });
     });
+  });
 
+  describe('Local actions', function () {
+    it('createModelDataAction', function () {
+      var action = fooActionCreator.createModelDataAction('1', { foo: 'bar' });
+      expect(action).to.deep.equal({
+        type: 'FOO_SET_DATA',
+        payload: {
+          id: '1',
+          data: {
+            foo: 'bar'
+          }
+        }
+      });
+    });
+    it('createLocalPutAction', function () {
+      var action = fooActionCreator.createLocalPutAction('1', { foo: 'bar' });
+      expect(action).to.deep.equal({
+        type: 'FOO_SET',
+        payload: {
+          id: '1',
+          result: {
+            foo: 'bar'
+          }
+        }
+      });
+    });
+    it('createLocalDeleteAction', function () {
+      var action = fooActionCreator.createLocalDeleteAction('1');
+      expect(action).to.deep.equal({
+        type: 'FOO_DELETE',
+        payload: {
+          id: '1'
+        }
+      });
+    });
   });
 
   describe('other XHR actions', function() {
@@ -462,21 +497,6 @@ describe('redux-effects-action-creator', function () {
             value: {
               foo: 'bar'
             }
-          }
-        }
-      });
-    });
-  });
-
-  describe('createModelDataAction', function() {
-    it('should handle data action', function () {
-      var action = fooActionCreator.createModelDataAction('1', {foo: 'bar'});
-      expect(action).to.deep.equal({
-        type: 'FOO_DATA',
-        payload: {
-          id: '1',
-          data: {
-            foo: 'bar'
           }
         }
       });

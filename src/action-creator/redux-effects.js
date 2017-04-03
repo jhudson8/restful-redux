@@ -37,6 +37,20 @@ var REST_METHODS = [{
   fetchOrAction: ACTION
 }];
 
+var STATIC_METHODS = [{
+  name: 'LocalPut',
+  action: 'SET',
+  mapParamTo: 'result'
+}, {
+  name: 'ModelData',
+  action: 'SET_DATA',
+  mapParamTo: 'data'
+}, {
+  name: 'LocalDelete',
+  action: 'DELETE',
+  payload: {}
+}];
+
 export default function (options) {
   checkRequiredOptions(['actionPrefix', 'entityType'], options);
 
@@ -68,31 +82,22 @@ export default function (options) {
       // response is assumed to be in [normalize](https://github.com/paularmstrong/normalize) format of
       // {result: _id_, entities: {_entityType_: {_id_: ...}}}
       let payload = response.value;
-      const _formatter = formatter || defaultFormat(!actionId || replaceModel ? 'result' : 'response');
+      const isActionType = actionId && !replaceModel;
+      const typeKey = isActionType ? 'response' : 'result';
       const formatterOptions = {
         id: id,
         actionId: actionId,
         entityType: entityType
       };
       if (type === SUCCESS) {
-        if (!actionId || replaceModel) {
-          const _payload = _formatter(payload, formatterOptions);
-          if (!_payload || _payload === payload) {
-            payload = defaultFormat('result')(payload);
-          } else {
-            payload = _payload;
-          }
-          if (schema && normalize && payload) {
-            payload = Object.assign(payload, normalize(payload.result, schema));
-          }
-        } else {
-          const _payload = _formatter(response.value, formatterOptions);
-          if (!_payload || _payload === payload) {
-            payload = defaultFormat('response')(payload);
-          } else {
-            payload = _payload;
-          }
-        }
+        payload = formatSuccessPayload({
+          payload: payload,
+          formatter: formatter,
+          formatterOptions: formatterOptions,
+          type: typeKey,
+          schema: schema,
+          normalize: normalize
+        });
       } else {
         payload = { response: response };
       }
@@ -153,25 +158,48 @@ export default function (options) {
     };
   }
 
-  var rtn = {
-    /* return an action which will set meta data to be associated with a model */
-    createModelDataAction: function (id, data) {
-      return {
-        type: `${actionPrefix}_DATA`,
-        payload: {
-          id: id,
-          data: data
+  var rtn = {};
+
+  STATIC_METHODS.forEach(function (options) {
+    const {
+      mapParamTo,
+      payload,
+      action,
+      name
+    } = options;
+    rtn[`create${name}Action`] = function (id, p1, options) {
+      options = options || {};
+      const {
+        formatter,
+        schema
+      } = options;
+      let _payload = payload;
+      if (!_payload) {
+        if (formatter || schema) {
+          _payload = formatSuccessPayload({
+            payload: payload,
+            formatter: formatter,
+            formatterOptions: { id: id },
+            type: mapParamTo || 'result',
+            schema: schema,
+            normalize: normalize
+          });
+        } else if (mapParamTo) {
+          _payload = {};
+          _payload[mapParamTo] = p1;
         }
-      };
-    }
-  };
+      }
+      _payload.id = id;
+      return createAction(`${actionPrefix}_${action}`, _payload);
+    };
+  });
 
   REST_METHODS.forEach(function (options) {
     const {
       fetchOrAction,
-      method,
-      isDelete
+      method
     } = options;
+    const isDelete = options.delete;
     /**
      * return the action to be dispatched when an XHR-based action should be taken on a model/REST document
      * - ACTION_SUCCESS_{entityType}: the data was retrieved successfully
@@ -261,6 +289,19 @@ export default function (options) {
   return rtn;
 }
 
+function formatSuccessPayload ({ payload, formatter, formatterOptions, type, schema, normalize }) {
+  formatter = formatter || defaultFormat(type);
+  const _payload = formatter(payload, formatterOptions);
+  if (!_payload || _payload === payload) {
+    payload = defaultFormat(type)(payload);
+  } else {
+    payload = _payload;
+  }
+  if (schema && normalize && payload) {
+    payload = Object.assign(payload, normalize(payload.result, schema));
+  }
+  return payload;
+}
 
 // create a dispatchable action that represents a pending model/REST document action
 function createPendingAction (actionPrefix, id, actionId, bubbleUp) {

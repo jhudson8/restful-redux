@@ -114,6 +114,7 @@ Returns a dispatchable redux action used to perform an arbitrary XHR request ass
 * ***params***: optional effects-fetch params `{ method, headers, mode, cache, body }` (see https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch)
 * ***schema***: optional [normalizr](https://github.com/paularmstrong/normalizr) schema if response should be normalized
 * ***formatter***: optional function(payload, id) used to format the response before being evaluated by [normalizr](https://github.com/paularmstrong/normalizr); [see formatter return format](#formatter-return-format)
+* ***delete***: `true` if the model value should be removed from redux state
 * ***replaceModel***: `true` if the model contents should be replaced with this XHR response
 * ***clearAfter***: optional time in milis to clear out this recorded action in redux state
 
@@ -161,7 +162,7 @@ Fetch (or action with `replaceModel = true`)
 * ***result***: formatted model value (accessable using `model.getValue()`)
 * ***data***: any model meta data ([see [Model.data()](./model.md))
 * ***entities***: normalized format (what [normalizr](https://github.com/paularmstrong/normalizr) would produce).  In this case `result` should be the model id.
-
+* ***delete***: `true` if the model value should be removed from redux state
 Any other action
 * ***response***: The formatted XHR response payload (accessable using `model.getAction().success` or `model.getAction().error`)
 * ***data***: any model meta data ([see [Model.data()](./model.md))
