@@ -1,13 +1,13 @@
-## v3.2.1
+## v3.4.1
 only call `forceFetch` function if we should not otherwise fetch
 
-## v3.2.0
+## v3.4.0
 add `createLocalDelete` and `createLocalPut` action creator functions to modify redux state through actions without XHR requests
 
-## v3.1.3
+## v3.3.3
 enhancement: allow formatter to return undefined and/or the same payload to be treated as if no formatter was used
 
-## v3.1.2
+## v3.3.2
 fix action pending state
 
 ## v3.3.1
