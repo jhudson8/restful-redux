@@ -67,7 +67,7 @@ export default function modelProvider (options) {
             });
             const model = Model.fromCache(modelOptions, modelCache);
             let shouldFetch = model.canBeFetched();
-            if (!shouldFetch || isForceFetchFunction) {
+            if (!shouldFetch && isForceFetchFunction) {
               // see if we should force it
               shouldFetch = isForceFetchFunction
                 ? options.forceFetch(id, model, props, prevProps) : isDifferentId && options.forceFetch;

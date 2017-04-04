@@ -1,3 +1,6 @@
+## v3.2.1
+only call `forceFetch` function if we should not otherwise fetch
+
 ## v3.2.0
 add `createLocalDelete` and `createLocalPut` action creator functions to modify redux state through actions without XHR requests
 

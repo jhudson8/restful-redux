@@ -158,7 +158,7 @@ describe('model-provider', function () {
         id: 'id',
         entityType: 'foo',
         fetchProp: 'fetch',
-        forceFetch: true
+        forceFetch: function () { return true; }
       })(Stub);
       let component = shallow(React.createElement(ComponentForceFetch, {
         id: '1',
@@ -173,7 +173,7 @@ describe('model-provider', function () {
         fetch: fetch,
         foo: 'bar'
       });
-      expect(fetch.callCount).to.eql(1);
+      expect(fetch.callCount).to.eql(2);
     });
 
     it('should trigger fetch even if id does not change', function () {
