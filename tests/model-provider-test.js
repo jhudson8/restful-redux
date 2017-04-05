@@ -99,37 +99,37 @@ describe('model-provider', function () {
   });
 
   describe('onIdChange', function () {
-    function createComponent(spy) {
-      return modelProvider({
+    function createComponent(spy, options) {
+      return modelProvider(Object.assign({
         id: 'id',
         entityType: 'foo',
         onIdChange: spy
-      })(Stub);
+      }, options))(Stub);
     }
 
     it('should always call on mount', function () {
       const spy = sinon.spy();
       const Component = createComponent(spy);
-      shallow(React.createElement(Component), {
+      shallow(React.createElement(Component, {
         id: undefined,
         entityType: 'foo'
-      });
+      }));
       expect(spy.callCount).to.equal(1);
 
-      shallow(React.createElement(Component), {
+      shallow(React.createElement(Component, {
         id: '1',
         entityType: 'foo'
-      });
+      }));
       expect(spy.callCount).to.equal(2);
     });
 
     it('should also call only when id changes', function () {
       const spy = sinon.spy();
       const Component = createComponent(spy);
-      let component = shallow(React.createElement(Component), {
+      let component = shallow(React.createElement(Component, {
         id: '1',
         entityType: 'foo'
-      });
+      }));
       expect(spy.callCount).to.equal(1);
       component = component.setProps({
         id: '2',
@@ -142,6 +142,29 @@ describe('model-provider', function () {
         foo: 'bar'
       });
       expect(spy.callCount).to.equal(2);
+    });
+    it('should not call if model encountered an XHR error', function () {
+      const fetchSpy = sinon.spy();
+      const Component = createComponent(sinon.spy(), {
+        forceFetch: sinon.spy(),
+        fetchProp: 'fetch',
+        fetch: fetchSpy
+      });
+      shallow(React.createElement(Component, {
+        id: 'idValue',
+        idValue: 'foo',
+        entityType: 'foo',
+        entities: {
+          _meta: {
+            foo: {
+              '1': {
+                fetch: { error: true }
+              }
+            }
+          }
+        }
+      }));
+      expect(fetchSpy.callCount).to.equal(0);
     });
   });
 

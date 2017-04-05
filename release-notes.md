@@ -1,3 +1,6 @@
+## v3.4.2
+do not fetch with the model provider if there has been a previous fetch error (avoid endless cycle) - any additional fetches must be manual
+
 ## v3.4.1
 only call `forceFetch` function if we should not otherwise fetch
 
