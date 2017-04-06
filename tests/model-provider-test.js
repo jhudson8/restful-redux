@@ -519,5 +519,34 @@ describe('model-provider', function () {
       expect(callArgs[0]).to.equal('1');
       expect(callArgs[1]).to.deep.equal({ abc: 'boop', ghi: 'beep' });
     });
+
+    it ('should allow function value (props, id)', function () {
+      const Component = modelProvider({
+        id: 'id',
+        entityType: 'foo',
+        fetchProp: 'fetch',
+        fetchOptions: function (props) {
+          return {
+            abc: props.params.jkl,
+            ghi: props.params.def
+          }
+        }
+      })(Stub);
+      const fetch = sinon.spy();
+      shallow(React.createElement(Component, {
+        id: '1',
+        foo: {},
+        fetch: fetch,
+        params: {
+          def: 'boop',
+          jkl: 'beep'
+        }
+      }));
+
+      expect(fetch.callCount).to.eql(1);
+      const callArgs = fetch.firstCall.args;
+      expect(callArgs[0]).to.equal('1');
+      expect(callArgs[1]).to.deep.equal({ abc: 'beep', ghi: 'boop' });
+    });
   });
 });

@@ -80,4 +80,4 @@ modelProvider({
 * ***denormalize***: normalizr denormalize function if you want the model value to be denormalized (`schema` is required)
 * ***schema***: normalizr schema to denormalize the value
 * ***arrayEntrySchema***: normalizr schema if the model value is an array and you want
-* ***fetchOptions***: optional function(props) used to provide a 2nd parameter to the fetch method if the `id` is not sufficient
+* ***fetchOptions***: optional function(props, id) used to provide a 2nd parameter to the fetch method if the `id` is not sufficient

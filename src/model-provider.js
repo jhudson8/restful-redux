@@ -28,10 +28,12 @@ export default function modelProvider (options) {
   // optimize for deep fetching
   _models.forEach(function (source) {
     const data = source.fetchOptions;
-    for (let key in data) {
-      if (data.hasOwnProperty(key)) {
-        if (typeof data[key] === 'string') {
-          data[key] = data[key].split('.');
+    if (typeof data === 'object') {
+      for (let key in data) {
+        if (data.hasOwnProperty(key)) {
+          if (typeof data[key] === 'string') {
+            data[key] = data[key].split('.');
+          }
         }
       }
     }
@@ -99,13 +101,18 @@ export default function modelProvider (options) {
   }
 
   function fetchModel (id, props, options) {
-    const fetchOptions = {};
     const fetchOptionsDef = options.fetchOptions;
-    for (var key in fetchOptionsDef) {
-      if (fetchOptionsDef.hasOwnProperty(key)) {
-        fetchOptions[key] = deepPropValue(fetchOptionsDef[key], props);
+    let fetchOptions = {};
+    if (typeof fetchOptionsDef === 'function') {
+      fetchOptions = fetchOptionsDef(props, id);
+    } else if (fetchOptionsDef) {
+      for (var key in fetchOptionsDef) {
+        if (fetchOptionsDef.hasOwnProperty(key)) {
+          fetchOptions[key] = deepPropValue(fetchOptionsDef[key], props);
+        }
       }
     }
+
     if (debug) {
       log(`triggering fetch for model "${id}" using "${options.fetchProp}" prop"`);
     }
@@ -227,6 +234,6 @@ function organizeProps (options) {
     idPropName: (options.idProp || 'id').split('.'),
     fetchProp: options.fetchProp,
     modelClass: options.modelClass || Model,
-    fetchOptions: Object.assign({}, options.fetchOptions)
+    fetchOptions: typeof options.fetchOptions === 'object' ? Object.assign({}, options.fetchOptions) : options.fetchOptions
   });
 }
