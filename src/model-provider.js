@@ -70,7 +70,7 @@ export default function modelProvider (options) {
             const isFetchError = model && model.fetchError();
             const value = model && model.value();
             let shouldFetch = model && !isFetchPending && !isFetchError && !value;
-            if (!isFetchPending && (!shouldFetch || isForceFetchFunction)) {
+            if (!shouldFetch && !isFetchPending && (!shouldFetch || isForceFetchFunction)) {
               // see if we should force it
               shouldFetch = isForceFetchFunction
                 ? options.forceFetch(id, model, props, prevProps) : isDifferentId && options.forceFetch;
@@ -111,8 +111,7 @@ export default function modelProvider (options) {
     }
     const fetchFunc = props[options.fetchProp];
     if (typeof fetchFunc !== 'function') {
-      console.error(options.fetchProp); // eslint-disable-line no-console
-      throw new Error(`props.${options.fetchProp} is a ${typeof fetchFunc} but should be a function`);
+      throw new Error(`props.${options.fetchProp} is ${typeof fetchFunc} but should be a function`);
     }
     props[options.fetchProp](id, fetchOptions);
   }

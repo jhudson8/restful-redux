@@ -1,3 +1,6 @@
+## v3.4.4
+added additional logging when using `debug: true`
+
 ## v3.4.3
 do not even allow forceFetch to be called if a fetch is pending
 

@@ -146,14 +146,16 @@ describe('model-provider', function () {
     it('should not call if model encountered an XHR error', function () {
       const fetchSpy = sinon.spy();
       const Component = createComponent(sinon.spy(), {
+        id: 'id',
         forceFetch: sinon.spy(),
         fetchProp: 'fetch',
-        fetch: fetchSpy
+        fetch: 'fetch'
       });
       shallow(React.createElement(Component, {
-        id: 'idValue',
+        id: '1',
         idValue: 'foo',
         entityType: 'foo',
+        fetch: fetchSpy,
         entities: {
           _meta: {
             foo: {
@@ -284,6 +286,24 @@ describe('model-provider', function () {
         foo: 'bar'
       });
       expect(fetch.callCount).to.eql(0);
+    });
+
+    it('should not call forceFetch if we are already going to fetch', function () {
+      const fetch = sinon.spy();
+      const forceFetch = sinon.spy();
+      const ComponentForceFetch = modelProvider({
+        id: 'id',
+        entityType: 'foo',
+        fetchProp: 'fetch',
+        forceFetch: forceFetch
+      })(Stub);
+      shallow(React.createElement(ComponentForceFetch, {
+        id: '1',
+        entities: { test: 'poop' },
+        fetch: fetch
+      }));
+      expect(fetch.callCount).to.eql(1);
+      expect(forceFetch.callCount).to.eql(0);
     });
   });
 
