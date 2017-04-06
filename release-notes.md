@@ -1,3 +1,6 @@
+## v3.4.3
+do not even allow forceFetch to be called if a fetch is pending
+
 ## v3.4.2
 do not fetch with the model provider if there has been a previous fetch error (avoid endless cycle) - any additional fetches must be manual
 

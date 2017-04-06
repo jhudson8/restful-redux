@@ -229,6 +229,34 @@ describe('model-provider', function () {
       expect(fetch.callCount).to.eql(2);
     });
 
+    it('should trigger fetch or allow forceFetch if a fetch is pending', function () {
+      const fetch = sinon.spy();
+      const forceFetch = sinon.spy();
+      const ComponentForceFetch = modelProvider({
+        id: 'id',
+        entityType: 'foo',
+        fetchProp: 'fetch',
+        forceFetch: forceFetch
+      })(Stub);
+      shallow(React.createElement(ComponentForceFetch, {
+        id: '1',
+        fetch: fetch,
+        entities: {
+          _meta: {
+            foo: {
+              '1': {
+                fetch: {
+                  pending: true
+                }
+              }
+            }
+          }
+        }
+      }));
+      expect(fetch.callCount).to.eql(0);
+      expect(forceFetch.callCount).to.eql(0);
+    });
+
     it('should never trigger fetch if `forceFetch` function returns false', function () {
       const fetch = sinon.spy();
       const entities = {
@@ -257,7 +285,6 @@ describe('model-provider', function () {
       });
       expect(fetch.callCount).to.eql(0);
     });
-
   });
 
   it('should trigger fetch when id changes', function () {
