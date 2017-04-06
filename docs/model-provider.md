@@ -39,9 +39,9 @@ export default connect(mapStateToProps, mapDispatchToProps)(
     entityType: 'customer',
     // if this is not included, the model will not be auto-fetched
     fetchProp: 'fetch',
-    // optional value to indicate that the model should be fetched even if it already exists
-    // can be a function for finer grained details (see below for more details)
-    forceFetch: true,
+    // function used to force a fetch even if the model data has already been retrieved
+    // note: this function will not be called if a fetch is pending
+    forceFetch: function (id, model, newProps, prevProps) { return true },
     // used if the model represents a collection and you want the value() response to contain Model objects rather than data
     arrayEntrySchema: _your_normalizr_schema_,
     // optional callback function when either the id value changes *or* the component is mounted
@@ -76,7 +76,7 @@ modelProvider({
 * ***idProp***: the property name used for the model id (defaults to `id`)
 * ***fetchProp***: the property used to fetch the model if necessary (the model will not be auto-fetched if this is not set)
 * ***modelClass***: the model class to use (defaults to { Model } from 'restful-redux`;  see [Model docs]('./model.md))
-* ***forceFetch***: `true` to force a fetch even if a the model data exists.  Or a function `(newId, currentModel, newProps, currentProps)` which returns a boolean for finer grained control (return `true` to fetch).  This function will execute during mount and any properties change.
+* ***forceFetch***:  Function `(newId, currentModel, newProps, currentProps)` which returns a boolean for finer grained control (return `true` to fetch).  This function will execute during mount and any properties change but not if there is a current XHR pending.
 * ***denormalize***: normalizr denormalize function if you want the model value to be denormalized (`schema` is required)
 * ***schema***: normalizr schema to denormalize the value
 * ***arrayEntrySchema***: normalizr schema if the model value is an array and you want
