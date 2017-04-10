@@ -41,12 +41,8 @@ export default class Model {
     this._value = value;
     this._options = options;
     this._meta = meta || {};
-    this._metadata = this._meta.data || {};
+    this._meta_data = this._meta.data || {};
     this._fetchedInfo = this._meta.fetched ? this._meta.fetched : this._value ? { type: 'set' } : false;
-  }
-
-  data () {
-    return this._metadata;
   }
 
   meta () {
@@ -90,85 +86,131 @@ export default class Model {
     }
     return this._formattedValue;
   }
+}
+
+var functions = {
+  data: function (meta) {
+    return (this && this._meta_data) || meta.data;
+  },
 
   /**
    * Return true if the model has been fetched
    */
-  wasFetched () {
-    let rtn = this._meta.fetch && this._meta.fetch.success;
-    if (!rtn && this.value()) {
+  wasFetched: function (meta) {
+    let rtn = meta.fetch && meta.fetch.success;
+    if (!rtn && typeof this.value === 'function' && this.value()) {
       rtn = 'exists';
     }
     return rtn;
-  }
+  },
 
-  canBeFetched () {
-    const meta = this._meta;
+  /**
+   * Return true if there is not a fetch pending or the model has been sucessfully fetched
+   */
+  canBeFetched: function (meta) {
     const fetchData = meta.fetch;
+    const hasValue = typeof this.value === 'function' && this.value();
     if (fetchData) {
       if (fetchData.pending) {
         return false;
       } else {
-        return !(fetchData.success || this.value());
+
+        return !(fetchData.success || !!hasValue);
       }
     } else {
-      return this.value() ? false : true;
+      return !hasValue;
     }
-  }
+  },
 
   /**
    * Return a boolean indicating if a model fetch is currently in progress
    */
-  isFetchPending () {
-    const fetchData = this._meta.fetch;
+  isFetchPending: function (meta) {
+    const fetchData = meta.fetch;
     return fetchData && fetchData.pending && (fetchData.initiatedAt || true) || false;
-  }
+  },
 
   /**
    * Return a fetch error if one was encountered
    */
-  fetchError () {
-    const fetchData = this._meta.fetch;
+  fetchError: function (meta) {
+    const fetchData = meta.fetch;
     return fetchData && fetchData.error;
-  }
+  },
 
   /**
    * Return a boolean indicating if a model fetch is currently in progress
    * @param {string} id: optinal identifier to see if a specific action is currently in progress
    */
-  isActionPending (actionId) {
-    const actionData = this._meta.action;
+  isActionPending (meta, actionId) {
+    const actionData = meta.action;
     if (actionData) {
       if ((actionId ? actionData.id === actionId : true) && actionData.pending) {
         return actionData;
       }
     }
     return false;
-  }
+  },
 
   /**
    * Return true if either a fetch or action is pending
    */
-  isPending (id) {
-    return !!(this.isFetchPending() || this.isActionPending(id));
-  }
+  isPending: function (meta, id) {
+    return !!(functions.isFetchPending(meta) || functions.isActionPending(meta, id));
+  },
 
   /**
    * If an action was performed and successful, return { id, success, error }.  `success` and `error` will be mutually exclusive and will
    * represent the XHR response payload
    * @paramm {string} actionId: optional action id to only return true if a specific action was performed
    */
-  wasActionPerformed (actionId) {
-    const actionData = this._meta.action;
+  wasActionPerformed: function (meta, actionId) {
+    const actionData = meta.action;
     if (actionData) {
       if (actionId ? actionData.id === actionId : true && !actionData.pending) {
         return actionData;
       }
     }
     return false;
-  }
-}
+  },
 
+  /**
+   * Return the number of milis since the last fetch completion (success or error)
+   */
+  timeSinceFetch: function (meta, currentTime) {
+    const fetchTime = (meta.fetch && meta.fetch.completedAt);
+    return fetchTime ? (currentTime || new Date().getTime()) - fetchTime : -1;
+  }
+};
+
+/**
+ * Include all defined functions to be included as instance functions as well as static
+ * functions that accept `meta` as the 1st parameter
+ */
+Object.keys(functions).forEach((functionName) => {
+  const func = functions[functionName];
+  function exec (isModelObject) {
+    return function () {
+      if (isModelObject) {
+        const meta = this._meta;
+        if (arguments.length == 0) {
+          return func.call(this, meta);
+        } else if (arguments.length === 1) {
+          // we know we don't have any of these methods with more than 1 arg
+          return func.call(this, meta, arguments[0]);
+        }
+      } else {
+        return func.apply(this, arguments);
+      }
+    };
+  }
+  Model.prototype[functionName] = exec(true);
+  Model[functionName] = exec();
+});
+
+/**
+ * Return a model from the cache object and create one if one does not exist
+ */
 Model.fromCache = function (options, cache) {
   const id = determineId(options.id);
   const entityType = options.entityType;
@@ -194,6 +236,9 @@ Model.fromCache = function (options, cache) {
   return cachedModel;
 };
 
+/**
+ * Clear the model referred to by the entity type and id from the cache
+ */
 Model.clearCache = function (id, entityType, cache) {
   id = determineId(id);
   var metaTypes = deepValue(cache, ['_meta', entityType]);

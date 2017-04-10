@@ -23,6 +23,16 @@ Anytime the [./model-provider.md](model provider) wrapper React class is used, a
 ```
 
 ### API
+#### Static Functions
+All of the Model instance methods (except `value`) are also available as static functions on the `Model class`.  This is useful if
+you have a reference to the `meta` object but not the Model object itself (see (Model Reducer beforeRender/afterRender)[./model-reducer]) for example scenarios.
+
+All of the static methods take the same params as the instance method except the `meta` object is added as the first param.
+```
+// get the time since fetch for the provided meta object
+const timeSinceFetch = Model.timeSinceFetch(meta);
+```
+
 #### Model.fromCache
 This is a static function on the Model class (options, cache) which will return a model from the `cache` if it exists.  The model
 would be placed into cache by using `Model.fromCache` at a previous time.  The model will be returned new if any model data changes.
@@ -117,6 +127,16 @@ The last action performed, unless cleared, will always be returned.  The return 
   initiatedAt: _timestamp_
   completedAt: _timestamp_
 }
+```
+
+#### timeSinceFetch
+The number of milis since the model has been fetched (even if error response) or `-1` if the model has not been fetched.  Optionally
+a timestamp (`new Date().getTime()`) as a parameter can be provided if you iterating over many models (as a new `Date` instance will be created for each function call otherwise).
+```
+const milis = model.timeSinceFetch();
+// or
+const now = new Date().getTime();
+const milis = model.timeSinceFetch(now);
 ```
 
 #### meta

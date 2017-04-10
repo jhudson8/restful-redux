@@ -1,3 +1,7 @@
+## v3.5.0
+- Added `timeSinceFetch` model function; see Model docs for more details
+- Added static functions for all Model instance functions (when you only have the model meta object); see Model docs for more details
+
 ## v3.4.4
 added additional logging when using `debug: true`
 

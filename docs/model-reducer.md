@@ -53,23 +53,20 @@ const allReducers = chainReducers([
 * ***actionPrefix***: required identifier for all actions which must match the `actionPrefix` config option in the associated action creator
 * ***entityType***: required identifier (used for root state key of domain specific models) which must match the `entityType` config option in the associated action creator
 * ***debug***: optional value to help log info to console if you are having trouble getting things working.  Can be `true` or `verbose` for more detailed console logs.
-* ***beforeReduce***: Callback function used to return new state ***before*** reducing happens. (see belor for function details)
-  * ***action***: the redux action
-  * ***util***: see ***Util*** section below - utility object used to manipulate entities
-  * ***id***: the entity id which was the focus of the dispatched action
-  * ***entities***: all entities from redux state
-  * ***value***: the model value that will be set to be associated with the provided id
-* ***afterReduce***: Callback function used to return new state ***after*** reducing happens. (see belor for function details)
+* ***beforeReduce***: Callback function used to return new state ***before*** reducing happens. (see below for function details)
+* ***afterReduce***: Callback function used to return new state ***after*** reducing happens. (see below for function details)
 
 #### beforeReduce / afterReduce
-This callback function must return the updated state if any changes are made.  Using the `reducerUtil` is handy for these situations.
+This callback function must return the updated state if any changes are made.  Using the `reducerUtil` (see below for reducerUtil details) is handy for these situations.
 
-The function signature is (data, state) where `data` is { action, id, entities, result, data }
+The function signature is (data, meta) where `data` is { action, id, entities, result, data, state }
 * ***action***: the dispatched action
 * ***id***: the entity id specific to the action that initiated the reducer
 * ***entities***: the `entities` action payload value (if provided) in the action payload (not the current state entities)
 * ***result***: the `result` action payload value (if provided)
 * ***data***: the `data` action payload value (if provided)
+* ***state***: the redux state
+* ***meta***: the model metadata;  You can use [Model static functions](./model.md#static-functions) with this;  for example `Model.timeSinceFetch(meta)`
 
 
 ## Reducer Util
@@ -133,24 +130,16 @@ const newState = reducerUtil(state).clear(_entityType_).execute();
 * ***entityType***: the entity type
 * ***id***: the entity id of the current iteration
 * ***value***: the entity value (what was fetched) of the current iteration
-* ***meta***: all metadata associated with the value { data, fetched, fetchedBy, actionError, actionPending, fetchError, fetchPending }
-  * ***data***: any data set using the action creator ***data*** function - persists even after a model is re-fetched
-  * ***fetched***: fetch data if the model has been fetched { type, timestamp, id, entityType }
-    * ***type***: 'full' if the model value is from a fetch; 'normalized' if the model value was from another model fetch that was normalized; 'set' if a model was constructed directly with a model value
-    * ***fetchedBy***: if a model was set from a normalization ( fetched.type === 'normalized '), will refer to the `fetched` value from the actual fetched model that was normalized
-    * ***actionError***: XHR error response from the last restful-redux action that was taken
-    * ***actionResponse***: XHR response from the last restful-redux action if successful
-    * ***actionPending***: `true` if a restful-redux action is currently in flight
-    * ***fetchError***: the XHR error if the model could not be fetched
-    * ***fetchPending***: true if the entity XHR fetch is currently in flight
+* ***meta***: all metadata associated with the value.  See [Model static functions](./model.md#static-functions);  for example `Model.timeSinceFetch(meta)`
 
-Note: _this_ can be used in your callback function to execute utility methods
+Note: _this_ can be used in your callback function to execute utility functions
 ```javascript
 // delete all entities fetched more than 10 min ago
 var checkTs = new Date().getTime() - (1000 * 60 * 10);
 const newState = reducerUtil(state).iterate(_entityType_, function (id, value, meta) {
-  var fetchTime = meta.fetchedBy ? meta.fetchedBy.timestamp : meta.fetched && meta.fetched.timestamp;
-  if (fetchTime && fetchTime < checkTs) {
+  // You can use Model static functions with the meta object
+  const timeSinceFetch = Model.timeSinceFetch(meta);
+  if (fetchTime > 0 && fetchTime < checkTs) {
     this.delete(id, _entityType_);
   }
 }).execute();

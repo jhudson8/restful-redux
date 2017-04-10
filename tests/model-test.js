@@ -250,6 +250,10 @@ describe('model', function () {
       var model = new Model(options({ fetch: { success: 'fetched' } }));
       expect(model.wasFetched()).to.equal('fetched');
     });
+
+    it('Model.wasFetched', function () {
+      expect(Model.wasFetched({ fetch: { success: 'fetched' } })).to.equal('fetched');
+    });
   });
 
 
@@ -268,6 +272,31 @@ describe('model', function () {
       var model = new Model(options({ }, true));
       expect(model.isFetchPending()).to.equal(false);
     });
+
+    it('Model.isFetchPending', function () {
+      expect(Model.isFetchPending({ })).to.equal(false);
+    });
+  });
+
+
+  describe('timeSinceFetch', function () {
+    it('should return a number if the model has been fetched', function () {
+      var model = new Model(options({ fetch: { completedAt: 12345 } }));
+      var value = model.timeSinceFetch();
+      expect(typeof value).to.equal('number');
+      expect(value > 0).to.equal(true);
+    });
+    it('should return -1 if the model has not been fetched', function () {
+      var model = new Model(options({ }));
+      expect(model.timeSinceFetch()).to.equal(-1);
+    });
+    it('should use the explicitely provided time if included', function () {
+      var model = new Model(options({ fetch: { completedAt: 12345 } }));
+      expect(model.timeSinceFetch(12346)).to.equal(1);
+    });
+    it('Model.timeSinceFetch', function () {
+      expect(Model.timeSinceFetch({ fetch: { completedAt: 12345 } }, 12346)).to.equal(1);
+    });
   });
 
 
@@ -280,6 +309,10 @@ describe('model', function () {
     it('should return undefined if no model exists', function () {
       var model = new Model(options({ }, true));
       expect(model.fetchError()).to.equal(undefined);
+    });
+
+    it('Model.fetchError', function () {
+      expect(Model.fetchError({ fetch: { error: {foo: 'bar'} } })).to.deep.equal({foo: 'bar'});
     });
   });
 
@@ -309,6 +342,10 @@ describe('model', function () {
       var model = new Model(options({ }, true));
       expect(model.isActionPending()).to.equal(false);
     });
+
+    it('Model.isActionPending', function () {
+      expect(Model.isActionPending({ action: { id: 'foo', pending: true, initiatedAt: 12345 } }, 'foo')).to.deep.equal({ id: 'foo', pending: true, initiatedAt: 12345 });
+    });
   });
 
 
@@ -336,6 +373,10 @@ describe('model', function () {
     it('should return false if an action was not performed', function () {
       var model = new Model(options({ }));
       expect(model.wasActionPerformed()).to.equal(false);
+    });
+
+    it('Model.wasActionPerformed', function () {
+      expect(Model.wasActionPerformed({ action: { id: 'foo', success: { foo: 'bar'}, completedAt: 12345 } }, 'foo')).to.deep.equal({ id: 'foo', success: { foo: 'bar'}, completedAt: 12345 });
     });
   });
 
