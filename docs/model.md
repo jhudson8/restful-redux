@@ -49,6 +49,8 @@ var myModel = Model.fromCache({
 
 #### data
 Return any meta data which can be set using the [action creator](./action-creator.md).  This is handy when your model is actually an array and you want to keep track of the total count or other related information.
+
+Note: this will always give you an object so you don't have to do a null check *unless you use the static Model.data(meta) function* - if you do not have any model data you will get `undefined`
 ```javascript
   render: function () {
     const model = this.props.model;
