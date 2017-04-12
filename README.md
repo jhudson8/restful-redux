@@ -40,7 +40,7 @@ applyMiddleware(multi, thunk, effects, fetch);
 
 
 ## Basic Example
-This is all you need to fetch, reduce and get access to your model data.  Here we will be fetching user data.
+This is all you need to fetch, reduce and get access to your model data and loading states.  Here we will be fetching user data.
 ### user action creator
 ```javascript
 import { createActionCreator } from 'restful-redux';
