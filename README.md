@@ -1,10 +1,12 @@
 # restful-redux
 
 ## tl;dr
-REST oriented action creators, reducers and model utilities to DRY up boilerplate XHR functionality.
+If Redux feels like it's missing first class XHR handling, give `restful-redux` a try.
 
 
 ## More Details
+
+
 GraphQL has it's place but many applications use REST-based service APIs for a variety of reasons.
 
 There are always commonalities between action creators, reducers and smart components with redux like

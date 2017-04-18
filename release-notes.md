@@ -1,3 +1,6 @@
+## v3.5.1
+- optimization: don't deep clone meta.data on reducer actions
+
 ## v3.5.0
 - Added `timeSinceFetch` model function; see Model docs for more details
 - Added static functions for all Model instance functions (when you only have the model meta object); see Model docs for more details

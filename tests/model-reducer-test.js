@@ -108,6 +108,27 @@ var bubbleUpTestState = {
 Object.freeze(bubbleUpTestState);
 const savedbubbleUpTestState = JSON.parse(JSON.stringify(bubbleUpTestState));
 
+var complexDataTestState = {
+  entities: {
+    _meta: {
+      foo: {
+        '1': {
+          fetch: {
+            success: 'normalized',
+            source: { entityType: 'fooList', id: 'l1' }
+          },
+          data: {
+            abc: [123, 456]
+          }
+        }
+      }
+    },
+    foo: {
+      '1': { foo: 'bar' }
+    }
+  }
+};
+
 describe('model-reducer', function () {
   const fooReducer = createReducer({
     actionPrefix: 'FOO',
@@ -263,7 +284,7 @@ describe('model-reducer', function () {
     });
   });
 
-  describe('DATA', function () {
+  describe('data', function () {
     it('should add new data attribute', function () {
       const state = fooReducer(initialState1, {
         type: 'FOO_DATA',
@@ -295,6 +316,38 @@ describe('model-reducer', function () {
           }
         }
       });
+    });
+
+    it('should not deep clone data upon reducer actions', function () {
+      var _data = complexDataTestState.entities._meta.foo['1'].data;
+      const state = fooReducer(complexDataTestState, {
+        type: 'FOO_FETCH_PENDING',
+        payload: {
+          id: '1'
+        }
+      });
+      delete state.entities._meta.foo['1'].fetch.initiatedAt;
+      expect(complexDataTestState).to.deep.equal(complexDataTestState);
+      expect(state).to.deep.equal({
+        entities: {
+          _meta: {
+            foo: {
+              '1': {
+                fetch: {
+                  pending: true
+                },
+                data: {
+                  abc: [123, 456]
+                }
+              }
+            }
+          },
+          foo: {
+            '1': { foo: 'bar' }
+          }
+        }
+      });
+      expect(state.entities._meta.foo['1'].data.abc).to.equal(_data.abc);
     });
 
     it('should remove existing data attribute', function () {

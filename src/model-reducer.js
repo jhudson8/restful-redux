@@ -197,7 +197,8 @@ function reducer (options) {
         pending: true,
         completedAt: undefined,
         success: undefined,
-        error: undefined
+        error: undefined,
+        source: undefined
       }
     }
   }, {
@@ -307,7 +308,13 @@ function mergeMeta (newMeta, oldMeta, options) {
   const meta = newMeta._replace ? clone(newMeta) : clone(oldMeta, newMeta);
   Object.keys(meta).forEach(function (key) {
     let value = meta[key];
-    if (key === '_timestamp') {
+    if (key === 'data') {
+      if (newMeta.data) {
+        meta.data = Object.assign(meta.data, oldMeta.data);
+      }
+      console.log(JSON.stringify(meta.data));
+      return;
+    } else if (key === '_timestamp') {
       meta[value] = options.timestamp;
     } else if (metaKeys.indexOf(key) >= 0) {
       return;
