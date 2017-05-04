@@ -1,3 +1,6 @@
+## v3.5.2
+- enhancement: allow modelProvider to support multiple models using the same fetchProp
+
 ## v3.5.1
 - optimization: don't deep clone meta.data on reducer actions
 
