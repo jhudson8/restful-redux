@@ -53,11 +53,11 @@ export default function modelProvider (options) {
   function maybeFetchModels (props, prevProps) {
     const self = this;
     const state = this.state;
-    _models.forEach((options) => {
+    _models.forEach((options, index) => {
       if (options.fetchProp && !props[options.modelProp || 'model']) {
         const id = getModelId(props, options);
         if (id) {
-          const prevId = state.fetched[options.fetchProp];
+          const prevId = state.fetched[index];
           const isDifferentId = prevId !== id;
           const modelCache = self.state.modelCache;
           const isForceFetchFunction = typeof options.forceFetch === 'function';
@@ -84,7 +84,7 @@ export default function modelProvider (options) {
 
               Model.clearCache(prevId, options.entityType, modelCache);
               fetchModel(id, props, options);
-              state.fetched[options.fetchProp] = id;
+              state.fetched[index] = id;
             } else if (debug) {
               if (isDifferentId) {
                 log(`not fetching model using "${options.fetchProp}"; id changed from ${prevId} to ${id} but data exists in state`);
@@ -120,7 +120,7 @@ export default function modelProvider (options) {
     if (typeof fetchFunc !== 'function') {
       throw new Error(`props.${options.fetchProp} is ${typeof fetchFunc} but should be a function`);
     }
-    props[options.fetchProp](id, fetchOptions);
+    props[options.fetchProp](id === NO_ID ? false : id, fetchOptions);
   }
 
   return function (_Component) {

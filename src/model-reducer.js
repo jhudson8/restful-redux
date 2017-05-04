@@ -312,7 +312,6 @@ function mergeMeta (newMeta, oldMeta, options) {
       if (newMeta.data) {
         meta.data = Object.assign(meta.data, oldMeta.data);
       }
-      console.log(JSON.stringify(meta.data));
       return;
     } else if (key === '_timestamp') {
       meta[value] = options.timestamp;
