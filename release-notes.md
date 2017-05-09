@@ -1,3 +1,6 @@
+## v3.5.3
+bug fix: treat `createGetAction` as a semantic action rather than a fetch
+
 ## v3.5.2
 - enhancement: allow modelProvider to support multiple models using the same fetchProp
 
