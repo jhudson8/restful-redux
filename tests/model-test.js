@@ -230,12 +230,17 @@ describe('model', function () {
       expect(model.wasFetched()).to.equal(true);
       expect(model.wasActionPerformed('test')).to.deep.equal({ id: 'test', error: { ghi: 'jkl' } });
     });
-    it('(ivalue, meta)', function () {
+    it('(value, meta)', function () {
       var model = new Model({ id: '1', foo: 'bar' }, { data: { abc: 'def' }, fetch: { success: true }, action: { id: 'test', error: { ghi: 'jkl' } } });
       expect(model.value()).to.deep.eql({ id: '1', foo: 'bar' });
       expect(model.data()).to.deep.eql({ abc: 'def' });
       expect(model.wasFetched()).to.equal(true);
       expect(model.wasActionPerformed('test')).to.deep.equal({ id: 'test', error: { ghi: 'jkl' } });
+    });
+    it('(value, true)', function () {
+      var model = new Model({ id: '1', foo: 'bar' }, true);
+      expect(model.value()).to.deep.eql({ id: '1', foo: 'bar' });
+      expect(model.wasFetched()).to.equal('exists');
     });
   });
 

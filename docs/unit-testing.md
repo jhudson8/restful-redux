@@ -28,6 +28,10 @@ new Model(_model_value_, { fetch: { pending: true } });
 ```
 new Model(_model_value_, { fetch: { success: true } });
 ```
+or just
+```
+new Model(_model_value_, true);
+```
 
 ### Fetched With Error
 ```

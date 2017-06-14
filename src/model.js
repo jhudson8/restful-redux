@@ -24,16 +24,24 @@ export default class Model {
         id = value ? determineId(value.id) : NO_ID;
       }
     } else {
-      // (options)
-      id = determineId(options.id);
-      entities = options.entities;
-      if (entities) {
-        // allow for root state to be passed
-        entities = entities.entities || entities;
+      if (value === true) {
+        // (value)
+        id = NO_ID;
+        value = options;
+        options = {};
+        meta = {};
+      } else {
+        // (options)
+        id = determineId(options.id);
+        entities = options.entities;
+        if (entities) {
+          // allow for root state to be passed
+          entities = entities.entities || entities;
+        }
+        entityType = options.entityType;
+        value = deepValue(entities, [entityType, id]);
+        meta = deepValue(entities, ['_meta', entityType, id]);
       }
-      entityType = options.entityType;
-      value = deepValue(entities, [entityType, id]);
-      meta = deepValue(entities, ['_meta', entityType, id]);
     }
 
     this.id = id;
