@@ -1,3 +1,7 @@
+## v3.6.0
+enhancement: add additional Model constructor for unit testing to indicate a successful fetch: `new Model(_value_, true)`
+note: `new Model(_model_value_, { fetch: { success: true } })` is still valid
+
 ## v3.5.3
 bug fix: treat `createGetAction` as a semantic action rather than a fetch
 
