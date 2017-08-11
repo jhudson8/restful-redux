@@ -1,6 +1,6 @@
 {
   "name": "restful-redux",
-  "version": "3.6.0",
+  "version": "4.0.0-beta",
   "description": "REST-oriented action creator, reducer and other associated utilities",
   "main": "lib/index.js",
   "keywords": [

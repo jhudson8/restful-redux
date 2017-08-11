@@ -1,3 +1,7 @@
+## v4.0.0-beta
+createGetAction/createPostAction... and all other except createFetchAction have redux action types of `ACTION` rather than `FETCH`
+which will not cause the model to show as being fetched when these actions are executed.  Also, by default, the response from these action will replace the model contents.
+
 ## v3.6.0
 enhancement: add additional Model constructor for unit testing to indicate a successful fetch: `new Model(_value_, true)`
 note: `new Model(_model_value_, { fetch: { success: true } })` is still valid

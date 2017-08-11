@@ -17,7 +17,8 @@ var REST_METHODS = [{
 }, {
   name: 'Get',
   method: 'GET',
-  fetchOrAction: ACTION
+  fetchOrAction: ACTION,
+  replaceModel: true
 }, {
   name: 'Delete',
   method: 'DELETE',
@@ -26,15 +27,18 @@ var REST_METHODS = [{
 }, {
   name: 'Put',
   method: 'PUT',
-  fetchOrAction: ACTION
+  fetchOrAction: ACTION,
+  replaceModel: true
 }, {
   name: 'Patch',
   method: 'PATCH',
-  fetchOrAction: ACTION
+  fetchOrAction: ACTION,
+  replaceModel: true
 }, {
   name: 'Post',
   method: 'POST',
-  fetchOrAction: ACTION
+  fetchOrAction: ACTION,
+  replaceModel: true
 }];
 
 var STATIC_METHODS = [{
@@ -200,6 +204,7 @@ export default function (options) {
       method
     } = options;
     const isDelete = options.delete;
+    const _replaceModel = options.replaceModel;
     /**
      * return the action to be dispatched when an XHR-based action should be taken on a model/REST document
      * - ACTION_SUCCESS_{entityType}: the data was retrieved successfully
@@ -227,6 +232,10 @@ export default function (options) {
       } = options;
       const _bubbleUp = typeof options.bubbleUp === 'undefined' ? bubbleUp : options.bubbleUp;
       const _delete = typeof options.delete !== 'undefined' ? options.delete : isDelete;
+      replaceModel = typeof replaceModel === 'undefined' ? _replaceModel : replaceModel;
+      if (typeof actionId === 'undefined' && fetchOrAction === ACTION) {
+        actionId = method;
+      }
       if (id === false) {
         id = NO_ID;
       }
@@ -244,12 +253,18 @@ export default function (options) {
         });
       }
 
-      const pendingAction = createPendingAction(actionPrefix, id, actionId, _bubbleUp);
+      const pendingAction = createPendingAction({
+        id,
+        fetchOrAction,
+        actionPrefix,
+        actionId,
+        bubbleUp: _bubbleUp
+      });
       const fetchAction = fetch(url, params);
       const composedAction = bind(fetchAction,
         asyncResponseAction({
           entityType,
-          fetchOrAction: fetchOrAction,
+          fetchOrAction,
           type: SUCCESS,
           id,
           actionId,
@@ -304,8 +319,8 @@ function formatSuccessPayload ({ payload, formatter, formatterOptions, type, sch
 }
 
 // create a dispatchable action that represents a pending model/REST document action
-function createPendingAction (actionPrefix, id, actionId, bubbleUp) {
-  const type = actionId ? ACTION : FETCH;
+function createPendingAction ({ actionPrefix, id, actionId, fetchOrAction, bubbleUp }) {
+  const type = fetchOrAction;
   const payload = { id };
   if (typeof bubbleUp !== 'undefined') {
     payload.bubbleUp = bubbleUp;

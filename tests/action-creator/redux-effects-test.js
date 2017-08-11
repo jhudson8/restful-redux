@@ -375,7 +375,7 @@ describe('redux-effects-action-creator', function () {
         payload: {
           id: '1',
           actionId: 'beep',
-          response: {
+          result: {
             foo: 'bar'
           }
         }
@@ -400,7 +400,7 @@ describe('redux-effects-action-creator', function () {
           payload: {
             id: '1',
             actionId: 'beep',
-            response: {
+            result: {
               foo: 'bar'
             }
           }
@@ -424,7 +424,7 @@ describe('redux-effects-action-creator', function () {
           payload: {
             id: '1',
             actionId: 'beep',
-            response: {
+            result: {
               foo: 'bar'
             }
           }
