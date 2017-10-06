@@ -1002,17 +1002,18 @@ describe('model-reducer', function () {
         }
       });
       expect(emptyState).to.deep.equal(savedEmptyState);
-      expect(typeof state.entities._meta.foo['1'].action.completedAt).to.equal('number');
-      delete state.entities._meta.foo['1'].action.completedAt;
+      expect(typeof state.entities._meta.foo['1'].actions.test.completedAt).to.equal('number');
+      delete state.entities._meta.foo['1'].actions.test.completedAt;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
             foo: {
               '1': {
-                action: {
-                  id: 'test',
-                  success: {
-                    foo: 'bar'
+                actions: {
+                  test: {
+                    success: {
+                      foo: 'bar'
+                    }
                   }
                 }
               }
@@ -1038,16 +1039,17 @@ describe('model-reducer', function () {
         }
       });
       expect(initialState1).to.deep.equal(savedInitialState1);
-      expect(typeof state.entities._meta.foo['1'].action.completedAt).to.equal('number');
-      delete state.entities._meta.foo['1'].action.completedAt;
+      expect(typeof state.entities._meta.foo['1'].actions.test.completedAt).to.equal('number');
+      delete state.entities._meta.foo['1'].actions.test.completedAt;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
             foo: {
               '1': {
-                action: {
-                  id: 'test',
-                  success: true
+                actions: {
+                  test: {
+                    success: true
+                  }
                 },
                 data: {
                   customMetaProp: 'foo'
@@ -1076,16 +1078,17 @@ describe('model-reducer', function () {
         }
       });
       expect(emptyState).to.deep.equal(savedEmptyState);
-      expect(typeof state.entities._meta.foo['1'].action.initiatedAt).to.equal('number');
-      delete state.entities._meta.foo['1'].action.initiatedAt;
+      expect(typeof state.entities._meta.foo['1'].actions.bar.initiatedAt).to.equal('number');
+      delete state.entities._meta.foo['1'].actions.bar.initiatedAt;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
             foo: {
               '1': {
-                action: {
-                  id: 'bar',
-                  pending: true
+                actions: {
+                  bar: {
+                    pending: true
+                  }
                 }
               }
             }
@@ -1103,16 +1106,17 @@ describe('model-reducer', function () {
         }
       });
       expect(initialState1).to.deep.equal(savedInitialState1);
-      expect(typeof state.entities._meta.foo['1'].action.initiatedAt).to.equal('number');
-      delete state.entities._meta.foo['1'].action.initiatedAt;
+      expect(typeof state.entities._meta.foo['1'].actions.bar.initiatedAt).to.equal('number');
+      delete state.entities._meta.foo['1'].actions.bar.initiatedAt;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
             foo: {
               '1': {
-                action: {
-                  id: 'bar',
-                  pending: true
+                actions: {
+                  bar: {
+                    pending: true
+                  }
                 },
                 data: {
                   customMetaProp: 'foo'
@@ -1144,17 +1148,18 @@ describe('model-reducer', function () {
         }
       });
       expect(emptyState).to.deep.equal(savedEmptyState);
-      expect(typeof state.entities._meta.foo['1'].action.completedAt).to.equal('number');
-      delete state.entities._meta.foo['1'].action.completedAt;
+      expect(typeof state.entities._meta.foo['1'].actions.bar.completedAt).to.equal('number');
+      delete state.entities._meta.foo['1'].actions.bar.completedAt;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
             foo: {
               '1': {
-                action: {
-                  id: 'bar',
-                  error: {
-                    abc: 'def'
+                actions: {
+                  bar: {
+                    error: {
+                      abc: 'def'
+                    }
                   }
                 }
               }
@@ -1176,17 +1181,18 @@ describe('model-reducer', function () {
         }
       });
       expect(initialState1).to.deep.equal(savedInitialState1);
-      expect(typeof state.entities._meta.foo['1'].action.completedAt).to.equal('number');
-      delete state.entities._meta.foo['1'].action.completedAt;
+      expect(typeof state.entities._meta.foo['1'].actions.bar.completedAt).to.equal('number');
+      delete state.entities._meta.foo['1'].actions.bar.completedAt;
       expect(state).to.deep.equal({
         entities: {
           _meta: {
             foo: {
               '1': {
-                action: {
-                  id: 'bar',
-                  error: {
-                    abc: 'def'
+                actions: {
+                  bar: {
+                    error: {
+                      abc: 'def'
+                    }
                   }
                 },
                 data: {
@@ -1211,14 +1217,18 @@ describe('model-reducer', function () {
     it('should handle empty state', function () {
       const state = fooReducer(emptyState, {
         type: 'FOO_ACTION_CLEAR',
-        payload: { id: '1' }
+        payload: { id: '1', actionId: 'bar' }
       });
       expect(emptyState).to.deep.equal(savedEmptyState);
       expect(state).to.deep.equal({
         entities: {
           _meta: {
             foo: {
-              '1': {}
+              '1': {
+                actions: {
+                  bar: undefined
+                }
+              }
             }
           },
           foo: {}
@@ -1228,7 +1238,7 @@ describe('model-reducer', function () {
     it('should work with existing model', function () {
       const state = fooReducer(initialState1, {
         type: 'FOO_ACTION_CLEAR',
-        payload: { id: '1' }
+        payload: { id: '1', actionId: 'bar' }
       });
       expect(initialState1).to.deep.equal(savedInitialState1);
       expect(state).to.deep.equal({
@@ -1236,6 +1246,9 @@ describe('model-reducer', function () {
           _meta: {
             foo: {
               '1': {
+                actions: {
+                  bar: undefined
+                },
                 data: {
                   customMetaProp: 'foo'
                 }
@@ -1255,13 +1268,14 @@ describe('model-reducer', function () {
     it('should actually clear out an action', function () {
       let state = JSON.parse(JSON.stringify(initialState1));
       const meta = state.entities._meta.foo['1'];
-      meta.action = {
-        id: 'actionId',
-        success: 'foo'
+      meta.actions = {
+        bar: {
+          success: 'foo'
+        }
       };
       state = fooReducer(state, {
         type: 'FOO_ACTION_CLEAR',
-        payload: { id: '1' }
+        payload: { id: '1', actionId: 'bar' }
       });
       expect(initialState2).to.deep.equal(savedInitialState2);
       expect(state).to.deep.equal({
@@ -1269,6 +1283,9 @@ describe('model-reducer', function () {
           _meta: {
             foo: {
               '1': {
+                actions: {
+                  bar: undefined
+                },
                 data: {
                   customMetaProp: 'foo'
                 }
@@ -1283,6 +1300,86 @@ describe('model-reducer', function () {
           }
         }
       });
+    });
+  });
+
+  it('should not clear out other actions', function () {
+    let state = JSON.parse(JSON.stringify(initialState1));
+    const meta = state.entities._meta.foo['1'];
+    meta.actions = {
+      bar: {
+        success: 'foo'
+      },
+      foo: {
+        success: true
+      }
+    };
+    state = fooReducer(state, {
+      type: 'FOO_ACTION_CLEAR',
+      payload: { id: '1', actionId: 'bar' }
+    });
+    expect(initialState2).to.deep.equal(savedInitialState2);
+    expect(state).to.deep.equal({
+      entities: {
+        _meta: {
+          foo: {
+            '1': {
+              actions: {
+                bar: undefined,
+                foo: {
+                  success: true
+                }
+              },
+              data: {
+                customMetaProp: 'foo'
+              }
+            }
+          }
+        },
+        foo: {
+          '1': {
+            foo: 'abc',
+            beep: 'boop'
+          }
+        }
+      }
+    });
+  });
+
+  it('should clear all actions', function () {
+    let state = JSON.parse(JSON.stringify(initialState1));
+    const meta = state.entities._meta.foo['1'];
+    meta.actions = {
+      bar: {
+        success: 'foo'
+      },
+      foo: {
+        success: true
+      }
+    };
+    state = fooReducer(state, {
+      type: 'FOO_ACTION_CLEAR',
+      payload: { id: '1' }
+    });
+    expect(initialState2).to.deep.equal(savedInitialState2);
+    expect(state).to.deep.equal({
+      entities: {
+        _meta: {
+          foo: {
+            '1': {
+              data: {
+                customMetaProp: 'foo'
+              }
+            }
+          }
+        },
+        foo: {
+          '1': {
+            foo: 'abc',
+            beep: 'boop'
+          }
+        }
+      }
     });
   });
 });

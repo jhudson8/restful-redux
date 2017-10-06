@@ -26,8 +26,8 @@ function reducer (options) {
   function update ({
     state,
     action,
-    id,
     actionId,
+    id,
     // action response
     response,
     // fetch result
@@ -86,8 +86,9 @@ function reducer (options) {
     // update the metadata
     const metaDomain = stateEntities._meta[entityType] = clone(stateEntities._meta[entityType]);
     meta = metaDomain[id] = mergeMeta(meta, metaDomain[id], {
-      timestamp: new Date().getTime(),
-      actionId
+      timestamp: new Date().getTime()
+    }, {
+      actionId: actionId
     });
 
     // handle special user data
@@ -115,6 +116,9 @@ function reducer (options) {
       let parent = meta;
       for (var i = 0; i < responseProp.length; i++) {
         let key = responseProp[i];
+        if (key === '$actionId') {
+          key = actionId;
+        }
         if (i === responseProp.length - 1) {
           parent[key] = response || true;
         } else {
@@ -215,19 +219,17 @@ function reducer (options) {
   }, {
     type: 'ACTION_ERROR',
     meta: {
-      _responseProp: ['action', 'error'],
-      action: {
+      _responseProp: ['actions', '$actionId', 'error'],
+      'actions.$actionId': {
         _replace: true,
-        id: '$actionId',
         _timestamp: 'completedAt',
       }
     }
   }, {
     type: 'ACTION_PENDING',
     meta: {
-      action: {
+      'actions.$actionId': {
         _replace: true,
-        id: '$actionId',
         pending: true,
         _timestamp: 'initiatedAt'
       }
@@ -235,18 +237,27 @@ function reducer (options) {
   }, {
     type: 'ACTION_SUCCESS',
     meta: {
-      _responseProp: ['action', 'success'],
-      action: {
+      _responseProp: ['actions', '$actionId', 'success'],
+      'actions.$actionId': {
         _replace: true,
-        id: '$actionId',
         _timestamp: 'completedAt',
       }
     }
   }, {
     type: 'ACTION_CLEAR',
-    meta: {
-      action: {
-        _delete: true
+    meta: function (payload) {
+      if (payload.actionId) {
+        return {
+          'actions.$actionId': {
+            _delete: true
+          }
+        };
+      } else {
+        return {
+          actions: {
+            _delete: true
+          }
+        }
       }
     }
   }, {
@@ -272,7 +283,10 @@ function reducer (options) {
         const bubbleUp = payload.bubbleUp;
         const id = (payload.id === false ? NO_ID : payload.id) || result;
         const actionId = payload.actionId;
-        const meta = options.meta;
+        let meta = options.meta;
+        if (typeof meta === 'function') {
+          meta = meta(payload);
+        }
         const data = meta._data ? payload : payload.data;
 
         return update({
@@ -301,11 +315,12 @@ function reducer (options) {
 
 // things we don't want to end up in the meta object
 var metaKeys = ['_timestamp', '_clearValue', '_responseProp', '_replace', '_replaceData', '_delete'];
-function mergeMeta (newMeta, oldMeta, options) {
+function mergeMeta (newMeta, oldMeta, options, data) {
   if (newMeta._delete) {
     return undefined;
   }
   const meta = newMeta._replace ? clone(newMeta) : clone(oldMeta, newMeta);
+  delete meta._replace;
   Object.keys(meta).forEach(function (key) {
     let value = meta[key];
     if (key === 'data') {
@@ -315,12 +330,54 @@ function mergeMeta (newMeta, oldMeta, options) {
       return;
     } else if (key === '_timestamp') {
       meta[value] = options.timestamp;
+      delete meta._timestamp;
     } else if (metaKeys.indexOf(key) >= 0) {
       return;
-    } else if (typeof value === 'object') {
-      value = meta[key] = mergeMeta(value, oldMeta ? oldMeta[key] : undefined, options);
     } else if (value === '$actionId') {
       meta[key] = options.actionId || true;
+    } else if (key.indexOf('.') > 0) {
+      // we've got nested content
+      const parts = key.split('.');
+      let root = meta;
+      let _root;
+      let _rootKey;
+      for (var i = 0; i < parts.length; i++) {
+        const part = parts[i];
+        const match = part.match(/^(\$?)([^!]*)(!?)$/);
+        let _key;
+        if (match[1]) {
+          // this is a variable
+          if (match[2] === 'actionId') {
+            _key = data.actionId;
+          } else {
+            throw new Error('unknown token name: ' + match[2]);
+          }
+          if (match[3] && !_key) {
+            // if the value does not exist, return the current parent
+            break;
+          }
+        } else {
+          _key = part;
+        }
+        if (i === parts.length - 1) {
+          const toSet = root[_key] || {};
+          root[_key] = mergeMeta(value, toSet, options, data);
+          meta[_rootKey] = _root;
+          break;
+        }
+        if (!root[_key]) {
+          root = root[_key] = {};
+        } else {
+          root = root[_key] = Object.assign({}, root[_key]);
+        }
+        if (i === 0) {
+          _root = root;
+          _rootKey = _key;
+        }
+      }
+      delete meta[key];
+    } else if (typeof value === 'object') {
+      value = meta[key] = mergeMeta(value, oldMeta ? oldMeta[key] : undefined, options, data);
     }
 
     if (typeof value === 'undefined') {

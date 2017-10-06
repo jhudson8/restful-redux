@@ -224,18 +224,18 @@ describe('model', function () {
 
   describe('alternative constructors', function () {
     it('(id, value, meta)', function () {
-      var model = new Model('1', { foo: 'bar' }, { data: { abc: 'def' }, fetch: { success: true }, action: { id: 'test', error: { ghi: 'jkl' } } });
+      var model = new Model('1', { foo: 'bar' }, { data: { abc: 'def' }, fetch: { success: true }, actions: { test: { error: { ghi: 'jkl' } } } });
       expect(model.value()).to.deep.eql({ foo: 'bar' });
       expect(model.data()).to.deep.eql({ abc: 'def' });
       expect(model.wasFetched()).to.equal(true);
-      expect(model.wasActionPerformed('test')).to.deep.equal({ id: 'test', error: { ghi: 'jkl' } });
+      expect(model.wasActionPerformed('test')).to.deep.equal({ error: { ghi: 'jkl' } });
     });
     it('(value, meta)', function () {
-      var model = new Model({ id: '1', foo: 'bar' }, { data: { abc: 'def' }, fetch: { success: true }, action: { id: 'test', error: { ghi: 'jkl' } } });
+      var model = new Model({ id: '1', foo: 'bar' }, { data: { abc: 'def' }, fetch: { success: true }, actions: { test: { error: { ghi: 'jkl' } } } });
       expect(model.value()).to.deep.eql({ id: '1', foo: 'bar' });
       expect(model.data()).to.deep.eql({ abc: 'def' });
       expect(model.wasFetched()).to.equal(true);
-      expect(model.wasActionPerformed('test')).to.deep.equal({ id: 'test', error: { ghi: 'jkl' } });
+      expect(model.wasActionPerformed('test')).to.deep.equal({ error: { ghi: 'jkl' } });
     });
     it('(value, true)', function () {
       var model = new Model({ id: '1', foo: 'bar' }, true);
@@ -323,66 +323,96 @@ describe('model', function () {
 
 
   describe('isActionPending', function () {
-    it('should return the action id if any action is pending', function () {
-      var model = new Model(options({ action: { id: 'foo', pending: true, initiatedAt: 12345 } }));
-      expect(model.isActionPending()).to.deep.equal({ id: 'foo', pending: true, initiatedAt: 12345 });
-    });
-
-    it('should return true if a specific action is pending', function () {
-      var model = new Model(options({ action: { id: 'foo', pending: true, initiatedAt: 12345 } }));
-      expect(model.isActionPending()).to.deep.equal({ id: 'foo', pending: true, initiatedAt: 12345 });
+    it('should return details if any action is pending', function () {
+      var model = new Model(options({ actions: { foo: { pending: true, initiatedAt: 12345 } } }));
+      expect(model.isActionPending('foo')).to.deep.equal({ pending: true, initiatedAt: 12345 });
     });
 
     it('should return false if a different action is pending', function () {
-      var model = new Model(options({ action: { id: 'foo', pending: true, initiatedAt: 12345 } }));
+      var model = new Model(options({ actions: { foo: { pending: true, initiatedAt: 12345 } } }));
       expect(model.isActionPending('bar')).to.equal(false);
     });
 
     it('should return false if an action is not pending', function () {
       var model = new Model(options({ }));
-      expect(model.isActionPending()).to.equal(false);
+      expect(model.isActionPending('foo')).to.equal(false);
     });
 
     it('should not fail if no model is provided', function () {
       var model = new Model(options({ }, true));
-      expect(model.isActionPending()).to.equal(false);
+      expect(model.isActionPending('foo')).to.equal(false);
     });
 
     it('Model.isActionPending', function () {
-      expect(Model.isActionPending({ action: { id: 'foo', pending: true, initiatedAt: 12345 } }, 'foo')).to.deep.equal({ id: 'foo', pending: true, initiatedAt: 12345 });
+      expect(Model.isActionPending({ actions: { foo: { pending: true, initiatedAt: 12345 } } }, 'foo'))
+      .to.deep.equal({ pending: true, initiatedAt: 12345 });
     });
   });
 
 
   describe('wasActionPerformed', function () {
     it('should return the action details if any action was performed', function () {
-      var model = new Model(options({ action: { id: 'foo', success: { foo: 'bar'}, completedAt: 12345 } }));
-      expect(model.wasActionPerformed()).to.deep.equal({ id: 'foo', success: { foo: 'bar'}, completedAt: 12345 });
+      var model = new Model(options({ actions: { foo: { success: { foo: 'bar'}, completedAt: 12345 } } }));
+      expect(model.wasActionPerformed('foo')).to.deep.equal({ success: { foo: 'bar'}, completedAt: 12345 });
     });
 
     it('should return action details if a specific action was performed', function () {
-      var model = new Model(options({ action: { id: 'foo', success: { foo: 'bar'}, completedAt: 12345 } }));
-      expect(model.wasActionPerformed('foo')).to.deep.equal({ id: 'foo', success: { foo: 'bar'}, completedAt: 12345 });
+      var model = new Model(options({ actions: { foo: { success: { foo: 'bar'}, completedAt: 12345 } } }));
+      expect(model.wasActionPerformed('foo')).to.deep.equal({ success: { foo: 'bar'}, completedAt: 12345 });
     });
 
     it('should return action error details if an action failed', function () {
-      var model = new Model(options({ action: { id: 'foo', error: { foo: 'bar'}, completedAt: 12345 } }));
-      expect(model.wasActionPerformed('foo')).to.deep.equal({ id: 'foo', error: { foo: 'bar'}, completedAt: 12345 });
+      var model = new Model(options({ actions: { foo: { error: { foo: 'bar'}, completedAt: 12345 } } }));
+      expect(model.wasActionPerformed('foo')).to.deep.equal({ error: { foo: 'bar'}, completedAt: 12345 });
     });
 
     it('should return false if a different action was performed', function () {
-      var model = new Model(options({ id: 'foo', error: { foo: 'bar'}, completedAt: 12345 }));
+      var model = new Model(options({ actions: { foo: { error: { foo: 'bar'}, completedAt: 12345 } } }));
       expect(model.wasActionPerformed('bar')).to.equal(false);
     });
 
     it('should return false if an action was not performed', function () {
       var model = new Model(options({ }));
-      expect(model.wasActionPerformed()).to.equal(false);
+      expect(model.wasActionPerformed('foo')).to.equal(false);
     });
 
     it('Model.wasActionPerformed', function () {
-      expect(Model.wasActionPerformed({ action: { id: 'foo', success: { foo: 'bar'}, completedAt: 12345 } }, 'foo')).to.deep.equal({ id: 'foo', success: { foo: 'bar'}, completedAt: 12345 });
+      expect(Model.wasActionPerformed({ actions: { foo: { success: { foo: 'bar'}, completedAt: 12345 } } }, 'foo'))
+      .to.deep.equal({ success: { foo: 'bar'}, completedAt: 12345 });
     });
   });
 
+  describe('actionError', function () {
+    it('should return the error details action is in error state', function () {
+      var model = new Model(options({ actions: { foo: { error: { foo: 'bar'}, completedAt: 12345 } } }));
+      expect(model.actionError('foo')).to.deep.equal({ foo: 'bar'});
+    });
+
+    it('should return false if the action is pending', function () {
+      var model = new Model(options({ actions: { foo: { pending: true, initiatedAt: 12345 } } }));
+      expect(model.actionError('foo')).to.deep.equal(false);
+    });
+
+    it('should return false if the action is in success state', function () {
+      var model = new Model(options({ actions: { foo: { success: { abc: 'def' }, completedAt: 12345 } } }));
+      expect(model.actionError('foo')).to.deep.equal(false);
+    });
+  });
+
+  describe('actionSuccess', function () {
+    it('should return the success details action is in success state', function () {
+      var model = new Model(options({ actions: { foo: { success: { foo: 'bar'}, completedAt: 12345 } } }));
+      expect(model.actionSuccess('foo')).to.deep.equal({ foo: 'bar'});
+    });
+
+    it('should return false if the action is pending', function () {
+      var model = new Model(options({ actions: { foo: { pending: true, initiatedAt: 12345 } } }));
+      expect(model.actionSuccess('foo')).to.deep.equal(false);
+    });
+
+    it('should return false if the action is in error state', function () {
+      var model = new Model(options({ actions: { foo: { error: { abc: 'def' }, completedAt: 12345 } } }));
+      expect(model.actionSuccess('foo')).to.deep.equal(false);
+    });
+  });
 });

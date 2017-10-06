@@ -139,47 +139,53 @@ var functions = {
   },
 
   /**
-   * Return a fetch error if one was encountered
+   * Return a fetch success result or false
    */
-  fetchError: function (meta) {
+  fetchSuccess: function (meta) {
     const fetchData = meta.fetch;
-    return fetchData && fetchData.error;
+    return (fetchData && fetchData.success) || false;
   },
 
   /**
    * Return a boolean indicating if a model fetch is currently in progress
    * @param {string} id: optinal identifier to see if a specific action is currently in progress
+   * @paramm {string} actionId: action id to only return true if a specific action was performed
    */
-  isActionPending (meta, actionId) {
-    const actionData = meta.action;
-    if (actionData) {
-      if ((actionId ? actionData.id === actionId : true) && actionData.pending) {
-        return actionData;
-      }
-    }
-    return false;
+  isActionPending: function (meta, actionId) {
+    verifyActionId(actionId);
+    const actionData = meta.actions && meta.actions[actionId];
+    return (actionData && actionData.pending && actionData) || false;
   },
 
   /**
-   * Return true if either a fetch or action is pending
-   */
-  isPending: function (meta, id) {
-    return !!(functions.isFetchPending(meta) || functions.isActionPending(meta, id));
-  },
-
-  /**
-   * If an action was performed and successful, return { id, success, error }.  `success` and `error` will be mutually exclusive and will
+   * If an action was performed and successful, return { success, error, pending }.  `success` and `error` will be mutually exclusive and will
    * represent the XHR response payload
-   * @paramm {string} actionId: optional action id to only return true if a specific action was performed
+   * @paramm {string} actionId: action id to only return true if a specific action was performed
    */
   wasActionPerformed: function (meta, actionId) {
-    const actionData = meta.action;
-    if (actionData) {
-      if (actionId ? actionData.id === actionId : true && !actionData.pending) {
-        return actionData;
-      }
-    }
-    return false;
+    verifyActionId(actionId);
+    const actionData = meta.actions;
+    return (actionData && actionData[actionId]) || false;
+  },
+
+  /**
+   * If an action was performed and is an in error state, return the error response
+   * @paramm {string} actionId: action id to only return true if a specific action was performed
+   */
+  actionError: function (meta, actionId) {
+    verifyActionId(actionId);
+    const actionData = meta.actions;
+    return (actionData && actionData[actionId] && actionData[actionId].error) || false;
+  },
+
+  /**
+   * If an action was performed and is in success state, return the success response
+   * @paramm {string} actionId: action id to only return true if a specific action was performed
+   */
+  actionSuccess: function (meta, actionId) {
+    verifyActionId(actionId);
+    const actionData = meta.actions;
+    return (actionData && actionData[actionId] && actionData[actionId].success) || false;
   },
 
   /**
@@ -279,4 +285,10 @@ function deepValue (parent, parts) {
     parent = parent[parts[i]];
   }
   return parent;
+}
+
+function verifyActionId (actionId) {
+  if (!actionId) {
+    throw new Error('action id must be provided');
+  }
 }

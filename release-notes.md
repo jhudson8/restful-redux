@@ -1,3 +1,11 @@
+## v5.0.0
+restful-redux can now support multiple concurrent actions (as long as they have different ids)
+- `isActionPending` now requires actionId
+- removed `isPending` function
+- added `actionError` function
+- added `actionSuccess` function
+
+
 ## v4.0.0-beta
 createGetAction/createPostAction... and all other except createFetchAction have redux action types of `ACTION` rather than `FETCH`
 which will not cause the model to show as being fetched when these actions are executed.  Also, by default, the response from these action will replace the model contents.

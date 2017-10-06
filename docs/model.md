@@ -95,8 +95,20 @@ Return a `truthy` if the model has an outstanding XHR fetch request.
   }
 ```
 
+#### fetchSuccess
+If a model XHR fetch failed, return the error response.  Otherwise return `false`.
+```javascript
+  render: function () {
+    const model = this.props.model;
+    const fetchError = model.fetchError();
+    if (model.fetchError) {
+      return <div>The data could not be fetched</div>;
+    }
+  }
+```
+
 #### fetchError
-If a model XHR fetch failed, return the error response.  Otherwise return `undefined`.
+If a model XHR fetch failed, return the error response.  Otherwise return `false`.
 ```javascript
   render: function () {
     const model = this.props.model;
@@ -120,15 +132,49 @@ Return a `truthy` value if an action XHR is pending (see `createXHRAction` in [.
 ```
 
 #### wasActionPerformed
-The last action performed, unless cleared, will always be returned.  The return object shape is
+Return the action content as { pending, error, success, completedAt, initiatedAt } if available 
+```javascript
+  render: function () {
+    const model = this.props.model;
+    const actionData = model.wasActionPerformed('update');
+    if (!actionData) {
+      // the action has not been performed
+    } else if (actionData) {
+      // the XHR request has not yet resolved
+    } else if (actionData.error) {
+      // there was an error performing the action
+    } else if (actionData.success) {
+      // success!
+    }
+  }
 ```
-{
-  id: _action id_,
-  success: _action response if successful_,
-  error: _action response if non 200 status code_
-  initiatedAt: _timestamp_
-  completedAt: _timestamp_
-}
+
+#### actionError
+Convienance method to just get the error payload if an action failed
+```javascript
+  render: function () {
+    const model = this.props.model;
+    const error = model.actionError('update');
+    if (error) {
+      // there was an error performing the action
+    } else {
+      // all we really know is that the action has not been performed or it is not in an error state
+    }
+  }
+```
+
+#### actionError
+Convienance method to just get the error payload if an action failed
+```javascript
+  render: function () {
+    const model = this.props.model;
+    const error = model.actionError('update');
+    if (error) {
+      // there was an error performing the action
+    } else {
+      // all we really know is that the action has not been performed or it is not in an error state
+    }
+  }
 ```
 
 #### timeSinceFetch

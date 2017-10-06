@@ -173,6 +173,11 @@ export default function (options) {
     } = options;
     rtn[`create${name}Action`] = function (id, p1, options) {
       options = options || {};
+      // if an actionId is provided for a createFetchAction, they really mean createGetAction
+      if (options.actionId && name === 'Fetch') {
+        return rtn.createGetAction(id, p1, options);
+      }
+
       const {
         formatter,
         schema
