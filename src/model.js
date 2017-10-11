@@ -147,6 +147,14 @@ var functions = {
   },
 
   /**
+   * Return a fetch error result or false
+   */
+  fetchError: function (meta) {
+    const fetchData = meta.fetch;
+    return (fetchData && fetchData.error) || false;
+  },
+
+  /**
    * Return a boolean indicating if a model fetch is currently in progress
    * @param {string} id: optinal identifier to see if a specific action is currently in progress
    * @paramm {string} actionId: action id to only return true if a specific action was performed

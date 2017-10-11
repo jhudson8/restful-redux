@@ -311,9 +311,9 @@ describe('model', function () {
       expect(model.fetchError()).to.deep.equal({foo: 'bar'});
     });
 
-    it('should return undefined if no model exists', function () {
+    it('should return false if no model exists', function () {
       var model = new Model(options({ }, true));
-      expect(model.fetchError()).to.equal(undefined);
+      expect(model.fetchError()).to.equal(false);
     });
 
     it('Model.fetchError', function () {

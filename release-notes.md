@@ -1,3 +1,6 @@
+## v5.0.1
+- add back Model.fetchError function
+
 ## v5.0.0
 restful-redux can now support multiple concurrent actions (as long as they have different ids)
 - `isActionPending` now requires actionId

@@ -257,7 +257,7 @@ function reducer (options) {
           actions: {
             _delete: true
           }
-        }
+        };
       }
     }
   }, {
