@@ -3,102 +3,79 @@
  * @param {object} modelOrDomain: the model object or entityType state object (if model `id` is provided)
  * @param {string} id: the model id if `modelOrDomain` represents the entityType state object
  */
+import { Model as ModelType } from './types';
 
 const NO_ID = '_noid_';
 
-export default class Model {
-  constructor (options, value, meta) {
-    let entities;
-    let id;
-    let entityType;
-    if (typeof meta !== 'undefined' || typeof value !== 'undefined') {
-      if (meta) {
-        // (id, value, meta)
-        id = options;
-        options = {};
-      } else {
-        // (value, meta)
-        meta = value;
-        value = options;
-        options = {};
-        id = value ? determineId(value.id) : NO_ID;
-      }
-    } else {
-      if (value === true) {
-        // (value)
-        id = NO_ID;
-        value = options;
-        options = {};
-        meta = {};
-      } else {
-        // (options)
-        id = determineId(options.id);
-        entities = options.entities;
-        if (entities) {
-          // allow for root state to be passed
-          entities = entities.entities || entities;
-        }
-        entityType = options.entityType;
-        value = deepValue(entities, [entityType, id]);
-        meta = deepValue(entities, ['_meta', entityType, id]);
-      }
+export default class Model<ModelType> {
+  constructor (options) {
+    let entities = options.entities;
+    const id = determineId(options.id);
+    const entityType = options.entityType;
+
+    if (entities) {
+      // allow for root state to be passed
+      entities = entities.entities || entities;
     }
 
-    this.id = id;
-    this._entities = entities;
-    this._value = value;
-    this._options = options;
-    this._meta = meta || {};
-    this._meta_data = this._meta.data || {};
-    this._fetchedInfo = this._meta.fetched ? this._meta.fetched : this._value ? { type: 'set' } : false;
+    const value: any = deepValue(entities, [entityType, id]);
+    const meta: any = deepValue(entities, ['_meta', entityType, id]);
+
+    (<any> this).id = id;
+    (<any> this)._entities = entities;
+    (<any> this)._value = value;
+    (<any> this)._options = options;
+    (<any> this)._meta = meta || {};
+    (<any> this)._meta_data = (<any> this)._meta.data || {};
+    (<any> this)._fetchedInfo = (<any> this)._meta.fetched ? (<any> this)._meta.fetched : (<any> this)._value ? { type: 'set' } : false;
   }
 
   meta () {
-    return this._meta;
+    return (<any> this)._meta;
   }
 
   /**
    * Return the (optionally formatted) model data
    */
   value () {
-    if (!this._formattedValue) {
-      this._formatted = true;
-      const options = this._options;
-      if (this._value && options.schema && options.denormalize) {
-        this._formattedValue = options.denormalize(
-          this._value,
+    if (!(<any> this)._formattedValue) {
+      (<any> this)._formatted = true;
+      const options = (<any> this)._options;
+      if ((<any> this)._value && options.schema && options.denormalize) {
+        (<any> this)._formattedValue = options.denormalize(
+          (<any> this)._value,
           options.schema,
-          this._entities
+          (<any> this)._entities
         );
       } else {
         const formatter = options.formatter;
-        this._formattedValue = formatter
+        (<any> this)._formattedValue = formatter
           ? formatter(options)
-          : this._value;
+          : (<any> this)._value;
       }
       let arrayEntrySchema = options.arrayEntrySchema;
       let ArrayEntryModel = Model;
-      if (arrayEntrySchema && this._formattedValue) {
+      if (arrayEntrySchema && (<any> this)._formattedValue) {
         if (arrayEntrySchema.model) {
           ArrayEntryModel = arrayEntrySchema.model || Model;
           arrayEntrySchema = arrayEntrySchema.schema;
         }
-        this._formattedValue = this._formattedValue.map((data) => {
+        (<any> this)._formattedValue = (<any> this)._formattedValue.map((data) => {
           return new ArrayEntryModel({
-            entities: this._entities,
+            entities: (<any> this)._entities,
             id: arrayEntrySchema.getId(data),
             entityType: arrayEntrySchema.key
           });
         });
       }
     }
-    return this._formattedValue;
+    return (<any> this)._formattedValue;
   }
 }
 
 var functions = {
   data: function (meta) {
-    return (this && this._meta_data) || meta.data;
+    return (this && (<any> this)._meta_data) || meta.data;
   },
 
   /**
@@ -211,7 +188,7 @@ var functions = {
  */
 Object.keys(functions).forEach((functionName) => {
   const func = functions[functionName];
-  function exec (isModelObject) {
+  function exec (isModelObject?: boolean) {
     return function () {
       if (isModelObject) {
         const meta = this._meta;
@@ -233,7 +210,7 @@ Object.keys(functions).forEach((functionName) => {
 /**
  * Return a model from the cache object and create one if one does not exist
  */
-Model.fromCache = function (options, cache) {
+(<any> Model).fromCache = function (options, cache) {
   const id = determineId(options.id);
   const entityType = options.entityType;
   const ModelClass = options.modelClass || Model;
@@ -261,7 +238,7 @@ Model.fromCache = function (options, cache) {
 /**
  * Clear the model referred to by the entity type and id from the cache
  */
-Model.clearCache = function (id, entityType, cache) {
+(<any> Model).clearCache = function (id, entityType, cache) {
   id = determineId(id);
   var metaTypes = deepValue(cache, ['_meta', entityType]);
   if (metaTypes) {

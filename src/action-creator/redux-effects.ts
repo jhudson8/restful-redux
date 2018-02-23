@@ -1,4 +1,7 @@
 import { checkRequiredOptions, logger } from '../common-util';
+import { ActionCreator as ActionCreatorType, ActionCreatorOptions } from '../types';
+import * as assign from 'object-assign';
+declare var Promise;
 
 const NO_ID = '_noid_';
 
@@ -55,7 +58,7 @@ var STATIC_METHODS = [{
   payload: {}
 }];
 
-export default function (options) {
+export default function (options: ActionCreatorOptions): ActionCreatorType {
   checkRequiredOptions(['actionPrefix', 'entityType'], options);
 
   const {
@@ -81,11 +84,11 @@ export default function (options) {
     formatter,
     reduxAction,
     clearAfter
-  }) {
+  }: any) {
     return function (response) {
       // response is assumed to be in [normalize](https://github.com/paularmstrong/normalize) format of
       // {result: _id_, entities: {_entityType_: {_id_: ...}}}
-      let payload = response.value;
+      let payload: any = response.value;
       const isActionType = actionId && !replaceModel;
       const typeKey = isActionType ? 'response' : 'result';
       const formatterOptions = {
@@ -148,7 +151,6 @@ export default function (options) {
               log(`action timeout ${entityType}:${id}`);
             }
             dispatch(asyncResponseAction ({
-              entityType,
               fetchOrAction,
               bubbleUp,
               type: 'CLEAR',
@@ -162,7 +164,7 @@ export default function (options) {
     };
   }
 
-  var rtn = {};
+  var rtn: any = {};
 
   STATIC_METHODS.forEach(function (options) {
     const {
@@ -182,7 +184,7 @@ export default function (options) {
         formatter,
         schema
       } = options;
-      let _payload = payload;
+      let _payload: any = payload;
       if (!_payload) {
         if (formatter || schema) {
           _payload = formatSuccessPayload({
@@ -203,7 +205,7 @@ export default function (options) {
     };
   });
 
-  REST_METHODS.forEach(function (options) {
+  REST_METHODS.forEach(function (options: any) {
     const {
       fetchOrAction,
       method
@@ -244,7 +246,7 @@ export default function (options) {
       if (id === false) {
         id = NO_ID;
       }
-      params = Object.assign({}, params, {
+      params = assign({}, params, {
         method: method
       });
 
@@ -268,7 +270,6 @@ export default function (options) {
       const fetchAction = fetch(url, params);
       const composedAction = bind(fetchAction,
         asyncResponseAction({
-          entityType,
           fetchOrAction,
           type: SUCCESS,
           id,
@@ -283,7 +284,6 @@ export default function (options) {
           clearAfter
         }),
         asyncResponseAction({
-          entityType,
           fetchOrAction: fetchOrAction,
           type: ERROR,
           id,
@@ -296,7 +296,7 @@ export default function (options) {
         })
       );
 
-      var rtn = [composedAction, pendingAction];
+      var rtn: any = [composedAction, pendingAction];
       rtn.promise = promise;
 
       if (debug) {
@@ -309,7 +309,7 @@ export default function (options) {
   return rtn;
 }
 
-function formatSuccessPayload ({ payload, formatter, formatterOptions, type, schema, normalize }) {
+function formatSuccessPayload ({ payload, formatter, formatterOptions, type, schema, normalize }): any {
   formatter = formatter || defaultFormat(type);
   const _payload = formatter(payload, formatterOptions);
   if (!_payload || _payload === payload) {
@@ -318,7 +318,7 @@ function formatSuccessPayload ({ payload, formatter, formatterOptions, type, sch
     payload = _payload;
   }
   if (schema && normalize && payload) {
-    payload = Object.assign(payload, normalize(payload.result, schema));
+    payload = assign(payload, normalize(payload.result, schema));
   }
   return payload;
 }
@@ -326,7 +326,7 @@ function formatSuccessPayload ({ payload, formatter, formatterOptions, type, sch
 // create a dispatchable action that represents a pending model/REST document action
 function createPendingAction ({ actionPrefix, id, actionId, fetchOrAction, bubbleUp }) {
   const type = fetchOrAction;
-  const payload = { id };
+  const payload: any = { id };
   if (typeof bubbleUp !== 'undefined') {
     payload.bubbleUp = bubbleUp;
   }

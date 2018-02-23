@@ -1,4 +1,6 @@
 import { checkRequiredOptions, logger } from './common-util';
+import { BeforeAfterReduceParam, ReducerOptions } from './types';
+import * as assign from 'object-assign';
 
 const NO_ID = '_noid_';
 
@@ -9,7 +11,7 @@ const NO_ID = '_noid_';
  * - entityType: the entityType used to isolate the event type names
  * - action: action
  */
-function reducer (options) {
+function reducer (options: ReducerOptions) {
   checkRequiredOptions(['entityType', 'actionPrefix'], options);
 
   const {
@@ -42,11 +44,11 @@ function reducer (options) {
     actionType
   }) {
     // should the value result be deleted
-    const clearValue = meta._clearValue;
+    const clearValue: boolean = meta._clearValue;
     // if there is a response, where it should be stored
-    const responseProp = meta._responseProp;
+    const responseProp: string = meta._responseProp;
     // if this is a fetch event
-    const fetched = meta.fetch && meta.fetch.success;
+    const fetched: any = meta.fetch && meta.fetch.success;
 
     // make sure our necessary data structure is initialized
     let stateEntities = clone(state.entities);
@@ -271,11 +273,11 @@ function reducer (options) {
   }
 
   return function (state = {}, action) {
-    const type = action.type;
+    const actionType = action.type;
     for (var i = 0; i < handlers.length; i++) {
-      if (handlers[i][0] === type) {
+      if (handlers[i][0] === actionType) {
         // we've got a match
-        const options = handlers[i][1];
+        const options: any = handlers[i][1];
         const payload = action.payload;
         const entities = payload.entities;
         const response = payload.response;
@@ -300,14 +302,13 @@ function reducer (options) {
           actionBubbleUp: bubbleUp,
           meta,
           actionId,
-          type: options.type,
-          actionType: type
+          actionType
         });
       }
     }
 
     if (verbose) {
-      log(`action *not* handled: ${type}`);
+      log(`action *not* handled: ${action.type}`);
     }
     return state;
   };
@@ -325,7 +326,7 @@ function mergeMeta (newMeta, oldMeta, options, data) {
     let value = meta[key];
     if (key === 'data') {
       if (newMeta.data) {
-        meta.data = Object.assign(meta.data, oldMeta.data);
+        meta.data = assign(meta.data, oldMeta.data);
       }
       return;
     } else if (key === '_timestamp') {
@@ -343,7 +344,7 @@ function mergeMeta (newMeta, oldMeta, options, data) {
       let _rootKey;
       for (var i = 0; i < parts.length; i++) {
         const part = parts[i];
-        const match = part.match(/^(\$?)([^!]*)(!?)$/);
+        const match: any = part.match(/^(\$?)([^!]*)(!?)$/);
         let _key;
         if (match[1]) {
           // this is a variable
@@ -368,7 +369,7 @@ function mergeMeta (newMeta, oldMeta, options, data) {
         if (!root[_key]) {
           root = root[_key] = {};
         } else {
-          root = root[_key] = Object.assign({}, root[_key]);
+          root = root[_key] = assign({}, root[_key]);
         }
         if (i === 0) {
           _root = root;
@@ -409,10 +410,9 @@ function updateEntityModels (values, entities, primaryId, primaryEntityType, fet
   return rtn;
 }
 
-function clone () {
-  var args = Array.prototype.slice.call(arguments);
+function clone (...args: any[]): any {
   args.unshift({});
-  return Object.assign.apply(Object, args);
+  return assign.apply(Object, args);
 }
 
 export default reducer;

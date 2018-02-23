@@ -1,7 +1,7 @@
 /* global it, describe */
-
 import Model from '../src/model';
 import { schema, denormalize } from 'normalizr';
+import assign from 'object-assign';
 var expect = require('chai').expect;
 
 var personSchema = new schema.Entity('people');
@@ -57,7 +57,7 @@ var normalizedEntities = {
 
 function options (entitiesOrMeta, isEntities, options) {
   var entities = isEntities ? entitiesOrMeta : copyMetaEntities(entitiesOrMeta);
-  return Object.assign({
+  return assign({
     id: '1',
     entityType: 'foo',
     entities: entities
@@ -66,7 +66,7 @@ function options (entitiesOrMeta, isEntities, options) {
 
 function copyMetaEntities(meta) {
   var entities = JSON.parse(JSON.stringify(metaEntities));
-  Object.assign(entities._meta.foo['1'], meta);
+  assign(entities._meta.foo['1'], meta);
   return entities;
 }
 
@@ -155,7 +155,7 @@ describe('model', function () {
         entities: {
           _meta: {
             foo: {
-              '1': Object.assign({}, meta)
+              '1': assign({}, meta)
             }
           },
           foo: {
@@ -175,7 +175,7 @@ describe('model', function () {
             }
           },
           foo: {
-            '1': Object.assign({}, value)
+            '1': assign({}, value)
           }
         }
       };
@@ -220,30 +220,6 @@ describe('model', function () {
       expect(model.value()).to.deep.equal(undefined);
     });
   });
-
-
-  describe('alternative constructors', function () {
-    it('(id, value, meta)', function () {
-      var model = new Model('1', { foo: 'bar' }, { data: { abc: 'def' }, fetch: { success: true }, actions: { test: { error: { ghi: 'jkl' } } } });
-      expect(model.value()).to.deep.eql({ foo: 'bar' });
-      expect(model.data()).to.deep.eql({ abc: 'def' });
-      expect(model.wasFetched()).to.equal(true);
-      expect(model.wasActionPerformed('test')).to.deep.equal({ error: { ghi: 'jkl' } });
-    });
-    it('(value, meta)', function () {
-      var model = new Model({ id: '1', foo: 'bar' }, { data: { abc: 'def' }, fetch: { success: true }, actions: { test: { error: { ghi: 'jkl' } } } });
-      expect(model.value()).to.deep.eql({ id: '1', foo: 'bar' });
-      expect(model.data()).to.deep.eql({ abc: 'def' });
-      expect(model.wasFetched()).to.equal(true);
-      expect(model.wasActionPerformed('test')).to.deep.equal({ error: { ghi: 'jkl' } });
-    });
-    it('(value, true)', function () {
-      var model = new Model({ id: '1', foo: 'bar' }, true);
-      expect(model.value()).to.deep.eql({ id: '1', foo: 'bar' });
-      expect(model.wasFetched()).to.equal('exists');
-    });
-  });
-
 
   describe('wasFetched', function () {
     it('should return "exists" if the model exists with no meta value', function () {

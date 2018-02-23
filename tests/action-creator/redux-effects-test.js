@@ -2,6 +2,7 @@
 import sinon from 'sinon';
 import { createActionCreator } from '../../src';
 import { normalize, schema } from 'normalizr';
+import assign from 'object-assign';
 var expect = require('chai').expect;
 
 var personSchema = new schema.Entity('people');
@@ -210,7 +211,7 @@ describe('redux-effects-action-creator', function () {
 
     it('should handle success event as a function', function () {
       var handler = function (payload) {
-        return Object.assign(payload, {test: 'foo'});
+        return assign(payload, {test: 'foo'});
       };
       var action = fooActionCreator.createFetchAction({
         id: '1',

@@ -1,3 +1,5 @@
+import * as assign from 'object-assign';
+
 /**
  * Enhance any redux-effects-fetch actions that are dispatched by setting 'same-origin' (or provided) credentials,
  * setting any provided headers and looking for object body content and setting JSON headers and serializing the content.
@@ -24,9 +26,9 @@ export default function (options) {
       if (action.type === EFFECT_FETCH) {
         // we've got an XHR request - clone the action so we can tweak it
         let params = action.payload.params || {};
-        action = Object.assign({}, action, {
-          payload: Object.assign({}, action.payload, {
-            params: Object.assign({
+        action = assign({}, action, {
+          payload: assign({}, action.payload, {
+            params: assign({
               // use default credentials
               credentials: options.credentials,
               headers: {}
@@ -38,14 +40,14 @@ export default function (options) {
         // auto add any headers
         const headers = setting('headers', options, action);
         if (headers) {
-          Object.assign(params.headers, headers);
+          assign(params.headers, headers);
         }
 
         const autoJSON = setting('autoJSON', options, action);
         if (autoJSON !== false) {
           const body = params.body;
           if (typeof body === 'object' || Array.isArray(body)) {
-            params.headers = Object.assign({
+            params.headers = assign({
               'Accept': 'application/json',
               'Content-Type': 'application/json;charset=UTF-8'
             }, params.headers);

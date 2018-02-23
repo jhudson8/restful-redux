@@ -1,6 +1,6 @@
 /* global it, describe */
-
 import { createReducer, chainReducers } from '../src';
+import assign from 'object-assign';
 const expect = require('chai').expect;
 
 const emptyState = {};
@@ -417,7 +417,7 @@ describe('model-reducer', function () {
         entityType: 'foo',
         actionPrefix: 'FOO',
         beforeReduce: function (data) {
-          return Object.assign({ foo: 'bar' }, data.state);
+          return assign({ foo: 'bar' }, data.state);
         }
       });
       const state = reducer(emptyState, {
@@ -459,7 +459,7 @@ describe('model-reducer', function () {
         entityType: 'foo',
         actionPrefix: 'FOO',
         afterReduce: function (data) {
-          return Object.assign({ foo: 'bar' }, data.state);
+          return assign({ foo: 'bar' }, data.state);
         }
       });
       const state = reducer(emptyState, {

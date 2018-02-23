@@ -1,6 +1,9 @@
-import React from 'react';
+import * as React from 'react';
 import { deepPropValue, checkRequiredOptions, logger } from './common-util';
+import * as createReactClass from 'create-react-class';
 import Model from './model';
+import { ModelProviderOptions } from './types';
+import * as assign from 'object-assign';
 
 const NO_ID = '_noid_';
 
@@ -9,24 +12,28 @@ const NO_ID = '_noid_';
  * exist in the store.  A `fetch` prop value is expected to be provided with `mapDispatchToProps`
  * - Component: the "dumb" component
  */
-export default function modelProvider (options) {
-  const debug = options.debug;
+export default function modelProvider (options: ModelProviderOptions) {
+  const {
+    id,
+    debug,
+    entitiesProp = 'entities',
+    models
+  } = options;
   const log = logger('model-provider');
 
   // organize up our model and collection requirements
-  const entitiesProp = options.entitiesProp || 'entities';
   const _models = [];
-  if (options.id || options.id === false) {
+  if (id || id === false) {
     _models.push(organizeProps(options));
-  } else if (options.models) {
-    for (let i = 0; i < options.models.length; i++) {
-      let _model = options.models[i];
+  } else if (models) {
+    for (let i = 0; i < models.length; i++) {
+      let _model: any = models[i];
       _models.push(organizeProps(_model));
     }
   }
 
   // optimize for deep fetching
-  _models.forEach(function (source) {
+  _models.forEach(function (source: any) {
     const data = source.fetchOptions;
     if (typeof data === 'object') {
       for (let key in data) {
@@ -39,7 +46,7 @@ export default function modelProvider (options) {
     }
   });
 
-  function getModelId (props, options) {
+  function getModelId (props, options: any) {
     const id = options.id;
     if (id === false || id === NO_ID) {
       return NO_ID;
@@ -51,9 +58,9 @@ export default function modelProvider (options) {
   }
 
   function maybeFetchModels (props, prevProps) {
-    const self = this;
-    const state = this.state;
-    _models.forEach((options, index) => {
+    const self: any = this;
+    const state = self.state;
+    _models.forEach((options: any, index: number) => {
       if (options.fetchProp && !props[options.modelProp || 'model']) {
         const id = getModelId(props, options);
         if (id) {
@@ -63,11 +70,11 @@ export default function modelProvider (options) {
           const isForceFetchFunction = typeof options.forceFetch === 'function';
           if (isDifferentId || isForceFetchFunction) {
             // we may need to fetch
-            const modelOptions = Object.assign({}, options, {
+            const modelOptions = assign({}, options, {
               id: id,
               entities: props[entitiesProp]
             });
-            const model = Model.fromCache(modelOptions, modelCache);
+            const model = (<any> Model).fromCache(modelOptions, modelCache);
             const isFetchPending = model && model.isFetchPending();
             const isFetchError = model && model.fetchError();
             const value = model && model.value();
@@ -82,7 +89,7 @@ export default function modelProvider (options) {
                 log(`fetching model data using "${options.fetchProp}" with id value ${id}`);
               }
 
-              Model.clearCache(prevId, options.entityType, modelCache);
+              (<any> Model).clearCache(prevId, options.entityType, modelCache);
               fetchModel(id, props, options);
               state.fetched[index] = id;
             } else if (debug) {
@@ -128,7 +135,7 @@ export default function modelProvider (options) {
       throw new Error('Undefined modelProvider component');
     }
 
-    return React.createClass({
+    return createReactClass({
       getInitialState: function () {
         return {
           modelCache: {},
@@ -177,7 +184,7 @@ export default function modelProvider (options) {
       const changelist = checkForMissingOrChangedIds(oldProps, newProps);
       if (changelist.length > 0) {
         const props = generateProps(newProps, state);
-        changelist.forEach(function (data) {
+        changelist.forEach(function (data: any) {
           if (options.onIdChange) {
             const options = data.options;
             const oldId = data.oldId;
@@ -189,18 +196,18 @@ export default function modelProvider (options) {
     }
 
     function generateProps (origProps, state) {
-      const props = Object.assign({}, origProps);
+      const props = assign({}, origProps);
       const modelCache = state.modelCache;
 
-      _models.forEach((options) => {
+      _models.forEach((options: any) => {
         const id = getModelId(props, options);
         if (id) {
-          const modelOptions = Object.assign({}, options, {
+          const modelOptions = assign({}, options, {
             id: id,
             entities: props[entitiesProp]
           });
           // reuse the same model object if we can
-          let model = Model.fromCache(modelOptions, modelCache);
+          let model = (<any> Model).fromCache(modelOptions, modelCache);
           setPropValue(props, options.idPropName, id);
           setPropValue(props, options.propName, model);
         }
@@ -224,16 +231,16 @@ function setPropValue (parent, keyParts, value) {
   }
 }
 
-function organizeProps (options) {
+function organizeProps (options: any): any {
   checkRequiredOptions(['id', 'entityType'], options);
   const id = options.id;
-  return Object.assign({}, options, {
+  return assign({}, options, {
     id: id === false ? NO_ID : ((typeof id === 'string') ? id.split('.') : id),
     entityType: options.entityType,
     propName: (options.modelProp || 'model').split('.'),
     idPropName: (options.idProp || 'id').split('.'),
     fetchProp: options.fetchProp,
     modelClass: options.modelClass || Model,
-    fetchOptions: typeof options.fetchOptions === 'object' ? Object.assign({}, options.fetchOptions) : options.fetchOptions
+    fetchOptions: typeof options.fetchOptions === 'object' ? assign({}, options.fetchOptions) : options.fetchOptions
   });
 }

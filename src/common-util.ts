@@ -1,12 +1,12 @@
 // return the value by doing a deeep inspection using the parts array
-export function deepPropValue (parts, parent) {
+export function deepPropValue (parts: Array<string>, parent: any) {
   for (let i = 0; i < parts.length && parent; i++) {
     parent = parent[parts[i]];
   }
   return parent;
 }
 
-export function checkRequiredOptions (keys, options) {
+export function checkRequiredOptions (keys: Array<string>, options: any): void {
   if (!options) {
     throw new Error('missing options');
   }
@@ -17,9 +17,9 @@ export function checkRequiredOptions (keys, options) {
   });
 }
 
-export function logger (prefix) {
-  const pre = [`${prefix} `];
-  return function () {
+export function logger (prefix: string): any {
+  const pre = [prefix];
+  return function (): void {
     /* eslint-disable no-console */
     console.log.apply(console, pre.concat.apply(pre, arguments));
     /* eslint-enable no-console */

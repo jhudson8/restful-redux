@@ -1,9 +1,9 @@
 /* global it, describe */
-
 import React from 'react';
 import sinon from 'sinon';
 import { shallow } from 'enzyme';
 import { modelProvider } from '../src';
+import assign from 'object-assign';
 var expect = require('chai').expect;
 
 function Stub () {}
@@ -100,7 +100,7 @@ describe('model-provider', function () {
 
   describe('onIdChange', function () {
     function createComponent(spy, options) {
-      return modelProvider(Object.assign({
+      return modelProvider(assign({
         id: 'id',
         entityType: 'foo',
         onIdChange: spy

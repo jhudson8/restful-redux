@@ -1,3 +1,5 @@
+import * as assign from 'object-assign';
+
 export default function (origState) {
   let state;
   let entities = origState.entities || {};
@@ -62,11 +64,11 @@ export default function (origState) {
     },
     execute: function () {
       if (operationCount > 0) {
-        state = Object.assign({}, origState, {
-          entities: Object.assign({}, origState.entities)
+        state = assign({}, origState, {
+          entities: assign({}, origState.entities)
         });
         entities = state.entities;
-        entities._meta = Object.assign({}, entities._meta);
+        entities._meta = assign({}, entities._meta);
       }
 
       let changeMade = false;
@@ -86,8 +88,8 @@ export default function (origState) {
           });
         } else {
           // entity specific operation
-          var _entities = entities[entityType] = Object.assign({}, entities[entityType]);
-          var _meta = entities._meta[entityType] = Object.assign({}, entities._meta[entityType]);
+          var _entities = entities[entityType] = assign({}, entities[entityType]);
+          var _meta = entities._meta[entityType] = assign({}, entities._meta[entityType]);
           entityOperations.forEach(function (operation) {
             var id = operation.id;
             var action = operation.action;
@@ -104,11 +106,11 @@ export default function (origState) {
                 changeMade = true;
               }
               if (data.data) {
-                _meta[id] = Object.assign({}, _meta[id], { data: replaceAttributes(_meta[id] && _meta[id].data, data.data) });
+                _meta[id] = assign({}, _meta[id], { data: replaceAttributes(_meta[id] && _meta[id].data, data.data) });
                 changeMade = true;
               }
               if (data.meta) {
-                _meta[id] = Object.assign({}, replaceAttributes(_meta[id], data.meta));
+                _meta[id] = assign({}, replaceAttributes(_meta[id], data.meta));
                 changeMade = true;
               }
             } else if (action === 'replace') {
@@ -116,7 +118,7 @@ export default function (origState) {
                 _entities[id] = value;
               }
               if (data) {
-                _meta[id] = Object.assign({}, _meta[id], { data: data });
+                _meta[id] = assign({}, _meta[id], { data: data });
               }
               changeMade = true;
             }
@@ -137,7 +139,7 @@ function replaceAttributes (source, replaceWith) {
   if (!replaceWith) {
     return source;
   }
-  source = Object.assign({}, source);
+  source = assign({}, source);
   for (var key in replaceWith) {
     if (replaceWith.hasOwnProperty(key)) {
       var value = replaceWith[key];
