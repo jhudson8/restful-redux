@@ -8,3 +8,6 @@ README.md
 .babelrc
 .eslinrc.json
 release-nodes.md
+.gitignore
+tsconfig.json
+yarn.lock

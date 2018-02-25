@@ -1,3 +1,4 @@
+import { Model as ModelType } from './types';
 import Model from './model';
 import createReducer from './model-reducer';
 import modelProvider from './model-provider';

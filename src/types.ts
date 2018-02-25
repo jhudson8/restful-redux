@@ -14,6 +14,7 @@ export interface ModelConstructorOptions {
 
 export interface Model {
   new(options: ModelConstructorOptions);
+
   id?: any;
   meta(): any;
   value(): any;
@@ -98,3 +99,5 @@ export interface ModelProviderOptions {
   models: Array<ModelProviderModelOptions>;
   onIdChange(newId: any, prevId: any, props: any);
 }
+
+export type ModelProviderResponse = (element: JSX.Element) => any;

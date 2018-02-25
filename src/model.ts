@@ -3,12 +3,12 @@
  * @param {object} modelOrDomain: the model object or entityType state object (if model `id` is provided)
  * @param {string} id: the model id if `modelOrDomain` represents the entityType state object
  */
-import { Model as ModelType } from './types';
+import { Model as ModelType, ModelConstructorOptions } from './types';
 
 const NO_ID = '_noid_';
 
 export default class Model<ModelType> {
-  constructor (options) {
+  constructor (options: ModelConstructorOptions) {
     let entities = options.entities;
     const id = determineId(options.id);
     const entityType = options.entityType;

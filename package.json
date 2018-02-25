@@ -1,8 +1,9 @@
 {
   "name": "restful-redux",
-  "version": "6.0.0-alpha.1",
+  "version": "6.0.0-alpha.2",
   "description": "REST-oriented action creator, reducer and other associated utilities",
   "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
   "keywords": [
     "redux",
     "react",
@@ -14,6 +15,7 @@
     "url": "https://github.com/jhudson8/restful-redux.git"
   },
   "dependencies": {
+    "create-react-class": "^15.6.3",
     "object-assign": "^4.1.1"
   },
   "devDependencies": {
@@ -44,7 +46,8 @@
     "test:unit": "rm -rf .test mkdir .test && tsc src/*.ts --outDir .test/src && babel tests --out-dir .test/tests && mocha --recursive .test/tests",
     "test": "npm run test:unit",
     "build": "rm -rf lib && rm -rf .test && tsc src/*.ts --outDir lib --declaration",
-    "prepublish": "npm run build"
+    "prepublish": "npm run build",
+    "postpublish": "rm -rf .test rm -rf lib"
   },
   "author": "Joe Hudson <joehud@gmail.com>",
   "license": "MIT"

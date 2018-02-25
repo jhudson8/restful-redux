@@ -2,7 +2,7 @@ import * as React from 'react';
 import { deepPropValue, checkRequiredOptions, logger } from './common-util';
 import * as createReactClass from 'create-react-class';
 import Model from './model';
-import { ModelProviderOptions } from './types';
+import { ModelProviderOptions, ModelProviderResponse } from './types';
 import * as assign from 'object-assign';
 
 const NO_ID = '_noid_';
@@ -12,7 +12,7 @@ const NO_ID = '_noid_';
  * exist in the store.  A `fetch` prop value is expected to be provided with `mapDispatchToProps`
  * - Component: the "dumb" component
  */
-export default function modelProvider (options: ModelProviderOptions) {
+export default function modelProvider (options: ModelProviderOptions): ModelProviderResponse {
   const {
     id,
     debug,
@@ -130,7 +130,7 @@ export default function modelProvider (options: ModelProviderOptions) {
     props[options.fetchProp](id === NO_ID ? false : id, fetchOptions);
   }
 
-  return function (_Component) {
+  return function (_Component: any) {
     if (!_Component) {
       throw new Error('Undefined modelProvider component');
     }
