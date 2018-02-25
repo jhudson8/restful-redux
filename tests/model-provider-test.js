@@ -10,9 +10,11 @@ function Stub () {}
 
 describe('model-provider', function () {
   const Component = modelProvider({
-    id: 'id',
-    entityType: 'foo',
-    fetchProp: 'fetch'
+    model: {
+      id: 'id',
+      entityType: 'foo',
+      fetchProp: 'fetch'
+    }
   })(Stub);
   const ComponentMultipleModels = modelProvider({
     models: [{
@@ -26,9 +28,11 @@ describe('model-provider', function () {
     }]
   })(Stub);
   const ComponentNestedId = modelProvider({
-    id: 'params.id',
-    entityType: 'foo',
-    fetchProp: 'fetch'
+    model: {
+      id: 'params.id',
+      entityType: 'foo',
+      fetchProp: 'fetch'
+    }
   })(Stub);
 
   describe('models and collections', function () {
@@ -101,9 +105,11 @@ describe('model-provider', function () {
   describe('onIdChange', function () {
     function createComponent(spy, options) {
       return modelProvider(assign({
-        id: 'id',
-        entityType: 'foo',
-        onIdChange: spy
+        model: {
+          id: 'id',
+          entityType: 'foo',
+          onIdChange: spy
+        }
       }, options))(Stub);
     }
 
@@ -180,10 +186,12 @@ describe('model-provider', function () {
       };
 
       const ComponentForceFetch = modelProvider({
-        id: 'id',
-        entityType: 'foo',
-        fetchProp: 'fetch',
-        forceFetch: function () { return true; }
+        model: {
+          id: 'id',
+          entityType: 'foo',
+          fetchProp: 'fetch',
+          forceFetch: function () { return true; }
+        }
       })(Stub);
       let component = shallow(React.createElement(ComponentForceFetch, {
         id: '1',
@@ -210,10 +218,12 @@ describe('model-provider', function () {
       };
 
       const ComponentForceFetch = modelProvider({
-        id: 'id',
-        entityType: 'foo',
-        fetchProp: 'fetch',
-        forceFetch: function () { return true; }
+        model: {
+          id: 'id',
+          entityType: 'foo',
+          fetchProp: 'fetch',
+          forceFetch: function () { return true; }
+        }
       })(Stub);
       let component = shallow(React.createElement(ComponentForceFetch, {
         id: '1',
@@ -235,10 +245,12 @@ describe('model-provider', function () {
       const fetch = sinon.spy();
       const forceFetch = sinon.spy();
       const ComponentForceFetch = modelProvider({
-        id: 'id',
-        entityType: 'foo',
-        fetchProp: 'fetch',
-        forceFetch: forceFetch
+        model: {
+          id: 'id',
+          entityType: 'foo',
+          fetchProp: 'fetch',
+          forceFetch: forceFetch
+        }
       })(Stub);
       shallow(React.createElement(ComponentForceFetch, {
         id: '1',
@@ -268,10 +280,12 @@ describe('model-provider', function () {
       };
 
       const ComponentForceFetch = modelProvider({
-        id: 'id',
-        entityType: 'foo',
-        fetchProp: 'fetch',
-        forceFetch: function () { return false; }
+        model: {
+          id: 'id',
+          entityType: 'foo',
+          fetchProp: 'fetch',
+          forceFetch: function () { return false; }
+        }
       })(Stub);
       let component = shallow(React.createElement(ComponentForceFetch, {
         id: '1',
@@ -292,10 +306,12 @@ describe('model-provider', function () {
       const fetch = sinon.spy();
       const forceFetch = sinon.spy();
       const ComponentForceFetch = modelProvider({
-        id: 'id',
-        entityType: 'foo',
-        fetchProp: 'fetch',
-        forceFetch: forceFetch
+        model: {
+          id: 'id',
+          entityType: 'foo',
+          fetchProp: 'fetch',
+          forceFetch: forceFetch
+        }
       })(Stub);
       shallow(React.createElement(ComponentForceFetch, {
         id: '1',
@@ -367,19 +383,23 @@ describe('model-provider', function () {
     expect(fetch.callCount).to.eql(0);
   });
 
-  describe('should obey "modelProp"', function () {
+  describe('should obey "propName"', function () {
     const Component = modelProvider({
-      id: 'id',
-      entityType: 'foo',
-      modelProp: 'bar',
-      fetchProp: 'fetch'
+      model: {
+        id: 'id',
+        entityType: 'foo',
+        propName: 'bar',
+        fetchProp: 'fetch'
+      }
     })(Stub);
 
     it('should handle nested model properties', function () {
       const Component = modelProvider({
-        id: 'id',
-        modelProp: 'foo.bar',
-        entityType: 'foo'
+        model: {
+          id: 'id',
+          propName: 'foo.bar',
+          entityType: 'foo'
+        }
       })(Stub);
 
       const impl = shallow(React.createElement(Component, {
@@ -423,10 +443,12 @@ describe('model-provider', function () {
 
   describe ('should obey "idProp"', function () {
     const Component = modelProvider({
-      id: 'id',
-      entityType: 'foo',
-      idProp: 'bar',
-      fetchProp: 'fetch'
+      model: {
+        id: 'id',
+        entityType: 'foo',
+        idProp: 'bar',
+        fetchProp: 'fetch'
+      }
     })(Stub);
 
     it ('should set id value on child component', function () {
@@ -446,9 +468,11 @@ describe('model-provider', function () {
 
   describe ('should obey "fetchProp"', function () {
     const Component = modelProvider({
-      id: 'id',
-      entityType: 'foo',
-      fetchProp: 'bar'
+      model: {
+        id: 'id',
+        entityType: 'foo',
+        fetchProp: 'bar'
+      }
     })(Stub);
 
     it ('should set id value on child component', function () {
@@ -493,12 +517,14 @@ describe('model-provider', function () {
 
   describe('should obey "fetchOptions"', function () {
     const Component = modelProvider({
-      id: 'id',
-      entityType: 'foo',
-      fetchProp: 'fetch',
-      fetchOptions: {
-        abc: 'params.def',
-        ghi: 'params.jkl'
+      model: {
+        id: 'id',
+        entityType: 'foo',
+        fetchProp: 'fetch',
+        fetchOptions: {
+          abc: 'params.def',
+          ghi: 'params.jkl'
+        }
       }
     })(Stub);
 
@@ -522,13 +548,15 @@ describe('model-provider', function () {
 
     it ('should allow function value (props, id)', function () {
       const Component = modelProvider({
-        id: 'id',
-        entityType: 'foo',
-        fetchProp: 'fetch',
-        fetchOptions: function (props) {
-          return {
-            abc: props.params.jkl,
-            ghi: props.params.def
+        model: {
+          id: 'id',
+          entityType: 'foo',
+          fetchProp: 'fetch',
+          fetchOptions: function (props) {
+            return {
+              abc: props.params.jkl,
+              ghi: props.params.def
+            };
           }
         }
       })(Stub);

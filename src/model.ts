@@ -81,13 +81,13 @@ export default class Model {
   }
 
   /**
-   * Return true if the model has been fetched
+   * Return truthy if the model has been fetched (`fetched` if fetched and `set` if used with constructor to set value)
    */
   wasFetched (): any {
     const meta: any = getMeta(this);
     let rtn = meta.fetch && meta.fetch.success;
     if (!rtn && typeof this.value === 'function' && this.value()) {
-      rtn = 'exists';
+      rtn = 'set';
     }
     return rtn;
   }
@@ -199,10 +199,10 @@ export default class Model {
   'wasActionPerformed', 'actionError', 'actionSuccess', 'timeSinceFetch'
 ].forEach(function (key) {
   const func = Model.prototype[key];
-  Model[key] = function({...args}) {
-    const meta = args[0];
-    args.splice(0, 1);
-    func.apply({ __static: { meta }}, args);
+  Model[key] = function() {
+    const meta = arguments[0];
+    const args = Array.prototype.slice.call(arguments, 1);
+    return func.apply({ __static: { meta }}, args);
   }
 });
 
@@ -278,5 +278,5 @@ function verifyActionId (actionId) {
 }
 
 function getMeta (context) {
-  return context._meta || context.__static ? context.__static.meta : undefined;
+  return context._meta ? context._meta : context.__static ? context.__static.meta : undefined;
 }

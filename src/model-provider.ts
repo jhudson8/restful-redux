@@ -2,7 +2,7 @@ import * as React from 'react';
 import { deepPropValue, checkRequiredOptions, logger } from './common-util';
 import * as createReactClass from 'create-react-class';
 import Model from './model';
-import { ModelProviderOptions, ModelProviderResponse } from './types';
+import { ModelProviderOptions, ModelProviderResponse, ModelProviderModelOptions } from './types';
 import * as assign from 'object-assign';
 
 const NO_ID = '_noid_';
@@ -14,18 +14,21 @@ const NO_ID = '_noid_';
  */
 export default function modelProvider (options: ModelProviderOptions): ModelProviderResponse {
   const {
-    id,
     debug,
-    entitiesProp = 'entities',
-    models
+    model,
+    models,
+    entitiesProp ='entities'
   } = options;
+  if (!models && !model) {
+    throw new Error('either `models` or `model` are required');
+  }
   const log = logger('model-provider');
 
   // organize up our model and collection requirements
   const _models = [];
-  if (id || id === false) {
-    _models.push(organizeProps(options));
-  } else if (models) {
+  if (model) {
+    _models.push(organizeProps(model));
+  } else {
     for (let i = 0; i < models.length; i++) {
       let _model: any = models[i];
       _models.push(organizeProps(_model));
@@ -60,8 +63,8 @@ export default function modelProvider (options: ModelProviderOptions): ModelProv
   function maybeFetchModels (props, prevProps) {
     const self: any = this;
     const state = self.state;
-    _models.forEach((options: any, index: number) => {
-      if (options.fetchProp && !props[options.modelProp || 'model']) {
+    _models.forEach((options: ModelProviderModelOptions, index: number) => {
+      if (options.fetchProp && !props[options.propName || 'model']) {
         const id = getModelId(props, options);
         if (id) {
           const prevId = state.fetched[index];
@@ -185,11 +188,11 @@ export default function modelProvider (options: ModelProviderOptions): ModelProv
       if (changelist.length > 0) {
         const props = generateProps(newProps, state);
         changelist.forEach(function (data: any) {
-          if (options.onIdChange) {
+          if (data.options.onIdChange) {
             const options = data.options;
             const oldId = data.oldId;
             const newId = data.newId;
-            options.onIdChange(newId, oldId, props);
+            data.options.onIdChange(newId, oldId, props);
           }
         });
       }
@@ -199,7 +202,7 @@ export default function modelProvider (options: ModelProviderOptions): ModelProv
       const props = assign({}, origProps);
       const modelCache = state.modelCache;
 
-      _models.forEach((options: any) => {
+      _models.forEach((options: ModelProviderModelOptions) => {
         const id = getModelId(props, options);
         if (id) {
           const modelOptions = assign({}, options, {
@@ -231,14 +234,14 @@ function setPropValue (parent, keyParts, value) {
   }
 }
 
-function organizeProps (options: any): any {
+function organizeProps (options: ModelProviderModelOptions): ModelProviderModelOptions {
   checkRequiredOptions(['id', 'entityType'], options);
   const id = options.id;
   return assign({}, options, {
     id: id === false ? NO_ID : ((typeof id === 'string') ? id.split('.') : id),
     entityType: options.entityType,
-    propName: (options.modelProp || 'model').split('.'),
-    idPropName: (options.idProp || 'id').split('.'),
+    propName: (options.propName || 'model').split('.'),
+    idPropName: (options.idPropName || 'id').split('.'),
     fetchProp: options.fetchProp,
     modelClass: options.modelClass || Model,
     fetchOptions: typeof options.fetchOptions === 'object' ? assign({}, options.fetchOptions) : options.fetchOptions
