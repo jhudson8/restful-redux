@@ -1,3 +1,10 @@
+## v6.0.0-rc.1
+- added typescript definitions
+- removed fuzzy constructors
+  - Model constructor only accepts a [single options parameter](https://github.com/jhudson8/restful-redux/blob/031cd7ea3bedc0ee3d2709ddd00d27291ba426e7/src/types.ts#L7)
+  - Action creators only accept a [single options parameter](https://github.com/jhudson8/restful-redux/blob/031cd7ea3bedc0ee3d2709ddd00d27291ba426e7/src/types.ts#L17)
+  - You must explicitely use `false` as the id value if the id for a Model is N/A
+
 ## v5.0.1
 - add back Model.fetchError function
 
