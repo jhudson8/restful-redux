@@ -12,25 +12,6 @@ export interface ModelConstructorOptions {
   meta?: any;
 }
 
-export interface Model {
-  new(options: ModelConstructorOptions);
-
-  id?: any;
-  meta(): any;
-  value(): any;
-  data(): any;
-  wasFetched(): boolean;
-  canBeFetched(): boolean;
-  isFetchPending(): boolean;
-  fetchSuccess(): any;
-  fetchError(): any;
-  isActionPending(actionId: any): boolean;
-  wasActionPerformed(actionId: any): ActionPerformResponse;
-  actionError(actionId: any): any;
-  actionSuccess(actionId: any): any;
-  timeSinceFetch(currentTime?: number): number;
-}
-
 export type Formatter = (data: any) => any;
 
 export interface FetchOptions {

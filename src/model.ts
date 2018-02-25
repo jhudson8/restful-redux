@@ -3,11 +3,11 @@
  * @param {object} modelOrDomain: the model object or entityType state object (if model `id` is provided)
  * @param {string} id: the model id if `modelOrDomain` represents the entityType state object
  */
-import { Model as ModelType, ModelConstructorOptions } from './types';
+import { ModelConstructorOptions } from './types';
 
 const NO_ID = '_noid_';
 
-export default class Model<ModelType> {
+export default class Model {
   constructor (options: ModelConstructorOptions) {
     let entities = options.entities;
     const id = determineId(options.id);
@@ -30,14 +30,14 @@ export default class Model<ModelType> {
     (<any> this)._fetchedInfo = (<any> this)._meta.fetched ? (<any> this)._meta.fetched : (<any> this)._value ? { type: 'set' } : false;
   }
 
-  meta () {
+  meta (): any {
     return (<any> this)._meta;
   }
 
   /**
    * Return the (optionally formatted) model data
    */
-  value () {
+  value (): any {
     if (!(<any> this)._formattedValue) {
       (<any> this)._formatted = true;
       const options = (<any> this)._options;
@@ -71,140 +71,139 @@ export default class Model<ModelType> {
     }
     return (<any> this)._formattedValue;
   }
-}
 
-var functions = {
-  data: function (meta) {
-    return (this && (<any> this)._meta_data) || meta.data;
-  },
+  /**
+   * Return metadata associated with this model
+   */
+  data (): any {
+    const meta: any = getMeta(this);
+    return meta ? meta.data : undefined;
+  }
 
   /**
    * Return true if the model has been fetched
    */
-  wasFetched: function (meta) {
+  wasFetched (): any {
+    const meta: any = getMeta(this);
     let rtn = meta.fetch && meta.fetch.success;
     if (!rtn && typeof this.value === 'function' && this.value()) {
       rtn = 'exists';
     }
     return rtn;
-  },
+  }
 
   /**
    * Return true if there is not a fetch pending or the model has been sucessfully fetched
    */
-  canBeFetched: function (meta) {
+  canBeFetched (): boolean {
+    const meta: any = getMeta(this);
     const fetchData = meta.fetch;
     const hasValue = typeof this.value === 'function' && this.value();
     if (fetchData) {
       if (fetchData.pending) {
         return false;
       } else {
-
         return !(fetchData.success || !!hasValue);
       }
     } else {
       return !hasValue;
     }
-  },
+  }
 
   /**
    * Return a boolean indicating if a model fetch is currently in progress
    */
-  isFetchPending: function (meta) {
+  isFetchPending (): any {
+    const meta: any = getMeta(this);
     const fetchData = meta.fetch;
     return fetchData && fetchData.pending && (fetchData.initiatedAt || true) || false;
-  },
+  }
 
   /**
    * Return a fetch success result or false
    */
-  fetchSuccess: function (meta) {
+  fetchSuccess (): any {
+    const meta: any = getMeta(this);
     const fetchData = meta.fetch;
     return (fetchData && fetchData.success) || false;
-  },
+  }
 
   /**
    * Return a fetch error result or false
    */
-  fetchError: function (meta) {
+  fetchError (): any {
+    const meta: any = getMeta(this);
     const fetchData = meta.fetch;
     return (fetchData && fetchData.error) || false;
-  },
+  }
 
   /**
    * Return a boolean indicating if a model fetch is currently in progress
    * @param {string} id: optinal identifier to see if a specific action is currently in progress
    * @paramm {string} actionId: action id to only return true if a specific action was performed
    */
-  isActionPending: function (meta, actionId) {
+  isActionPending (actionId: any): any {
     verifyActionId(actionId);
+    const meta: any = getMeta(this);
     const actionData = meta.actions && meta.actions[actionId];
     return (actionData && actionData.pending && actionData) || false;
-  },
+  }
 
   /**
    * If an action was performed and successful, return { success, error, pending }.  `success` and `error` will be mutually exclusive and will
    * represent the XHR response payload
    * @paramm {string} actionId: action id to only return true if a specific action was performed
    */
-  wasActionPerformed: function (meta, actionId) {
+  wasActionPerformed (actionId: any): any {
     verifyActionId(actionId);
+    const meta: any = getMeta(this);
     const actionData = meta.actions;
     return (actionData && actionData[actionId]) || false;
-  },
+  }
 
   /**
    * If an action was performed and is an in error state, return the error response
    * @paramm {string} actionId: action id to only return true if a specific action was performed
    */
-  actionError: function (meta, actionId) {
+  actionError (actionId: any): any {
     verifyActionId(actionId);
+    const meta: any = getMeta(this);
     const actionData = meta.actions;
     return (actionData && actionData[actionId] && actionData[actionId].error) || false;
-  },
+  }
 
   /**
    * If an action was performed and is in success state, return the success response
    * @paramm {string} actionId: action id to only return true if a specific action was performed
    */
-  actionSuccess: function (meta, actionId) {
+  actionSuccess (actionId: any): any {
     verifyActionId(actionId);
+    const meta: any = getMeta(this);
     const actionData = meta.actions;
     return (actionData && actionData[actionId] && actionData[actionId].success) || false;
-  },
+  }
 
   /**
    * Return the number of milis since the last fetch completion (success or error)
    */
-  timeSinceFetch: function (meta, currentTime) {
+  timeSinceFetch (currentTime?: number): number {
+    const meta: any = getMeta(this);
     const fetchTime = (meta.fetch && meta.fetch.completedAt);
     return fetchTime ? (currentTime || new Date().getTime()) - fetchTime : -1;
   }
-};
+}
 
-/**
- * Include all defined functions to be included as instance functions as well as static
- * functions that accept `meta` as the 1st parameter
- */
-Object.keys(functions).forEach((functionName) => {
-  const func = functions[functionName];
-  function exec (isModelObject?: boolean) {
-    return function () {
-      if (isModelObject) {
-        const meta = this._meta;
-        if (arguments.length == 0) {
-          return func.call(this, meta);
-        } else if (arguments.length === 1) {
-          // we know we don't have any of these methods with more than 1 arg
-          return func.call(this, meta, arguments[0]);
-        }
-      } else {
-        return func.apply(this, arguments);
-      }
-    };
+// allow the following to have static accessors
+[
+  'data', 'wasFetched', 'canBeFetched', 'isFetchPending', 'fetchSuccess', 'fetchError', 'isActionPending',
+  'wasActionPerformed', 'actionError', 'actionSuccess', 'timeSinceFetch'
+].forEach(function (key) {
+  const func = Model.prototype[key];
+  Model[key] = function({...args}) {
+    const meta = args[0];
+    args.splice(0, 1);
+    func.apply({ __static: { meta }}, args);
   }
-  Model.prototype[functionName] = exec(true);
-  Model[functionName] = exec();
 });
 
 /**
@@ -276,4 +275,8 @@ function verifyActionId (actionId) {
   if (!actionId) {
     throw new Error('action id must be provided');
   }
+}
+
+function getMeta (context) {
+  return context._meta || context.__static ? context.__static.meta : undefined;
 }
