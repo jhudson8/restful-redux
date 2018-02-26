@@ -160,7 +160,7 @@ export connect(mapStateToProps, mapDispatchToProps)(
     denormalize: denormalize,
     schema: productCollectionSchema
     // below is what will replace the product values with Model objects that give you access to product level XHR status
-    arrayEntrySchema: productSchema
+    arrayEntrySchema: productSchema // normalizr schema for individual objects in the collection
   })(UserProfileComponent);
 )
 ```

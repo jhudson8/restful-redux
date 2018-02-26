@@ -14,13 +14,26 @@ export interface ModelConstructorOptions {
 
 export type Formatter = (data: any) => any;
 
-export interface FetchOptions {
-  id?: any;
-  actionId?: any;
+export interface FetchActionOptions {
+  id: any;
   url: string;
   params?: object;
-  formatter(payload: any, options?: any);
-  schema: any;
+  formatter?(payload: any, options?: any);
+  schema?: any;
+  replaceModel?: boolean;
+  bubbleUp?: boolean;
+  successAction?: any;
+  errorAction?: any;
+  clearAfter?: boolean;
+}
+
+export interface ActionOptions {
+  id: any;
+  actionId: any;
+  url: string;
+  params?: object;
+  formatter?(payload: any, options?: any);
+  schema?: any;
   replaceModel?: boolean;
   bubbleUp?: boolean;
   successAction?: any;
@@ -40,12 +53,12 @@ export interface ActionCreator {
   createModelDataAction(id: any, data?: any);
   createLocalPutAction(id: any, data: any);
   createLocalDeleteAction(id: any);
-  createFetchAction(options: FetchOptions);
-  createGetAction(options: FetchOptions);
-  createPatchction(options: FetchOptions);
-  createPostAction(options: FetchOptions);
-  createPutAction(options: FetchOptions);
-  createDeleteAction(options: FetchOptions);
+  createFetchAction(options: FetchActionOptions);
+  createGetAction(options: ActionOptions);
+  createPatchction(options: ActionOptions);
+  createPostAction(options: ActionOptions);
+  createPutAction(options: ActionOptions);
+  createDeleteAction(options: ActionOptions);
 }
 
 export interface BeforeAfterReduceParam {
@@ -75,14 +88,16 @@ export interface ModelProviderModelOptions {
   modelClass?: any;
   fetchOptions?: any;
   forceFetch?: any; // true to always fetch or function(...) to determine if model should be fetched
+  arrayEntrySchema?: any; // normalizr schema for individual objects in the collection
+  denormalize?: any; // normalizr `denormalize` function
 }
 
 export interface ModelProviderOptions {
-  debug: boolean;
+  debug?: boolean;
   model?: ModelProviderModelOptions,
   models?: Array<ModelProviderModelOptions>;
   entitiesProp?: string; // the React component `props` name use dto access the `entities` data
-  onIdChange(newId: any, prevId: any, props: any);
+  onIdChange?(newId: any, prevId: any, props: any);
 }
 
 export type ModelProviderResponse = (element: JSX.Element) => any;
