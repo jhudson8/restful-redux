@@ -241,7 +241,7 @@ describe('model-provider', function () {
       expect(fetch.callCount).to.eql(2);
     });
 
-    it('should trigger fetch or allow forceFetch if a fetch is pending', function () {
+    it('should not trigger fetch or allow forceFetch if a fetch is pending', function () {
       const fetch = sinon.spy();
       const forceFetch = sinon.spy();
       const ComponentForceFetch = modelProvider({
@@ -260,7 +260,8 @@ describe('model-provider', function () {
             foo: {
               '1': {
                 fetch: {
-                  pending: true
+                  pending: true,
+                  initiatedAt: 12345
                 }
               }
             }

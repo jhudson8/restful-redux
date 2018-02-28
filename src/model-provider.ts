@@ -77,7 +77,7 @@ export default function modelProvider (options: ModelProviderOptions): ModelProv
               id: id,
               entities: props[entitiesProp]
             });
-            const model = (<any> Model).fromCache(modelOptions, modelCache);
+            const model = Model.fromCache(modelOptions, modelCache);
             const isFetchPending = model && model.isFetchPending();
             const isFetchError = model && model.fetchError();
             const value = model && model.value();
@@ -92,7 +92,27 @@ export default function modelProvider (options: ModelProviderOptions): ModelProv
                 log(`fetching model data using "${options.fetchProp}" with id value ${id}`);
               }
 
-              (<any> Model).clearCache(prevId, options.entityType, modelCache);
+              Model.clearCache(prevId, options.entityType, modelCache);
+              if (id !== undefined && options.entityType) {
+                // seed our state so a model will show up in the props
+                const meta = modelCache._meta = modelCache._meta || {};
+                const entities = meta[options.entityType] = meta[options.entityType] || {};
+                entities[id] = {
+                  fetch: {
+                    pending: true
+                  }
+                };
+              }
+              new Model({
+                id: null,
+                entityType: options.entityType,
+                meta: options.fetchProp ? {
+                  fetch: {
+                    pending: true
+                  }
+                } : undefined
+              });
+
               fetchModel(id, props, options);
               state.fetched[index] = id;
             } else if (debug) {
@@ -210,7 +230,7 @@ export default function modelProvider (options: ModelProviderOptions): ModelProv
             entities: props[entitiesProp]
           });
           // reuse the same model object if we can
-          let model = (<any> Model).fromCache(modelOptions, modelCache);
+          let model = Model.fromCache(modelOptions, modelCache);
           setPropValue(props, options.idPropName, id);
           setPropValue(props, options.propName, model);
         }

@@ -222,9 +222,9 @@ describe('model', function () {
   });
 
   describe('wasFetched', function () {
-    it('should return "set" if the model exists with no meta value', function () {
+    it('should return true if the model exists with no meta value', function () {
       var model = new Model(options(noMetaEntities, true));
-      expect(model.wasFetched()).to.deep.equal('set');
+      expect(model.wasFetched()).to.equal(true);
     });
 
     it('should return the meta "fetched" if exists', function () {
@@ -244,18 +244,18 @@ describe('model', function () {
       expect(model.isFetchPending()).to.equal(12345);
     });
 
-    it('should return false if a fetch is not pending', function () {
+    it('should return undefined if a fetch is not pending', function () {
       var model = new Model(options({ }));
-      expect(model.isFetchPending()).to.equal(false);
+      expect(model.isFetchPending()).to.equal(undefined);
     });
 
     it('should not fail if no model is provided', function () {
       var model = new Model(options({ }, true));
-      expect(model.isFetchPending()).to.equal(false);
+      expect(model.isFetchPending()).to.equal(undefined);
     });
 
     it('Model.isFetchPending', function () {
-      expect(Model.isFetchPending({ })).to.equal(false);
+      expect(Model.isFetchPending({ })).to.equal(undefined);
     });
   });
 
@@ -301,27 +301,27 @@ describe('model', function () {
   describe('isActionPending', function () {
     it('should return details if any action is pending', function () {
       var model = new Model(options({ actions: { foo: { pending: true, initiatedAt: 12345 } } }));
-      expect(model.isActionPending('foo')).to.deep.equal({ pending: true, initiatedAt: 12345 });
+      expect(model.isActionPending('foo')).to.equal(12345);
     });
 
-    it('should return false if a different action is pending', function () {
+    it('should return undefined if a different action is pending', function () {
       var model = new Model(options({ actions: { foo: { pending: true, initiatedAt: 12345 } } }));
-      expect(model.isActionPending('bar')).to.equal(false);
+      expect(model.isActionPending('bar')).to.equal(undefined);
     });
 
-    it('should return false if an action is not pending', function () {
+    it('should return undefined if an action is not pending', function () {
       var model = new Model(options({ }));
-      expect(model.isActionPending('foo')).to.equal(false);
+      expect(model.isActionPending('foo')).to.equal(undefined);
     });
 
     it('should not fail if no model is provided', function () {
       var model = new Model(options({ }, true));
-      expect(model.isActionPending('foo')).to.equal(false);
+      expect(model.isActionPending('foo')).to.equal(undefined);
     });
 
     it('Model.isActionPending', function () {
       expect(Model.isActionPending({ actions: { foo: { pending: true, initiatedAt: 12345 } } }, 'foo'))
-      .to.deep.equal({ pending: true, initiatedAt: 12345 });
+      .to.deep.equal(12345);
     });
   });
 
@@ -342,14 +342,14 @@ describe('model', function () {
       expect(model.wasActionPerformed('foo')).to.deep.equal({ error: { foo: 'bar'}, completedAt: 12345 });
     });
 
-    it('should return false if a different action was performed', function () {
+    it('should return undefined if a different action was performed', function () {
       var model = new Model(options({ actions: { foo: { error: { foo: 'bar'}, completedAt: 12345 } } }));
-      expect(model.wasActionPerformed('bar')).to.equal(false);
+      expect(model.wasActionPerformed('bar')).to.equal(undefined);
     });
 
-    it('should return false if an action was not performed', function () {
+    it('should return undefined if an action was not performed', function () {
       var model = new Model(options({ }));
-      expect(model.wasActionPerformed('foo')).to.equal(false);
+      expect(model.wasActionPerformed('foo')).to.equal(undefined);
     });
 
     it('Model.wasActionPerformed', function () {
@@ -364,14 +364,14 @@ describe('model', function () {
       expect(model.actionError('foo')).to.deep.equal({ foo: 'bar'});
     });
 
-    it('should return false if the action is pending', function () {
+    it('should return null if the action is pending', function () {
       var model = new Model(options({ actions: { foo: { pending: true, initiatedAt: 12345 } } }));
-      expect(model.actionError('foo')).to.deep.equal(false);
+      expect(model.actionError('foo')).to.deep.equal(null);
     });
 
-    it('should return false if the action is in success state', function () {
+    it('should return null if the action is in success state', function () {
       var model = new Model(options({ actions: { foo: { success: { abc: 'def' }, completedAt: 12345 } } }));
-      expect(model.actionError('foo')).to.deep.equal(false);
+      expect(model.actionError('foo')).to.deep.equal(null);
     });
   });
 
@@ -381,14 +381,14 @@ describe('model', function () {
       expect(model.actionSuccess('foo')).to.deep.equal({ foo: 'bar'});
     });
 
-    it('should return false if the action is pending', function () {
+    it('should return null if the action is pending', function () {
       var model = new Model(options({ actions: { foo: { pending: true, initiatedAt: 12345 } } }));
-      expect(model.actionSuccess('foo')).to.deep.equal(false);
+      expect(model.actionSuccess('foo')).to.deep.equal(null);
     });
 
-    it('should return false if the action is in error state', function () {
+    it('should return null if the action is in error state', function () {
       var model = new Model(options({ actions: { foo: { error: { abc: 'def' }, completedAt: 12345 } } }));
-      expect(model.actionSuccess('foo')).to.deep.equal(false);
+      expect(model.actionSuccess('foo')).to.deep.equal(null);
     });
   });
 });

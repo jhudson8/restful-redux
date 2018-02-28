@@ -1,3 +1,7 @@
+import {
+  ModelCacheOptions,
+  ActionPerformResponse
+} from './types';
 /**
  * Return the model specific utility object
  * @param {object} modelOrDomain: the model object or entityType state object (if model `id` is provided)
@@ -18,8 +22,8 @@ export default class Model {
       entities = entities.entities || entities;
     }
 
-    const value: any = deepValue(entities, [entityType, id]);
-    const meta: any = deepValue(entities, ['_meta', entityType, id]);
+    const value: any = options.value || deepValue(entities, [entityType, id]);
+    const meta: any = options.meta || deepValue(entities, ['_meta', entityType, id]);
 
     (<any> this).id = id;
     (<any> this)._entities = entities;
@@ -83,11 +87,11 @@ export default class Model {
   /**
    * Return truthy if the model has been fetched (`fetched` if fetched and `set` if used with constructor to set value)
    */
-  wasFetched (): any {
+  wasFetched (): boolean {
     const meta: any = getMeta(this);
-    let rtn = meta.fetch && meta.fetch.success;
+    let rtn = !!meta.fetch && meta.fetch.success;
     if (!rtn && typeof this.value === 'function' && this.value()) {
-      rtn = 'set';
+      rtn = true;
     }
     return rtn;
   }
@@ -111,12 +115,12 @@ export default class Model {
   }
 
   /**
-   * Return a boolean indicating if a model fetch is currently in progress
+   * Return a truthy (timestamp of when the fetch was initiated) if a fetch is pending
    */
-  isFetchPending (): any {
+  isFetchPending (): number {
     const meta: any = getMeta(this);
     const fetchData = meta.fetch;
-    return fetchData && fetchData.pending && (fetchData.initiatedAt || true) || false;
+    return fetchData && fetchData.pending && fetchData.initiatedAt;
   }
 
   /**
@@ -138,15 +142,15 @@ export default class Model {
   }
 
   /**
-   * Return a boolean indicating if a model fetch is currently in progress
+   * Return a truthy (timestamp of action initiation) if the action is pending
    * @param {string} id: optinal identifier to see if a specific action is currently in progress
-   * @paramm {string} actionId: action id to only return true if a specific action was performed
+   * @paramm {string} actionId: action id
    */
-  isActionPending (actionId: any): any {
+  isActionPending (actionId: any): number {
     verifyActionId(actionId);
     const meta: any = getMeta(this);
     const actionData = meta.actions && meta.actions[actionId];
-    return (actionData && actionData.pending && actionData) || false;
+    return actionData && actionData.pending && actionData.initiatedAt;
   }
 
   /**
@@ -154,33 +158,35 @@ export default class Model {
    * represent the XHR response payload
    * @paramm {string} actionId: action id to only return true if a specific action was performed
    */
-  wasActionPerformed (actionId: any): any {
+  wasActionPerformed (actionId: any): ActionPerformResponse {
     verifyActionId(actionId);
     const meta: any = getMeta(this);
     const actionData = meta.actions;
-    return (actionData && actionData[actionId]) || false;
+    return actionData && actionData[actionId];
   }
 
   /**
    * If an action was performed and is an in error state, return the error response
    * @paramm {string} actionId: action id to only return true if a specific action was performed
+   * @returns the error response payload
    */
   actionError (actionId: any): any {
     verifyActionId(actionId);
     const meta: any = getMeta(this);
     const actionData = meta.actions;
-    return (actionData && actionData[actionId] && actionData[actionId].error) || false;
+    return (actionData && actionData[actionId] && actionData[actionId].error) || null;
   }
 
   /**
    * If an action was performed and is in success state, return the success response
    * @paramm {string} actionId: action id to only return true if a specific action was performed
+   * @returns the success response payload or true if the response was a success
    */
   actionSuccess (actionId: any): any {
     verifyActionId(actionId);
     const meta: any = getMeta(this);
     const actionData = meta.actions;
-    return (actionData && actionData[actionId] && actionData[actionId].success) || false;
+    return (actionData && actionData[actionId] && actionData[actionId].success) || null;
   }
 
   /**
@@ -190,6 +196,61 @@ export default class Model {
     const meta: any = getMeta(this);
     const fetchTime = (meta.fetch && meta.fetch.completedAt);
     return fetchTime ? (currentTime || new Date().getTime()) - fetchTime : -1;
+  }
+
+  /**
+   * Return a model from the cache object and create one if one does not exist
+   */
+  static fromCache (options: ModelCacheOptions, cache?: any) {
+    if (!cache) {
+      return null;
+    }
+
+    const id = determineId(options.id);
+    const entityType = options.entityType;
+    const ModelClass = options.modelClass || Model;
+    let entities = options.entities || {};
+    // allow for root state to be provided
+    entities = entities.entities || entities;
+    const cachedEntities = cache[entityType] = cache[entityType] || {};
+    const cachedMeta = cache._meta = cache._meta || {};
+    const cachedModels = cachedEntities.__models = cachedEntities.__models || {};
+
+    let cachedModel = cachedModels[id];
+    const cachedData = getMetaAndValue(id, cache, entityType);
+    const checkData = getMetaAndValue(id, entities, entityType);
+    if (!cachedModel || cachedData.meta !== checkData.meta || cachedData.value !== checkData.value) {
+      // we need to cache and return a new model
+      cachedEntities[id] = checkData.value;
+      const cachedMetaEntity = cachedMeta[entityType] = cachedMeta[entityType] || {};
+      cachedMetaEntity[id] = checkData.meta;
+      cachedModel = new ModelClass(options);
+      cachedModels[id] = cachedModel;
+    }
+    return cachedModel;
+  }
+
+  /**
+   * Clear the model referred to by the entity type and id from the cache
+   */
+  static clearCache (id: any, entityType: string, cache?: any) {
+    if (!cache) {
+      return;
+    }
+
+    id = determineId(id);
+    var metaTypes = deepValue(cache, ['_meta', entityType]);
+    if (metaTypes) {
+      delete metaTypes[id];
+    }
+    const entityTypes = cache[entityType];
+    if (entityTypes) {
+      delete entityTypes[id];
+    }
+    const models = deepValue(cache, [entityType, '__models']);
+    if (models) {
+      delete models[id];
+    }
   }
 }
 
@@ -205,53 +266,6 @@ export default class Model {
     return func.apply({ __static: { meta }}, args);
   }
 });
-
-/**
- * Return a model from the cache object and create one if one does not exist
- */
-(<any> Model).fromCache = function (options, cache) {
-  const id = determineId(options.id);
-  const entityType = options.entityType;
-  const ModelClass = options.modelClass || Model;
-  let entities = options.entities || {};
-  // allow for root state to be provided
-  entities = entities.entities || entities;
-  const cachedEntities = cache[entityType] = cache[entityType] || {};
-  const cachedMeta = cache._meta = cache._meta || {};
-  const cachedModels = cachedEntities.__models = cachedEntities.__models || {};
-
-  let cachedModel = cachedModels[id];
-  const cachedData = getMetaAndValue(id, cache, entityType);
-  const checkData = getMetaAndValue(id, entities, entityType);
-  if (!cachedModel || cachedData.meta !== checkData.meta || cachedData.value !== checkData.value) {
-    // we need to cache and return a new model
-    cachedEntities[id] = checkData.value;
-    const cachedMetaEntity = cachedMeta[entityType] = cachedMeta[entityType] || {};
-    cachedMetaEntity[id] = checkData.meta;
-    cachedModel = new ModelClass(options);
-    cachedModels[id] = cachedModel;
-  }
-  return cachedModel;
-};
-
-/**
- * Clear the model referred to by the entity type and id from the cache
- */
-(<any> Model).clearCache = function (id, entityType, cache) {
-  id = determineId(id);
-  var metaTypes = deepValue(cache, ['_meta', entityType]);
-  if (metaTypes) {
-    delete metaTypes[id];
-  }
-  const entityTypes = cache[entityType];
-  if (entityTypes) {
-    delete entityTypes[id];
-  }
-  const models = deepValue(cache, [entityType, '__models']);
-  if (models) {
-    delete models[id];
-  }
-};
 
 function determineId (id) {
   return id === false ? NO_ID : id;
