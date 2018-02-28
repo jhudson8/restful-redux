@@ -1,4 +1,7 @@
-## v6.0.0-rc.1
+## v6.0.1
+- small bug fix regard loading state with the model provider
+
+## v6.0.0
 - added typescript definitions
 - removed fuzzy constructors
   - Model constructor only accepts a [single options parameter](https://github.com/jhudson8/restful-redux/blob/031cd7ea3bedc0ee3d2709ddd00d27291ba426e7/src/types.ts#L7)

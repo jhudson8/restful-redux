@@ -95,24 +95,16 @@ export default function modelProvider (options: ModelProviderOptions): ModelProv
               Model.clearCache(prevId, options.entityType, modelCache);
               if (id !== undefined && options.entityType) {
                 // seed our state so a model will show up in the props
-                const meta = modelCache._meta = modelCache._meta || {};
+                modelOptions.entities = modelOptions.entities || {};
+                const meta = modelOptions.entities._meta = modelOptions.entities._meta || {};
                 const entities = meta[options.entityType] = meta[options.entityType] || {};
                 entities[id] = {
                   fetch: {
-                    pending: true
+                    pending: true,
+                    initiatedAt: new Date().getTime()
                   }
                 };
               }
-              new Model({
-                id: null,
-                entityType: options.entityType,
-                meta: options.fetchProp ? {
-                  fetch: {
-                    pending: true
-                  }
-                } : undefined
-              });
-
               fetchModel(id, props, options);
               state.fetched[index] = id;
             } else if (debug) {
