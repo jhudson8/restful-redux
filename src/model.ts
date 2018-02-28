@@ -117,10 +117,10 @@ export default class Model {
   /**
    * Return a truthy (timestamp of when the fetch was initiated) if a fetch is pending
    */
-  isFetchPending (): number {
+  isFetchPending (): boolean {
     const meta: any = getMeta(this);
     const fetchData = meta.fetch;
-    return fetchData && fetchData.pending && fetchData.initiatedAt;
+    return (fetchData && fetchData.pending) || false;
   }
 
   /**
@@ -146,11 +146,11 @@ export default class Model {
    * @param {string} id: optinal identifier to see if a specific action is currently in progress
    * @paramm {string} actionId: action id
    */
-  isActionPending (actionId: any): number {
+  isActionPending (actionId: any): boolean {
     verifyActionId(actionId);
     const meta: any = getMeta(this);
     const actionData = meta.actions && meta.actions[actionId];
-    return actionData && actionData.pending && actionData.initiatedAt;
+    return (actionData && actionData.pending) || false;
   }
 
   /**

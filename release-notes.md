@@ -1,4 +1,7 @@
 ## v6.0.1
+- use actual booleans rather than timestamps for isFetchPending/isActionPending to make unit tests easier
+
+## v6.0.1
 - small bug fix regard loading state with the model provider
 
 ## v6.0.0

@@ -200,6 +200,8 @@ describe('model-provider', function () {
       }));
       expect(fetch.callCount).to.eql(1);
 
+      // remove fetch pending state
+      delete entities._meta.foo['1'].fetch;
       component.setProps({
         id: '1',
         entities: entities,
@@ -232,6 +234,8 @@ describe('model-provider', function () {
       }));
       expect(fetch.callCount).to.eql(1);
 
+      // remove fetch pending state
+      delete entities._meta.foo['1'].fetch;
       component.setProps({
         id: '1',
         entities: entities,
