@@ -1,4 +1,7 @@
-## v6.0.1
+## v6.0.3
+- remove `entityType` as a required attribute of the Model constructor
+
+## v6.0.2
 - use actual booleans rather than timestamps for isFetchPending/isActionPending to make unit tests easier
 
 ## v6.0.1
