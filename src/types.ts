@@ -8,7 +8,7 @@ export interface ActionPerformResponse {
 export interface ModelConstructorOptions {
   id?: any; // model id
   entities?: any; // entities object (https://github.com/paularmstrong/normalizr/blob/master/docs/api.md#normalizedata-schema)
-  entityType: string; // normalized entity type key
+  entityType?: string; // normalized entity type key
   value?: any; // model value
   meta?: any; // any model meta content
 }
