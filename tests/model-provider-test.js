@@ -176,7 +176,7 @@ describe('model-provider', function () {
     });
   });
 
-  describe('forceFetch', function () {
+  describe ('forceFetch', function () {
     it('should trigger fetch even if id does not change (but only when mounted)', function () {
       const fetch = sinon.spy();
       const entities = {
@@ -200,8 +200,15 @@ describe('model-provider', function () {
       }));
       expect(fetch.callCount).to.eql(1);
 
-      // remove fetch pending state
-      delete entities._meta.foo['1'].fetch;
+      // now we'll put ourselves in a fetch complete state
+      entities._meta = {
+        foo: {
+          '1': {
+            fetch: { success: true }
+          }
+        }
+      };
+
       component.setProps({
         id: '1',
         entities: entities,
@@ -234,8 +241,15 @@ describe('model-provider', function () {
       }));
       expect(fetch.callCount).to.eql(1);
 
-      // remove fetch pending state
-      delete entities._meta.foo['1'].fetch;
+      // now we'll put ourselves in a fetch complete state
+      entities._meta = {
+        foo: {
+          '1': {
+            fetch: { success: true }
+          }
+        }
+      };
+
       component.setProps({
         id: '1',
         entities: entities,

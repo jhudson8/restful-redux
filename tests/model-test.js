@@ -227,13 +227,13 @@ describe('model', function () {
       expect(model.wasFetched()).to.equal(true);
     });
 
-    it('should return the meta "fetched" if exists', function () {
+    it('should return true if exists', function () {
       var model = new Model(options({ fetch: { success: 'fetched' } }));
-      expect(model.wasFetched()).to.equal('fetched');
+      expect(model.wasFetched()).to.equal(true);
     });
 
     it('Model.wasFetched', function () {
-      expect(Model.wasFetched({ fetch: { success: 'fetched' } })).to.equal('fetched');
+      expect(Model.wasFetched({ fetch: { success: 'fetched' } })).to.equal(true);
     });
   });
 

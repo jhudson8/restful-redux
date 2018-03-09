@@ -31,7 +31,6 @@ export default class Model {
     (<any> this)._options = options;
     (<any> this)._meta = meta || {};
     (<any> this)._meta_data = (<any> this)._meta.data || {};
-    (<any> this)._fetchedInfo = (<any> this)._meta.fetched ? (<any> this)._meta.fetched : (<any> this)._value ? { type: 'set' } : false;
   }
 
   meta (): any {
@@ -93,7 +92,7 @@ export default class Model {
     if (!rtn && typeof this.value === 'function' && this.value()) {
       rtn = true;
     }
-    return rtn;
+    return !!rtn;
   }
 
   /**
@@ -223,8 +222,13 @@ export default class Model {
       // we need to cache and return a new model
       cachedEntities[id] = checkData.value;
       const cachedMetaEntity = cachedMeta[entityType] = cachedMeta[entityType] || {};
-      cachedMetaEntity[id] = checkData.meta;
-      cachedModel = new ModelClass(options);
+      cachedMetaEntity[id] = checkData.meta || cachedMetaEntity[id];
+      cachedModel = new ModelClass({
+        id: id,
+        entityType: options.entityType,
+        entities: options.entities,
+        meta: cachedMetaEntity[id]
+      }); // joe
       cachedModels[id] = cachedModel;
     }
     return cachedModel;

@@ -1,3 +1,6 @@
+## v6.0.4
+- ensure that the model provider *always* sets a model as long as the id can be determined
+
 ## v6.0.3
 - remove `entityType` as a required attribute of the Model constructor
 

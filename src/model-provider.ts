@@ -95,8 +95,7 @@ export default function modelProvider (options: ModelProviderOptions): ModelProv
               Model.clearCache(prevId, options.entityType, modelCache);
               if (id !== undefined && options.entityType) {
                 // seed our state so a model will show up in the props
-                modelOptions.entities = modelOptions.entities || {};
-                const meta = modelOptions.entities._meta = modelOptions.entities._meta || {};
+                const meta = state.modelCache._meta = state.modelCache._meta || {};
                 const entities = meta[options.entityType] = meta[options.entityType] || {};
                 entities[id] = {
                   fetch: {
