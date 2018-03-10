@@ -11,6 +11,10 @@ export interface ModelConstructorOptions {
   entityType?: string; // normalized entity type key
   value?: any; // model value
   meta?: any; // any model meta content
+  schema?: any; // normalizr schema that should be used for this model
+  denormalize?: any; // denormalize function from the `normalizr` package
+  formatter?: (value: any | undefined, options: ModelConstructorOptions) => any;
+  arrayEntrySchema?: any; // normalizr schema if this model represents a collection of models that should be denormalized
 }
 export interface FormatterOptions {
   id?: any; // the model id

@@ -1,3 +1,6 @@
+## 6.0.5
+- add additional denormalize / colletion schema attributes to model constructor type definition
+
 ## v6.0.4
 - ensure that the model provider *always* sets a model as long as the id can be determined
 

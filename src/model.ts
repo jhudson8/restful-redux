@@ -12,9 +12,18 @@ import { ModelConstructorOptions } from './types';
 const NO_ID = '_noid_';
 
 export default class Model {
+  id: any;
+  private _value?: any;
+  private _meta?: any;
+  private _data?: any;
+  private formatted: any = false;
+  private entities?: any;
+  private options?: ModelConstructorOptions;
+  private formattedValue?: any;
+
   constructor (options: ModelConstructorOptions) {
     let entities = options.entities;
-    const id = determineId(options.id);
+    const id = this.id = determineId(options.id);
     const entityType = options.entityType;
 
     if (entities) {
@@ -25,62 +34,60 @@ export default class Model {
     const value: any = options.value || deepValue(entities, [entityType, id]);
     const meta: any = options.meta || deepValue(entities, ['_meta', entityType, id]);
 
-    (<any> this).id = id;
-    (<any> this)._entities = entities;
-    (<any> this)._value = value;
-    (<any> this)._options = options;
-    (<any> this)._meta = meta || {};
-    (<any> this)._meta_data = (<any> this)._meta.data || {};
+    this.entities = entities;
+    this._value = value;
+    this.options = options;
+    this._meta = meta || {};
+    this._data = this._meta.data || {};
   }
 
   meta (): any {
-    return (<any> this)._meta;
+    return this._meta;
   }
 
   /**
    * Return the (optionally formatted) model data
    */
   value (): any {
-    if (!(<any> this)._formattedValue) {
-      (<any> this)._formatted = true;
-      const options = (<any> this)._options;
-      if ((<any> this)._value && options.schema && options.denormalize) {
-        (<any> this)._formattedValue = options.denormalize(
-          (<any> this)._value,
+    if (!this.formatted) {
+      this.formatted = true;
+      const options = this.options;
+      if (this._value && options.schema && options.denormalize) {
+        this.formattedValue = options.denormalize(
+          this._value,
           options.schema,
-          (<any> this)._entities
+          this.entities
         );
       } else {
         const formatter = options.formatter;
-        (<any> this)._formattedValue = formatter
-          ? formatter(options)
-          : (<any> this)._value;
+        this.formattedValue = formatter
+          ? formatter(this._value, options)
+          : this._value;
       }
       let arrayEntrySchema = options.arrayEntrySchema;
       let ArrayEntryModel = Model;
-      if (arrayEntrySchema && (<any> this)._formattedValue) {
+      if (arrayEntrySchema && this.formattedValue) {
         if (arrayEntrySchema.model) {
           ArrayEntryModel = arrayEntrySchema.model || Model;
           arrayEntrySchema = arrayEntrySchema.schema;
         }
-        (<any> this)._formattedValue = (<any> this)._formattedValue.map((data) => {
+        this.formattedValue = this.formattedValue.map((data) => {
           return new ArrayEntryModel({
-            entities: (<any> this)._entities,
+            entities: this.entities,
             id: arrayEntrySchema.getId(data),
             entityType: arrayEntrySchema.key
           });
         });
       }
     }
-    return (<any> this)._formattedValue;
+    return this.formattedValue;
   }
 
   /**
    * Return metadata associated with this model
    */
   data (): any {
-    const meta: any = getMeta(this);
-    return meta ? meta.data : undefined;
+    return this._data;
   }
 
   /**
@@ -89,10 +96,10 @@ export default class Model {
   wasFetched (): boolean {
     const meta: any = getMeta(this);
     let rtn = !!meta.fetch && meta.fetch.success;
-    if (!rtn && typeof this.value === 'function' && this.value()) {
+    if (!rtn && this.value()) {
       rtn = true;
     }
-    return !!rtn;
+    return !!(rtn || this.value());
   }
 
   /**
@@ -101,7 +108,7 @@ export default class Model {
   canBeFetched (): boolean {
     const meta: any = getMeta(this);
     const fetchData = meta.fetch;
-    const hasValue = typeof this.value === 'function' && this.value();
+    const hasValue = typeof this._value === 'function' && this.value();
     if (fetchData) {
       if (fetchData.pending) {
         return false;

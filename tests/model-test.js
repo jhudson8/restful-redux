@@ -75,7 +75,7 @@ describe('model', function () {
     it('should return a new model if cache is empty and entities are empty', function () {
       var model = Model.fromCache({ id: '1', entityType: 'foo' }, {});
       expect(model.value()).to.equal(undefined);
-      expect(model.data()).to.equal(undefined);
+      expect(model.data()).to.deep.equal({});
     });
 
     it('should return the same model if cache is empty and entities are empty', function () {
@@ -223,7 +223,7 @@ describe('model', function () {
 
   describe('wasFetched', function () {
     it('should return true if the model exists with no meta value', function () {
-      var model = new Model(options(noMetaEntities, true));
+      var model = new Model(options(noMetaEntities));
       expect(model.wasFetched()).to.equal(true);
     });
 
