@@ -221,7 +221,9 @@ export default function modelProvider (options: ModelProviderOptions): ModelProv
           });
           // reuse the same model object if we can
           let model = Model.fromCache(modelOptions, modelCache);
-          setPropValue(props, options.idPropName, id);
+          if (options.idPropName) {
+            setPropValue(props, options.idPropName, id);
+          }
           setPropValue(props, options.propName, model);
         }
       });
@@ -251,7 +253,7 @@ function organizeProps (options: ModelProviderModelOptions): ModelProviderModelO
     id: id === false ? NO_ID : ((typeof id === 'string') ? id.split('.') : id),
     entityType: options.entityType,
     propName: (options.propName || 'model').split('.'),
-    idPropName: (options.idPropName || 'id').split('.'),
+    idPropName: options.idPropName ? options.idPropName.split('.') : undefined,
     fetchProp: options.fetchProp,
     modelClass: options.modelClass || Model,
     fetchOptions: typeof options.fetchOptions === 'object' ? assign({}, options.fetchOptions) : options.fetchOptions
