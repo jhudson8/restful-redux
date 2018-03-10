@@ -97,11 +97,11 @@ export default function modelProvider (options: ModelProviderOptions): ModelProv
                 // seed our state so a model will show up in the props
                 const meta = state.modelCache._meta = state.modelCache._meta || {};
                 const entities = meta[options.entityType] = meta[options.entityType] || {};
-                entities[id] = {
+                entities[id] = assign({}, entities[id], {
                   fetch: {
                     pending: true
                   }
-                };
+                });
               }
               fetchModel(id, props, options);
               state.fetched[index] = id;
