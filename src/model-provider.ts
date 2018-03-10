@@ -99,8 +99,7 @@ export default function modelProvider (options: ModelProviderOptions): ModelProv
                 const entities = meta[options.entityType] = meta[options.entityType] || {};
                 entities[id] = {
                   fetch: {
-                    pending: true,
-                    initiatedAt: new Date().getTime()
+                    pending: true
                   }
                 };
               }
