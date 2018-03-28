@@ -1,3 +1,7 @@
+## 6.1.0
+- add better logging debugging to model provider
+- suport nested fetch property (not that I think anyone is ever going to use this)
+
 ## 6.0.5
 - add additional denormalize / colletion schema attributes to model constructor type definition
 

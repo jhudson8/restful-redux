@@ -49,22 +49,14 @@ export default function modelProvider (options: ModelProviderOptions): ModelProv
     }
   });
 
-  function getModelId (props, options: any) {
-    const id = options.id;
-    if (id === false || id === NO_ID) {
-      return NO_ID;
-    } else if (typeof id === 'function') {
-      return id(props);
-    } else if (id) {
-      return deepPropValue(id, props);
-    }
-  }
-
   function maybeFetchModels (props, prevProps) {
     const self: any = this;
     const state = self.state;
     _models.forEach((options: ModelProviderModelOptions, index: number) => {
-      if (options.fetchProp && !props[options.propName || 'model']) {
+      // see if the model has been set already
+      const model = getPropValue(options.propName, props);
+      const fetchFunction = getPropValue(options.fetchProp, props);
+      if (fetchFunction && !model) {
         const id = getModelId(props, options);
         if (id) {
           const prevId = state.fetched[index];
@@ -89,7 +81,7 @@ export default function modelProvider (options: ModelProviderOptions): ModelProv
             }
             if (shouldFetch) {
               if (debug) {
-                log(`fetching model data using "${options.fetchProp}" with id value ${id}`);
+                log(`fetching model with id "${id}" data using "${options.fetchProp}"`);
               }
 
               Model.clearCache(prevId, options.entityType, modelCache);
@@ -107,14 +99,14 @@ export default function modelProvider (options: ModelProviderOptions): ModelProv
               state.fetched[index] = id;
             } else if (debug) {
               if (isDifferentId) {
-                log(`not fetching model using "${options.fetchProp}"; id changed from ${prevId} to ${id} but data exists in state`);
+                log(`not fetching model "${options.propName}"; id changed from ${prevId} to ${id} but data exists in state`);
               }
             }
           } else if (debug) {
-            log(`not fetching model using "${options.fetchProp}" because id value has not changed from ${id}`);
+            log(`not fetching model "${options.propName}" because id value has not changed from ${id}`);
           }
         } else if (debug) {
-          log(`not fetching model using "${options.fetchProp}" for ${id} because no change in id value`);
+          log(`not fetching model "${options.propName}" because the id "${id}" was not found in props`, props);
         }
       }
     });
@@ -128,7 +120,7 @@ export default function modelProvider (options: ModelProviderOptions): ModelProv
     } else if (fetchOptionsDef) {
       for (var key in fetchOptionsDef) {
         if (fetchOptionsDef.hasOwnProperty(key)) {
-          fetchOptions[key] = deepPropValue(fetchOptionsDef[key], props);
+          fetchOptions[key] = getPropValue(fetchOptionsDef[key], props);
         }
       }
     }
@@ -232,6 +224,25 @@ export default function modelProvider (options: ModelProviderOptions): ModelProv
   };
 }
 
+function getModelId (props, options: any) {
+  const id = options.id;
+  if (id === false || id === NO_ID) {
+    return NO_ID;
+  } else {
+    return getPropValue(id, props);
+  }
+}
+
+function getPropValue (keyParts, parent) {
+  if (typeof keyParts === 'undefined') {
+    return undefined
+  } else if (typeof keyParts === 'function') {
+    return keyParts(parent);
+  } else if (Array.isArray(keyParts)) {
+    return deepPropValue(keyParts, parent);
+  }
+}
+
 function setPropValue (parent, keyParts, value) {
   for (var i = 0; i < keyParts.length; i++) {
     var key = keyParts[i];
@@ -249,13 +260,17 @@ function setPropValue (parent, keyParts, value) {
 function organizeProps (options: ModelProviderModelOptions): ModelProviderModelOptions {
   checkRequiredOptions(['id', 'entityType'], options);
   const id = options.id;
-  return assign({}, options, {
-    id: id === false ? NO_ID : ((typeof id === 'string') ? id.split('.') : id),
+  const rtn = assign({}, options, {
+    id: id === false ? NO_ID : typeof id === 'string' ? id.split('.') : id,
     entityType: options.entityType,
     propName: (options.propName || 'model').split('.'),
     idPropName: options.idPropName ? options.idPropName.split('.') : undefined,
-    fetchProp: options.fetchProp,
+    fetchProp: options.fetchProp ? options.fetchProp.split('.') : undefined,
     modelClass: options.modelClass || Model,
     fetchOptions: typeof options.fetchOptions === 'object' ? assign({}, options.fetchOptions) : options.fetchOptions
   });
+  if (rtn.id) {
+    console.warn('id prop *must* be provided to model provider');
+  }
+  return rtn;
 }
